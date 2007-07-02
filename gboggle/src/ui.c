@@ -9,6 +9,7 @@
 #include "board_widget.h"
 #include "board.h"
 #include "boggle.h"
+#include "langconf.h"
 
 /*
  * constants
@@ -124,6 +125,13 @@ game_new_callback (GtkMenuItem *menu_item, gpointer user_data)
         gtk_entry_set_text (GTK_ENTRY (guess_entry), "");
     }
     start_game ();
+}
+
+static void
+preferences_callback (GtkMenuItem *menu_item, gpointer user_data)
+{
+    gtk_dialog_run (GTK_DIALOG (preferences_dialog));
+    gtk_widget_hide (preferences_dialog);
 }
 
 static gboolean
@@ -273,7 +281,7 @@ create_main_window (guint boardw, guint boardh)
 {
     GtkWidget *solutions_tree_view;
     GtkWidget *scrolled_history, *scrolled_solutions;
-    GtkWidget *menu_bar, *game_menu, *menu_item;
+    GtkWidget *menu_bar, *game_menu, *settings_menu, *menu_item;
 
     main_win = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title ( GTK_WINDOW (main_win), "gboggle");
@@ -315,6 +323,7 @@ create_main_window (guint boardw, guint boardh)
     /* menu */
     menu_bar = gtk_menu_bar_new ();
     game_menu = gtk_menu_new ();
+    settings_menu = gtk_menu_new ();
 
     /* Game/New */
     menu_item = gtk_menu_item_new_with_label ("New");
@@ -330,9 +339,23 @@ create_main_window (guint boardw, guint boardh)
                       G_CALLBACK (gtk_main_quit), NULL);
     gtk_widget_show (menu_item);
 
+    /* Game */
     menu_item = gtk_menu_item_new_with_label ("Game");
     gtk_menu_shell_append (GTK_MENU_SHELL (menu_bar), menu_item);
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (menu_item), game_menu);
+    gtk_widget_show (menu_item);
+    
+    /* Settings/Preferences */
+    menu_item = gtk_menu_item_new_with_label ("Preferences");
+    gtk_menu_shell_append (GTK_MENU_SHELL (settings_menu), menu_item);
+    g_signal_connect (G_OBJECT (menu_item), "activate",
+                      G_CALLBACK (preferences_callback), NULL);
+    gtk_widget_show (menu_item);
+
+    /* Settings */
+    menu_item = gtk_menu_item_new_with_label ("Settings");
+    gtk_menu_shell_append (GTK_MENU_SHELL (menu_bar), menu_item);
+    gtk_menu_item_set_submenu (GTK_MENU_ITEM (menu_item), settings_menu);
     gtk_widget_show (menu_item);
     
     gtk_box_pack_start (GTK_BOX (left_vbox), board_widget, FALSE, FALSE, VPAD);
@@ -370,6 +393,48 @@ create_main_window (guint boardw, guint boardh)
     /* guess_label and guess_entry remain invisible */
 
     gtk_editable_set_editable (GTK_EDITABLE (guess_entry), FALSE);
+}
+
+void
+create_preferences_dialog (GPtrArray *confs)
+{
+    GtkWidget *dialog;
+    GtkWidget *table;
+    GtkWidget *lang_label;
+    GtkWidget *lang_combo;
+    gint i;
+
+    dialog = gtk_dialog_new_with_buttons ("Preferences",
+                                          GTK_WINDOW (main_win),
+                                          GTK_DIALOG_MODAL |
+                                              GTK_DIALOG_DESTROY_WITH_PARENT,
+                                          GTK_STOCK_OK,
+                                          GTK_RESPONSE_OK,
+                                          GTK_STOCK_CANCEL,
+                                          GTK_RESPONSE_CANCEL,
+                                          NULL);
+    lang_label = gtk_label_new ("Language:");
+    lang_combo = gtk_combo_box_new_text ();
+    for (i = 0; i < confs->len; ++i)
+    {
+        struct langconf *conf = 
+            (struct langconf *) g_ptr_array_index (confs, 0);
+        
+        g_debug ("lang %d %s\n", i, conf->lang);
+        gtk_combo_box_append_text (GTK_COMBO_BOX (lang_combo), conf->lang);
+    }
+    gtk_combo_box_set_active (GTK_COMBO_BOX (lang_combo), 0);
+
+    table = gtk_table_new (2, 1, FALSE);
+    gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), table);
+    gtk_table_set_row_spacings (GTK_TABLE (table), 5);
+    gtk_table_set_col_spacings (GTK_TABLE (table), 5);
+    gtk_table_attach_defaults (GTK_TABLE (table), lang_label, 0, 1, 0, 1);
+    gtk_table_attach_defaults (GTK_TABLE (table), lang_combo, 1, 2, 0, 1);
+
+    gtk_widget_show_all (table);
+
+    preferences_dialog = dialog;
 }
 
 void

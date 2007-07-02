@@ -26,6 +26,7 @@ GtkWidget *guess_label, *time_label, *score_label;
 GtkWidget *guess_entry;
 GtkWidget *new_game_button;
 GtkWidget *history_tree_view;
+GtkWidget *preferences_dialog;
 
 GtkListStore *history_list_store, *solutions_list_store;
 
@@ -51,6 +52,9 @@ gulong guess_keypressed_id;
 void
 create_main_window (guint boardw,
                     guint boardh);
+
+void
+create_preferences_dialog (GPtrArray *confs);
 
 void
 init_game (GNode *trie,

@@ -67,6 +67,7 @@ read_langconf_from (gchar *filename)
     struct langconf *conf = NULL;
     enum parser_state state;
     GPtrArray *lang_conf;
+    gboolean error_occured = FALSE;
 
     fd = open (filename, O_RDONLY);
     if (fd < 0)
@@ -89,7 +90,7 @@ read_langconf_from (gchar *filename)
     {
         guint line = g_scanner_cur_line (scanner);
         /* guint pos = g_scanner_cur_position (scanner);*/
-        gboolean error_occured = FALSE;
+        error_occured = FALSE;
 
         if(state == PARSER_INIT || state == PARSER_LETTER)
         {
@@ -99,6 +100,7 @@ read_langconf_from (gchar *filename)
                 if (conf)
                 {
                     g_ptr_array_add (lang_conf, conf);
+                    g_debug ("lang %s added\n", conf->lang);
                 }
                 state = PARSER_LANG;
                 conf = g_new0 (struct langconf, 1);
@@ -178,34 +180,34 @@ read_langconf_from (gchar *filename)
                 state = PARSER_LETTER;
                 break;
         }
-
-        if (error_occured)
-        {
-            gint i;
-
-            for (i = 0; i < lang_conf->len; ++i)
-            {
-                struct langconf *c = 
-                    (struct langconf *)g_ptr_array_index (lang_conf, i);                
-                g_ptr_array_free (c->alphabet, TRUE);
-                g_free (c->weights);
-                g_free (c->dictf);
-                g_free (c->lang);
-            }
-            
-            g_ptr_array_free (lang_conf, TRUE);
-            return NULL;
-        }
-        else
-        {
-            if (conf)
-            {
-                g_ptr_array_add (lang_conf, conf);
-            }
-        }
-
-
     } /* for get_next_token */
-            
+
+    if (error_occured)
+    {
+        gint i;
+
+        for (i = 0; i < lang_conf->len; ++i)
+        {
+            struct langconf *c = 
+                (struct langconf *)g_ptr_array_index (lang_conf, i);                
+            g_ptr_array_free (c->alphabet, TRUE);
+            g_free (c->weights);
+            g_free (c->dictf);
+            g_free (c->lang);
+        }
+
+        g_ptr_array_free (lang_conf, TRUE);
+        return NULL;
+    }
+    else
+    {
+        if (conf)
+        {
+            g_ptr_array_add (lang_conf, conf);
+            g_debug ("lang %s added\n", conf->lang);
+        }
+    }
+
+           
     return lang_conf;
 }
