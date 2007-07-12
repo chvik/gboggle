@@ -130,8 +130,21 @@ game_new_callback (GtkMenuItem *menu_item, gpointer user_data)
 static void
 preferences_callback (GtkMenuItem *menu_item, gpointer user_data)
 {
+    gint l, oldl;
+    
+    oldl = gtk_combo_box_get_active (GTK_COMBO_BOX (lang_combo));
     gtk_dialog_run (GTK_DIALOG (preferences_dialog));
     gtk_widget_hide (preferences_dialog);
+    l = gtk_combo_box_get_active (GTK_COMBO_BOX (lang_combo));
+    g_debug ("lang %d selected\n", l);
+    if (l >= 0)
+    {
+        if (!set_language (l))
+        {
+            g_debug ("lang set to %d failed, revert to %d\n", l, oldl);
+            gtk_combo_box_set_active (GTK_COMBO_BOX (lang_combo), oldl);
+        }
+    }
 }
 
 static gboolean
@@ -401,7 +414,6 @@ create_preferences_dialog (GPtrArray *confs)
     GtkWidget *dialog;
     GtkWidget *table;
     GtkWidget *lang_label;
-    GtkWidget *lang_combo;
     gint i;
 
     dialog = gtk_dialog_new_with_buttons ("Preferences",
@@ -418,7 +430,7 @@ create_preferences_dialog (GPtrArray *confs)
     for (i = 0; i < confs->len; ++i)
     {
         struct langconf *conf = 
-            (struct langconf *) g_ptr_array_index (confs, 0);
+            (struct langconf *) g_ptr_array_index (confs, i);
         
         g_debug ("lang %d %s\n", i, conf->lang);
         gtk_combo_box_append_text (GTK_COMBO_BOX (lang_combo), conf->lang);
@@ -437,13 +449,33 @@ create_preferences_dialog (GPtrArray *confs)
     preferences_dialog = dialog;
 }
 
-void
-init_game (GNode *trie, const gchar * const *alph,
-           guint *wght)
+gboolean
+set_language (gint l)
 {
+    struct langconf *conf;
+    GNode *trie;
+    const gchar * const *alph;
+    
+    conf = (struct langconf *)g_ptr_array_index(langconfs, l);
+    alph = (const gchar * const *)conf->alphabet->pdata;
+    trie = g_node_new (NULL);
+    if(trie_load (trie, alph, conf->dictf) != 0)
+    {
+        g_printf ("%s: failed to open\n", conf->dictf);
+        return FALSE;
+    }
+
+    if (dictionary)
+        g_node_destroy(dictionary);
     dictionary = trie;
     alphabet = alph;
-    weights = wght;
+    weights = (guint *)conf->weights->data;
+    return TRUE;
+}
+
+void
+init_game ()
+{
     timer_tag = 0;
 }
 
@@ -461,6 +493,8 @@ start_game ()
                       alphabet, weights, dictionary);
     found_words = g_ptr_array_new ();
     guessed_words = g_ptr_array_new ();
+    score = 0;
+    gtk_label_set_text (GTK_LABEL (score_label), "");
 
     board_widget_init_with_board ( BOARD_WIDGET (board_widget), brd);
 
