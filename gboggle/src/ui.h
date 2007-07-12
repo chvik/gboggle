@@ -18,6 +18,7 @@ const gchar * const *alphabet;
 guint *weights;
 GNode *dictionary;
 board *brd;
+GPtrArray *langconfs;
 
 GtkWidget *main_win;
 GtkWidget *board_widget;
@@ -27,6 +28,7 @@ GtkWidget *guess_entry;
 GtkWidget *new_game_button;
 GtkWidget *history_tree_view;
 GtkWidget *preferences_dialog;
+GtkWidget *lang_combo;
 
 GtkListStore *history_list_store, *solutions_list_store;
 
@@ -56,10 +58,13 @@ create_main_window (guint boardw,
 void
 create_preferences_dialog (GPtrArray *confs);
 
+/* l: index in the lang_conf array
+ * returns FALSE if loading of the dictionary fails */
+gboolean
+set_language (gint l);
+
 void
-init_game (GNode *trie,
-           const gchar * const *alphabet, 
-           guint *weights);
+init_game ();
 
 void
 start_game ();
