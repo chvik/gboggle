@@ -180,6 +180,10 @@ read_langconf_from (gchar *filename)
                 state = PARSER_LETTER;
                 break;
         }
+
+        if (error_occured)
+            break;
+
     } /* for get_next_token */
 
     if (error_occured)

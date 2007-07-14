@@ -218,7 +218,7 @@ normalize_guess (const gchar *guess)
 {
     gchar *norm;
 
-    norm = g_utf8_strdown (g_utf8_normalize (guess, -1, G_NORMALIZE_ALL), -1);
+    norm = g_utf8_strdown (g_utf8_normalize (guess, -1, G_NORMALIZE_DEFAULT_COMPOSE), -1);
     return norm;
 }
 
@@ -276,7 +276,8 @@ find_str_on_board (GPtrArray *paths, const gchar *str, board *brd)
     
     g_assert (paths);
 
-    lower = g_utf8_strdown (g_utf8_normalize (str, -1, G_NORMALIZE_ALL),
+    lower = g_utf8_strdown (g_utf8_normalize (str, -1,
+                                              G_NORMALIZE_DEFAULT_COMPOSE),
                             -1);
     if (!lower[0])
         return not_in_board;
