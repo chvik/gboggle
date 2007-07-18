@@ -29,6 +29,7 @@ GtkWidget *new_game_button;
 GtkWidget *history_tree_view;
 GtkWidget *preferences_dialog;
 GtkWidget *lang_combo;
+GtkWidget *end_game_menu_item;
 
 GtkListStore *history_list_store, *solutions_list_store;
 

@@ -128,6 +128,12 @@ game_new_callback (GtkMenuItem *menu_item, gpointer user_data)
 }
 
 static void
+game_end_callback (GtkMenuItem *menu_item, gpointer user_data)
+{
+    stop_game ();
+}
+
+static void
 preferences_callback (GtkMenuItem *menu_item, gpointer user_data)
 {
     gint l, oldl;
@@ -339,11 +345,19 @@ create_main_window (guint boardw, guint boardh)
     settings_menu = gtk_menu_new ();
 
     /* Game/New */
-    menu_item = gtk_menu_item_new_with_label ("New");
+    menu_item = gtk_menu_item_new_with_label ("New game");
     gtk_menu_shell_append (GTK_MENU_SHELL (game_menu), menu_item);
     g_signal_connect (G_OBJECT (menu_item), "activate",
                       G_CALLBACK (game_new_callback), NULL);
     gtk_widget_show (menu_item);
+
+    /* Game/End */
+    end_game_menu_item = gtk_menu_item_new_with_label ("End game");
+    gtk_menu_shell_append (GTK_MENU_SHELL (game_menu), end_game_menu_item);
+    g_signal_connect (G_OBJECT (end_game_menu_item), "activate",
+                      G_CALLBACK (game_end_callback), NULL);
+    gtk_widget_set_sensitive (end_game_menu_item, FALSE);
+    gtk_widget_show (end_game_menu_item);
     
     /* Game/Exit */
     menu_item = gtk_menu_item_new_with_label ("Exit");
@@ -498,7 +512,7 @@ start_game ()
 
     board_widget_init_with_board ( BOARD_WIDGET (board_widget), brd);
 
-
+    gtk_widget_set_sensitive (end_game_menu_item, TRUE);
     gtk_widget_hide (new_game_button);
     gtk_widget_show (guess_label);
     gtk_widget_show (guess_entry);
@@ -526,11 +540,11 @@ stop_game ()
     gtk_widget_hide (guess_label);
     gtk_widget_hide (guess_entry);
     gtk_widget_show (new_game_button);
+    gtk_widget_set_sensitive (end_game_menu_item, FALSE);
+
     gtk_editable_set_editable (GTK_EDITABLE (guess_entry), FALSE);
-    
     g_signal_handler_disconnect (guess_entry, guess_changed_id);
     g_signal_handler_disconnect (guess_entry, guess_keypressed_id);
-
     gtk_entry_set_text (GTK_ENTRY (guess_entry), "");
 
     solutions = g_ptr_array_new ();
