@@ -25,5 +25,6 @@ AC_C_CONST
 AC_CHECK_FUNCS([pow])
 
 AC_CONFIG_FILES([Makefile
-                 src/Makefile])
+                 src/Makefile
+                 dict/Makefile])
 AC_OUTPUT
