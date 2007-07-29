@@ -52,11 +52,15 @@ letter
 gcharp2letter (const gchar * const *alphabet,
                const gchar *ch);
 
-/* returns newly allocated array of letters
+/* returns GPtrArray of newly allocated array of letters
  * returns NULL if str contains characters not contained by alphabet */
-letter *
+GPtrArray *
 str2letters (const gchar * const *alphabet,
              const gchar *str);
+letter *
+str2letters_ (const gchar * const *alphabet,
+             const gchar *str);
+
 
 
 /* returns zero terminated array, must be freed by the caller */

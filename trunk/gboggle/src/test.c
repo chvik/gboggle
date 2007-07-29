@@ -9,18 +9,6 @@
 #include "ui.h"
 #include "langconf.h"
 
-const gchar * const test_alphabet[] = { "a", "b", "c", "d", NULL };
-guint test_weights[] = { 1, 4, 2, 0 };
-const gchar * const en_alphabet[] = { "a", "b", "c", "d", "e", "f", "g", "h",
-    "i", "j", "k", "l", "m", "n", "o", "p", "qu", "r", "s", "t", "u", "v", "w",
-    "x", "y", "z", NULL };
-guint en_weights[] = { /*a*/ 8, 3, 3, 3, /*e*/ 10, 2, 3, 3,
-                       /*i*/ 7, 1, 2, /*l*/ 5, 3, 5, /*o*/ 6, /*p*/ 3,
-                       /*q*/ /*1*/ 5,
-                       /*r*/ 4, 5, 5, /*u*/ 4, 2, 2, 1, 3, 1 };
-
-#define DICTFILE "dict"
-
 /*
  * test functions
  */
@@ -87,11 +75,16 @@ print_path (board *brd, coord **path)
 int main(int argc, char **argv)
 {
     int i, j, k;
-    GPtrArray *sol;
     guess_st st;
+    GNode *trie;
+    GPtrArray *l;
 
-    g_printf (" hello " "bello\n");
-    read_langconf();
+    langconfs = read_langconf();
+    set_language (1);
+
+    l = str2letters (alphabet, "kacsa");
+    l = str2letters (alphabet, "hosszú");
+
 
     /*
     dictionary = g_node_new (NULL);

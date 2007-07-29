@@ -6,10 +6,27 @@
 #include <glib/gstdio.h>
 #include "boggle.h"
 
+/*
+ * Static declarations
+ */
+
 static guess_st
 depth_search (letter *guess, const board *brd, gint startx, gint starty,
               GPtrArray *solutions, const coord **path_prefix,
               GNode *trie_node, const gboolean *seen);
+
+static gint
+str_compare (gconstpointer a, gconstpointer b, gpointer data);
+
+static gboolean
+append_word (gpointer word, gpointer index, gpointer words);
+
+static gboolean
+append_index (gpointer word, gpointer index, gpointer sol_index);
+
+/*
+ * Definitions
+ */
 
 void
 trie_add (GNode *root, const gchar * const *alphabet, const letter *word)
@@ -34,6 +51,70 @@ trie_add (GNode *root, const gchar * const *alphabet, const letter *word)
     if (word[0])
         trie_add (child, alphabet, word + 1);
 }
+
+/* returns missing solutions in alphabetical order in words
+ * and their index of solutions in sol_index */
+void
+missing_solutions (GPtrArray **words, GArray **sol_index,
+                   board *brd, GPtrArray *solutions, GPtrArray *found_words)
+{
+    GTree *soltree;
+    gint i;
+
+    soltree = g_tree_new_full ((GCompareDataFunc)str_compare,
+                               NULL, NULL, NULL);
+    for (i = 0; i < solutions->len; ++i)
+    {
+        coord **path;
+        gchar *word;
+        gint len;
+        gint j;
+        
+        path = (coord **)g_ptr_array_index (solutions, i);
+        for (len = 0; path[len]; ++len);
+        word = g_new0 (gchar , len * 6 + 1);
+        /* utf8 wide chars cannot exceed 6 bytes */
+        for (j = 0; j < len; ++j)
+        {
+            const gchar *chp;
+            
+            chp = board_gcharp_at (brd, path[j]->x, path[j]->y);
+            strncat (word, chp, len * 6 - strlen (word));
+        }
+        if (!g_tree_lookup (soltree, (gconstpointer)word))
+        {
+            guint *index;
+
+            index = g_new (guint, 1);
+            *index = i;
+            g_tree_insert (soltree, (gpointer)word, (gpointer)index);
+        }
+    }
+
+    for (i = 0; i < found_words->len; ++i)
+    {
+        gchar *fw;
+        gpointer key, val;
+
+        fw = g_ptr_array_index (found_words, i);
+        if(g_tree_lookup_extended (soltree, (gconstpointer)fw,
+                                   &key, &val))
+        {
+            g_tree_remove (soltree, (gconstpointer)fw);
+            g_free (key);
+            g_free (val);
+        }
+    }
+
+    *words = g_ptr_array_new ();
+    *sol_index = g_array_new (FALSE, FALSE, sizeof (guint));
+    g_tree_foreach (soltree, (GTraverseFunc)append_word,
+                   (gpointer)*words);
+    g_tree_foreach (soltree, (GTraverseFunc)append_index,
+                    (gpointer)*sol_index);
+    g_tree_destroy (soltree);
+}
+
 
 guess_st
 search_solution (GPtrArray *solutions, letter *guess, const board *brd, 
@@ -226,9 +307,9 @@ guess_st
 process_guess (const gchar *guess, board *brd, GPtrArray *guessed_words,
                guint *word_val)
 {
-    letter *ltr;
     guess_st st;
     GPtrArray *solutions;
+    GPtrArray *letters_arr;
     gint i, len;
 
     if (g_utf8_strlen (guess, -1) < MIN_WORD_LENGTH)
@@ -246,24 +327,37 @@ process_guess (const gchar *guess, board *brd, GPtrArray *guessed_words,
 
     g_ptr_array_add (guessed_words, (gpointer)guess);
 
-    ltr = str2letters (brd->alphabet, guess);
-    if (!ltr)
+    letters_arr = str2letters (brd->alphabet, guess);
+    if (!letters_arr || letters_arr->len == 0)
         return not_in_board;
 
-    /* check lenght again because of multichar letters (eg. "qu") */
-    for (len = 0; ltr[len] && len < MIN_WORD_LENGTH; ++len);
-    if (len < MIN_WORD_LENGTH)
+    st = not_in_board;
+    for (i = 0; i < letters_arr->len; ++i)
     {
-        return too_short;
-    }
+        letter *ltr = g_ptr_array_index (letters_arr, i);
+        guess_st tmpst;
         
-    solutions = g_ptr_array_new ();
-    st = search_solution (solutions, ltr, brd, TRUE);
+        /* check length again because of multichar letters (eg. "qu") */
+        for (len = 0; ltr[len] && len < MIN_WORD_LENGTH; ++len);
+        if (len < MIN_WORD_LENGTH)
+        {
+            return too_short;
+        }
+        
+        solutions = g_ptr_array_new ();
+        tmpst = search_solution (solutions, ltr, brd, TRUE);
 
-    *word_val = 1; /* TODO */
-
+        if (tmpst == good_guess)
+        {
+            *word_val = 1; /* TODO */
+            return tmpst;
+        }
+        if (tmpst == not_in_dictionary)
+        {
+            st = tmpst;
+        }
+    }
     return st;
-       
 }
 
 
@@ -272,7 +366,9 @@ find_str_on_board (GPtrArray *paths, const gchar *str, board *brd)
 {
     gchar *lower;
     letter *ltr;
+    GPtrArray *ltr_arr;
     guess_st st;
+    gint i;
     
     g_assert (paths);
 
@@ -282,17 +378,21 @@ find_str_on_board (GPtrArray *paths, const gchar *str, board *brd)
     if (!lower[0])
         return not_in_board;
 
-    ltr = str2letters (brd->alphabet, lower);
+    ltr_arr = str2letters (brd->alphabet, lower);
     g_free (lower);
-    if (!ltr)
+    if (!ltr_arr || ltr_arr->len == 0)
         return not_in_board;
 
-    st = search_solution (paths, ltr, brd, FALSE);
-    g_assert (st != not_in_dictionary);
-    DEBUGSTM (g_printf ("search result: %d\n", st));
-
+    for (i = 0; i < ltr_arr->len; ++i)
+    {
+        ltr = g_ptr_array_index (ltr_arr, i);
+        st = search_solution (paths, ltr, brd, FALSE);
+        g_assert (st != not_in_dictionary);
+        DEBUGSTM (g_printf ("search result: %d\n", st));
+        if (st == good_guess)
+            return st;
+    }
     return st;
-       
 }
 
 #define BUFLENGTH 256
@@ -304,6 +404,7 @@ trie_load (GNode *root, const gchar * const *alphabet, const gchar *filename)
     char buf[BUFLENGTH];
     letter *letters;
     gint gcharlen, letterlen;
+    GPtrArray *letters_arr;
 
     dictf = g_fopen (filename, "r");
     if (!dictf)
@@ -311,6 +412,8 @@ trie_load (GNode *root, const gchar * const *alphabet, const gchar *filename)
 
     while (fgets (buf, BUFLENGTH - 1, dictf))
     {
+        gint i;
+
         gcharlen = strlen (buf);
         if (gcharlen == BUFLENGTH - 1 && buf[BUFLENGTH-2] != '\n')
         {
@@ -322,13 +425,21 @@ trie_load (GNode *root, const gchar * const *alphabet, const gchar *filename)
             /* remove newline from end */
             buf[gcharlen-1] = 0;
         }
-        if (!(letters = str2letters (alphabet, buf)))
+        letters_arr = str2letters (alphabet, buf);
+        if (!letters_arr || letters_arr->len == 0)
             continue;                       
-        for (letterlen = 0; letters[letterlen]; ++letterlen);
-        if (letterlen < MIN_WORD_LENGTH)
-            continue;
-        trie_add (root, alphabet, letters);
-        g_free (letters);
+        /* XXX
+         * put all possible letter decomposition into trie
+         */
+        for (i = 0; i < letters_arr->len; ++i)
+        {
+            letters = g_ptr_array_index (letters_arr, i);
+            for (letterlen = 0; letters[letterlen]; ++letterlen);
+            if (letterlen < MIN_WORD_LENGTH)
+                continue;
+            trie_add (root, alphabet, letters);
+        }
+        g_ptr_array_free (letters_arr, TRUE);
     }
 
     return 0;
@@ -342,4 +453,25 @@ solutions_dispose (GPtrArray *solutions)
     g_ptr_array_free (solutions, TRUE);
     /* XXX */
 }
+
+gint
+str_compare (gconstpointer a, gconstpointer b, gpointer data)
+{
+    return g_utf8_collate (a, b);
+}
+
+gboolean
+append_word (gpointer word, gpointer index, gpointer words)
+{
+    g_ptr_array_add (words, word);
+    return FALSE;
+}
+
+gboolean
+append_index (gpointer word, gpointer index, gpointer sol_index)
+{
+    g_array_append_val (sol_index, *(guint *)index);
+    return FALSE;
+}
+
 

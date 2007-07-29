@@ -37,6 +37,14 @@ search_solution (GPtrArray *solutions,
                 const board *brd, 
                 gboolean use_trie);
 
+/* returns unique list of missing words with their index in solutions */
+void
+missing_solutions (GPtrArray  **words,
+                   GArray     **sol_index,
+                   board       *brd,
+                   GPtrArray   *solutions,
+                   GPtrArray   *found_words);
+
 gchar *
 normalize_guess (const gchar *guess);
 
