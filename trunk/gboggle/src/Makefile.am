@@ -13,3 +13,6 @@ gboggle_LDADD = @PACKAGE_LIBS@
 
 #test_SOURCES = $(sources) test.c
 #test_LDADD = @PACKAGE_LIBS@
+
+gbogglerc: gbogglerc.in
+	sed s,'@DICTDIR@',@datadir@/dict, $< >$@
