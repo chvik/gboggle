@@ -491,6 +491,10 @@ void
 init_game ()
 {
     timer_tag = 0;
+    solutions = NULL;
+    found_words = NULL;
+    guessed_words = 0;
+    brd = NULL;
 }
 
 void
@@ -499,6 +503,7 @@ start_game ()
 
     board_dispose (brd);
     solutions_dispose (solutions);
+    solutions = NULL;
     /* XXX free ptrarrays */
     gtk_list_store_clear (history_list_store);
     gtk_list_store_clear (solutions_list_store);
@@ -533,9 +538,9 @@ void
 stop_game ()
 {
     guess_st st;
-    gchar *str;
     
     g_source_remove (timer_tag);
+    timer_tag = 0;
 
     gtk_widget_hide (guess_label);
     gtk_widget_hide (guess_entry);
@@ -549,12 +554,9 @@ stop_game ()
 
     solutions = g_ptr_array_new ();
     st = search_solution (solutions, NULL, brd, TRUE);
-    list_solutions (solutions, found_words);
-
-    str = g_strdup_printf ("Score: %d of %d", score, solutions->len);
-    gtk_label_set_text (GTK_LABEL (score_label), str);
-    g_free (str);
+    list_solutions_and_score (solutions, found_words);
 }
+
 
 void
 history_add (const gchar *word, guess_st st)
@@ -571,92 +573,17 @@ history_add (const gchar *word, guess_st st)
     g_free (path);
 }
 
-gint
-str_compare (gconstpointer a, gconstpointer b, gpointer data)
-{
-    return g_utf8_collate (a, b);
-}
-
-gboolean
-append_word (gpointer word, gpointer index, gpointer words)
-{
-    g_ptr_array_add (words, word);
-    return FALSE;
-}
-
-gboolean
-append_index (gpointer word, gpointer index, gpointer sol_index)
-{
-    g_array_append_val (sol_index, *(guint *)index);
-    return FALSE;
-}
-
-/* returns missing solutions in alphabetical order in words
- * and their index of solutions in sol_index */
-void
-missing_solutions (GPtrArray **words, GArray **sol_index,
-                   GPtrArray *solutions, GPtrArray *found_words)
-{
-    GTree *soltree;
-    gint i;
-
-    soltree = g_tree_new ((GCompareFunc)str_compare);    
-    for (i = 0; i < solutions->len; ++i)
-    {
-        coord **path;
-        gchar *word;
-        gint len;
-        gint j;
-        
-        path = (coord **)g_ptr_array_index (solutions, i);
-        for (len = 0; path[len]; ++len);
-        word = g_new0 (gchar , len * 6 + 1);
-        /* utf8 wide chars cannot exceed 6 bytes */
-        for (j = 0; j < len; ++j)
-        {
-            const gchar *chp;
-            
-            chp = board_gcharp_at (brd, path[j]->x, path[j]->y);
-            strncat (word, chp, len * 6 - strlen (word));
-        }
-        if (!g_tree_lookup (soltree, (gconstpointer)word))
-        {
-            guint *index;
-
-            index = g_new (guint, 1);
-            *index = i;
-            g_tree_insert (soltree, (gpointer)word, (gpointer)index);
-        }
-    }
-
-    for (i = 0; i < found_words->len; ++i)
-    {
-        gchar *fw;
-
-        fw = g_ptr_array_index (found_words, i);
-        if(g_tree_lookup (soltree, (gconstpointer)fw))
-        {
-            g_tree_remove (soltree, (gconstpointer)fw);
-        }
-    }
-
-    *words = g_ptr_array_new ();
-    *sol_index = g_array_new (FALSE, FALSE, sizeof (guint));
-    g_tree_foreach (soltree, (GTraverseFunc)append_word,
-                   (gpointer)*words);
-    g_tree_foreach (soltree, (GTraverseFunc)append_index,
-                    (gpointer)*sol_index);
-}
 
 void
-list_solutions (GPtrArray *solutions, GPtrArray *found_words)
+list_solutions_and_score (GPtrArray *solutions, GPtrArray *found_words)
 {
     GtkTreeIter iter;
     GPtrArray *words;
     GArray *sol_index;
     gint i;
+    gchar *str;
     
-    missing_solutions (&words, &sol_index, solutions, found_words);
+    missing_solutions (&words, &sol_index, brd, solutions, found_words);
     for (i = 0; i < words->len; ++i)
     {
         gtk_list_store_append (solutions_list_store, &iter);
@@ -664,9 +591,12 @@ list_solutions (GPtrArray *solutions, GPtrArray *found_words)
                             0, (gchar *)g_ptr_array_index (words, i),
                             1, g_array_index (sol_index, guint, i),
                             -1);
-        DEBUGSTM (g_printf ("%s added\n", 
-                            (gchar *)g_ptr_array_index (words, i)));
+        /*g_debug ("%s added", (gchar *)g_ptr_array_index (words, i));*/
     }
+
+    str = g_strdup_printf ("Score: %d of %d", score, words->len);
+    gtk_label_set_text (GTK_LABEL (score_label), str);
+    g_free (str);
 }
 
 void

@@ -78,8 +78,8 @@ history_add (const gchar *word,
              guess_st st); 
 
 void
-list_solutions (GPtrArray *solutions,
-                GPtrArray *found_words);
+list_solutions_and_score (GPtrArray *solutions,
+                          GPtrArray *found_words);
 
 void
 mark_path (coord **path);
