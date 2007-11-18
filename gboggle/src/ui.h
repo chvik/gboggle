@@ -10,54 +10,12 @@
 #define DEFAULT_BOARD_HEIGHT 4
 #define GAME_LENGTH_SEC 120
 
-/*
- * global variables
- */
-
-const gchar * const *alphabet;
-guint *weights;
-GNode *dictionary;
-board *brd;
-GPtrArray *langconfs;
-
-GtkWidget *main_win;
-GtkWidget *board_widget;
-GtkWidget *main_vbox, *top_hbox, *left_vbox, *right_vbox, *bottom_hbox;
-GtkWidget *guess_label, *time_label, *score_label;
-GtkWidget *guess_entry;
-GtkWidget *new_game_button;
-GtkWidget *history_tree_view;
-GtkWidget *preferences_dialog;
-GtkWidget *lang_combo;
-GtkWidget *end_game_menu_item;
-
-GtkListStore *history_list_store, *solutions_list_store;
-
-GPtrArray *found_words;
-GPtrArray *guessed_words;
-GPtrArray *solutions;
-
-gint score;
-
-guint board_width;
-guint board_height;
-
-GTimeVal game_start;
-gint timer_tag; 
-
-gulong guess_changed_id;
-gulong guess_keypressed_id;
-
-/*
- * functions
- */
+void
+create_main_window (gint boardw,
+                    gint boardh);
 
 void
-create_main_window (guint boardw,
-                    guint boardh);
-
-void
-create_preferences_dialog (GPtrArray *confs);
+create_preferences_dialog (void);
 
 /* l: index in the lang_conf array
  * returns FALSE if loading of the dictionary fails */
@@ -65,13 +23,13 @@ gboolean
 set_language (gint l);
 
 void
-init_game ();
+init_game (void);
 
 void
-start_game ();
+start_game (void);
 
 void
-stop_game ();
+stop_game (void);
 
 void
 history_add (const gchar *word,

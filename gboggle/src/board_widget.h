@@ -48,8 +48,8 @@ GType
 board_widget_get_type ();
 
 GtkWidget *
-board_widget_new (guint width,
-                  guint height);
+board_widget_new (gint width,
+                  gint height);
 
 void
 board_widget_init_with_board (BoardWidget *boardw,
@@ -62,8 +62,8 @@ board_widget_initbg (BoardWidget *boardw);
  * scale can be set between 0 and 1 */
 void
 board_widget_mark_field (BoardWidget *boardw,
-                         guint x,
-                         guint y, 
+                         gint x,
+                         gint y, 
                          gdouble scale);
 
 G_END_DECLS

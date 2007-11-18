@@ -88,7 +88,7 @@ read_langconf_from (gchar *filename)
              ttype != G_TOKEN_EOF;
              ttype = g_scanner_get_next_token (scanner))
     {
-        guint line = g_scanner_cur_line (scanner);
+        gint line = g_scanner_cur_line (scanner);
         /* guint pos = g_scanner_cur_position (scanner);*/
         error_occured = FALSE;
 
@@ -105,7 +105,7 @@ read_langconf_from (gchar *filename)
                 state = PARSER_LANG;
                 conf = g_new0 (struct langconf, 1);
                 conf->alphabet = g_ptr_array_new ();
-                conf->weights = g_array_new (TRUE, TRUE, sizeof (guint));
+                conf->weights = g_array_new (TRUE, TRUE, sizeof (gint));
                 continue;
             }
             else if (state == PARSER_INIT)

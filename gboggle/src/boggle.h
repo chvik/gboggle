@@ -54,7 +54,7 @@ guess_st
 process_guess (const gchar *guess,
                board *brd,
                GPtrArray *guessed_words,
-               guint *word_val);
+               gint *word_val);
 
 guess_st
 find_str_on_board (GPtrArray *paths,

@@ -52,7 +52,7 @@ static void board_widget_init(BoardWidget *boardw)
 }
 
 GtkWidget *
-board_widget_new (guint width, guint height)
+board_widget_new (gint width, gint height)
 {
     gint i, j;
     BoardWidget *boardw = BOARD_WIDGET (g_object_new (board_widget_get_type (), 
@@ -118,7 +118,7 @@ board_widget_init_with_board (BoardWidget *boardw, board *brd)
 }
 
 static void
-board_widget_unmark_field (BoardWidget *boardw, guint x, guint y)
+board_widget_unmark_field (BoardWidget *boardw, gint x, gint y)
 {
     gtk_widget_modify_bg (FIELD(boardw, x, y), GTK_STATE_NORMAL,
                           &bgcolor_unmarked);
@@ -127,7 +127,7 @@ board_widget_unmark_field (BoardWidget *boardw, guint x, guint y)
 void
 board_widget_initbg (BoardWidget *boardw)
 {
-    guint x, y;
+    gint x, y;
     
     for (y = 0; y < boardw->height; ++y)
         for (x = 0; x < boardw->width; ++x)
@@ -135,7 +135,7 @@ board_widget_initbg (BoardWidget *boardw)
 }
 
 void
-board_widget_mark_field (BoardWidget *boardw, guint x, guint y,
+board_widget_mark_field (BoardWidget *boardw, gint x, gint y,
                          gdouble scale)
 {
     GdkColor color;
