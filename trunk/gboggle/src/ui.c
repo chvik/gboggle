@@ -605,7 +605,8 @@ list_solutions_and_score (GPtrArray *solutions, GPtrArray *found_words)
         /*g_debug ("%s added", (gchar *)g_ptr_array_index (words, i));*/
     }
 
-    str = g_strdup_printf ("Score: %d of %d", app_data.score, words->len);
+    str = g_strdup_printf ("Score: %d of %d", app_data.score, 
+            app_data.score + words->len);
     gtk_label_set_text (GTK_LABEL (app_data.score_label), str);
     g_free (str);
 }
