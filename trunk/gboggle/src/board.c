@@ -12,11 +12,11 @@ rec_str2letters (GPtrArray *array,
 
 /* returns random letter from alphabet according to weights */
 
-letter random_letter(const gchar * const *alphabet, const guint *weights)
+letter random_letter(const gchar * const *alphabet, const gint *weights)
 {
     gint i, c, cml, lb, ub;
     guint len = g_strv_length((gchar **)alphabet);
-    guint *cmlweights = g_malloc((len+1) * sizeof(guint));
+    gint *cmlweights = g_malloc((len+1) * sizeof(gint));
 
     cml = 0;
     cmlweights[0] = 0;
@@ -46,7 +46,7 @@ letter random_letter(const gchar * const *alphabet, const guint *weights)
  
 board *
 board_new (gint width, gint height, const gchar * const *alphabet,
-           const guint *weights, GNode *trie)
+           const gint *weights, GNode *trie)
 {
     int i;
     board *brd;

@@ -6,6 +6,7 @@
 #include <gdk/gdkkeysyms.h>
 
 #include "ui.h"
+#include "appdata.h"
 #include "board_widget.h"
 #include "board.h"
 #include "boggle.h"
@@ -32,12 +33,12 @@ guess_changed (GtkEditable *editable, gpointer data)
     GPtrArray *paths;
     coord **path;
  
-    board_widget_initbg (BOARD_WIDGET (board_widget));
+    board_widget_initbg (BOARD_WIDGET (app_data.board_widget));
 
     guess = gtk_entry_get_text (GTK_ENTRY (editable));
     DEBUGSTM (g_printf ("guess %s\n", guess));
     paths = g_ptr_array_new ();
-    st = find_str_on_board (paths, guess, brd);
+    st = find_str_on_board (paths, guess, app_data.brd);
     
     if (st == good_guess)
     {
@@ -54,7 +55,7 @@ guess_keypressed (GtkEditable *editable, GdkEventKey *event, gpointer data)
     guess_st st;
     const gchar *guess;
     gchar *normalized_guess;
-    guint word_val;
+    gint word_val;
 
     if (event->keyval != GDK_Return)
     {
@@ -65,27 +66,26 @@ guess_keypressed (GtkEditable *editable, GdkEventKey *event, gpointer data)
     normalized_guess = normalize_guess (guess);
     DEBUGSTM (g_printf ("guess submitted: %s\n", normalized_guess));
 
-    st = process_guess (normalized_guess, brd, guessed_words, &word_val);
+    st = process_guess (normalized_guess, app_data.brd, 
+            app_data.guessed_words, &word_val);
     DEBUGSTM (g_printf ("guess state: %d\n", st));    
     if (st == good_guess)
     {
         gchar *str;
 
-        g_ptr_array_add (found_words, normalized_guess);
-        score += word_val;
-        str = g_strdup_printf("Score: %d", score);
-        gtk_label_set_text (GTK_LABEL (score_label), str);
+        g_ptr_array_add (app_data.found_words, normalized_guess);
+        app_data.score += word_val;
+        str = g_strdup_printf("Score: %d", app_data.score);
+        gtk_label_set_text (GTK_LABEL (app_data.score_label), str);
         g_free (str);
     }
     DEBUGSTM (g_printf ("history add: %s %d\n", guess, st));
     history_add (guess, st);
 
-    board_widget_initbg (BOARD_WIDGET (board_widget));
-    gtk_entry_set_text (GTK_ENTRY (guess_entry), "");
-
+    board_widget_initbg (BOARD_WIDGET (app_data.board_widget));
+    gtk_entry_set_text (GTK_ENTRY (app_data.guess_entry), "");
 
     return FALSE;
-    
 }
 
 static void
@@ -102,8 +102,8 @@ solutions_tree_view_changed (GtkTreeSelection *selection, gpointer data)
     }
     
     gtk_tree_model_get (model, &iter, 1, &sol_index, -1);
-    path = (coord **)g_ptr_array_index (solutions, sol_index);
-    board_widget_initbg (BOARD_WIDGET (board_widget));
+    path = (coord **)g_ptr_array_index (app_data.solutions, sol_index);
+    board_widget_initbg (BOARD_WIDGET (app_data.board_widget));
     mark_path (path);
 }
 
@@ -116,13 +116,15 @@ new_game_button_clicked (GtkButton *button, gpointer user_data)
 static void
 game_new_callback (GtkMenuItem *menu_item, gpointer user_data)
 {
-    if (timer_tag)
+    if (app_data.timer_tag)
     {
         /* during game */
-        g_source_remove (timer_tag);
-        g_signal_handler_disconnect (guess_entry, guess_changed_id);
-        g_signal_handler_disconnect (guess_entry, guess_keypressed_id);
-        gtk_entry_set_text (GTK_ENTRY (guess_entry), "");
+        g_source_remove (app_data.timer_tag);
+        g_signal_handler_disconnect (app_data.guess_entry,
+                app_data.guess_changed_id);
+        g_signal_handler_disconnect (app_data.guess_entry, 
+                app_data.guess_keypressed_id);
+        gtk_entry_set_text (GTK_ENTRY (app_data.guess_entry), "");
     }
     start_game ();
 }
@@ -138,17 +140,17 @@ preferences_callback (GtkMenuItem *menu_item, gpointer user_data)
 {
     gint l, oldl;
     
-    oldl = gtk_combo_box_get_active (GTK_COMBO_BOX (lang_combo));
-    gtk_dialog_run (GTK_DIALOG (preferences_dialog));
-    gtk_widget_hide (preferences_dialog);
-    l = gtk_combo_box_get_active (GTK_COMBO_BOX (lang_combo));
+    oldl = gtk_combo_box_get_active (GTK_COMBO_BOX (app_data.lang_combo));
+    gtk_dialog_run (GTK_DIALOG (app_data.preferences_dialog));
+    gtk_widget_hide (app_data.preferences_dialog);
+    l = gtk_combo_box_get_active (GTK_COMBO_BOX (app_data.lang_combo));
     g_debug ("lang %d selected\n", l);
     if (l >= 0)
     {
         if (!set_language (l))
         {
             g_debug ("lang set to %d failed, revert to %d\n", l, oldl);
-            gtk_combo_box_set_active (GTK_COMBO_BOX (lang_combo), oldl);
+            gtk_combo_box_set_active (GTK_COMBO_BOX (app_data.lang_combo), oldl);
         }
     }
 }
@@ -161,13 +163,13 @@ timer_func (gpointer data)
     gchar buf[16];
 
     g_get_current_time (&curr_time);
-    sec = GAME_LENGTH_SEC - (curr_time.tv_sec - game_start.tv_sec);
+    sec = GAME_LENGTH_SEC - (curr_time.tv_sec - app_data.game_start.tv_sec);
     if (sec < 0)
         sec = 0;
     min = sec / 60;
     sec %= 60;
     g_snprintf (buf, sizeof (buf), "Time: %d:%02d", min, sec);
-    gtk_label_set_text (GTK_LABEL (time_label), buf);
+    gtk_label_set_text (GTK_LABEL (app_data.time_label), buf);
 
     if(min == 0 && sec == 0)
     {
@@ -296,47 +298,49 @@ create_solution_tree_view (GtkTreeModel *model)
 
 
 void
-create_main_window (guint boardw, guint boardh)
+create_main_window (gint boardw, gint boardh)
 {
     GtkWidget *solutions_tree_view;
     GtkWidget *scrolled_history, *scrolled_solutions;
     GtkWidget *menu_bar, *game_menu, *settings_menu, *menu_item;
 
-    main_win = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title ( GTK_WINDOW (main_win), "gboggle");
-    gtk_container_set_border_width (GTK_CONTAINER (main_win), 10);
+    app_data.main_win = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title ( GTK_WINDOW (app_data.main_win), "gboggle");
+    gtk_container_set_border_width (GTK_CONTAINER (app_data.main_win), 10);
 
-    board_width = boardw;
-    board_height = boardh;
+    app_data.board_width = boardw;
+    app_data.board_height = boardh;
 
-    board_widget = board_widget_new (board_width, board_height);
-    guess_label = gtk_label_new ("Guess:");
-    guess_entry = gtk_entry_new ();
-    new_game_button = gtk_button_new_with_label ("New Game");
-    gtk_entry_set_width_chars (GTK_ENTRY (guess_entry), 10);
-    main_vbox = gtk_vbox_new (FALSE, 0);
-    left_vbox = gtk_vbox_new (FALSE, 0);
-    top_hbox = gtk_hbox_new (FALSE, 0);
-    bottom_hbox = gtk_hbox_new (FALSE, 0);
-    right_vbox = gtk_vbox_new (FALSE, 0);
-    time_label = gtk_label_new ("Time: 0:00");
-    score_label = gtk_label_new ("Score: 0");
+    app_data.board_widget = board_widget_new (boardw, boardh);
+    app_data.guess_label = gtk_label_new ("Guess:");
+    app_data.guess_entry = gtk_entry_new ();
+    app_data.new_game_button = gtk_button_new_with_label ("New Game");
+    gtk_entry_set_width_chars (GTK_ENTRY (app_data.guess_entry), 10);
+    app_data.main_vbox = gtk_vbox_new (FALSE, 0);
+    app_data.left_vbox = gtk_vbox_new (FALSE, 0);
+    app_data.top_hbox = gtk_hbox_new (FALSE, 0);
+    app_data.bottom_hbox = gtk_hbox_new (FALSE, 0);
+    app_data.right_vbox = gtk_vbox_new (FALSE, 0);
+    app_data.time_label = gtk_label_new ("Time: 0:00");
+    app_data.score_label = gtk_label_new ("Score: 0");
 
     /* guess history */
-    history_list_store = gtk_list_store_new (2, G_TYPE_STRING, G_TYPE_INT);
+    app_data.history_list_store = gtk_list_store_new (2, G_TYPE_STRING, G_TYPE_INT);
     scrolled_history = gtk_scrolled_window_new (NULL, NULL);
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_history),
                                     GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-    history_tree_view = create_history_tree_view (GTK_TREE_MODEL (history_list_store));
-    gtk_widget_set_size_request (history_tree_view, LIST_WIDTH, LIST_HEIGHT);
+    app_data.history_tree_view = create_history_tree_view (GTK_TREE_MODEL (app_data.history_list_store));
+    gtk_widget_set_size_request (app_data.history_tree_view, LIST_WIDTH, 
+            LIST_HEIGHT);
     
     /* solutions */
-    solutions_list_store = gtk_list_store_new (2, G_TYPE_STRING, G_TYPE_INT);
+    app_data.solutions_list_store = 
+        gtk_list_store_new (2, G_TYPE_STRING, G_TYPE_INT);
     scrolled_solutions = gtk_scrolled_window_new (NULL, NULL);
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_solutions),
                                     GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
     solutions_tree_view = create_solution_tree_view (
-                             GTK_TREE_MODEL (solutions_list_store));
+                             GTK_TREE_MODEL (app_data.solutions_list_store));
     gtk_widget_set_size_request (solutions_tree_view, LIST_WIDTH, LIST_HEIGHT);
     
     /* menu */
@@ -352,12 +356,12 @@ create_main_window (guint boardw, guint boardh)
     gtk_widget_show (menu_item);
 
     /* Game/End */
-    end_game_menu_item = gtk_menu_item_new_with_label ("End game");
-    gtk_menu_shell_append (GTK_MENU_SHELL (game_menu), end_game_menu_item);
-    g_signal_connect (G_OBJECT (end_game_menu_item), "activate",
+    app_data.end_game_menu_item = gtk_menu_item_new_with_label ("End game");
+    gtk_menu_shell_append (GTK_MENU_SHELL (game_menu), app_data.end_game_menu_item);
+    g_signal_connect (G_OBJECT (app_data.end_game_menu_item), "activate",
                       G_CALLBACK (game_end_callback), NULL);
-    gtk_widget_set_sensitive (end_game_menu_item, FALSE);
-    gtk_widget_show (end_game_menu_item);
+    gtk_widget_set_sensitive (app_data.end_game_menu_item, FALSE);
+    gtk_widget_show (app_data.end_game_menu_item);
     
     /* Game/Exit */
     menu_item = gtk_menu_item_new_with_label ("Exit");
@@ -385,45 +389,47 @@ create_main_window (guint boardw, guint boardh)
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (menu_item), settings_menu);
     gtk_widget_show (menu_item);
     
-    gtk_box_pack_start (GTK_BOX (left_vbox), board_widget, FALSE, FALSE, VPAD);
-    gtk_box_pack_start (GTK_BOX (main_vbox), menu_bar, FALSE, FALSE, 2);
-    gtk_box_pack_start (GTK_BOX (main_vbox), top_hbox, TRUE, TRUE, VPAD);
-    gtk_box_pack_start (GTK_BOX (main_vbox), bottom_hbox, TRUE, TRUE, VPAD);
-    gtk_container_add (GTK_CONTAINER (scrolled_history), history_tree_view);
+    gtk_box_pack_start (GTK_BOX (app_data.left_vbox), app_data.board_widget, FALSE, FALSE, VPAD);
+    gtk_box_pack_start (GTK_BOX (app_data.main_vbox), menu_bar, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (app_data.main_vbox), app_data.top_hbox, TRUE, TRUE, VPAD);
+    gtk_box_pack_start (GTK_BOX (app_data.main_vbox), app_data.bottom_hbox, TRUE, TRUE, VPAD);
+    gtk_container_add (GTK_CONTAINER (scrolled_history), app_data.history_tree_view);
     gtk_container_add (GTK_CONTAINER (scrolled_solutions), solutions_tree_view);
-    gtk_box_pack_start (GTK_BOX (bottom_hbox), new_game_button, FALSE, FALSE,
+    gtk_box_pack_start (GTK_BOX (app_data.bottom_hbox), app_data.new_game_button, FALSE, FALSE,
                         HPAD);
-    gtk_box_pack_start (GTK_BOX (bottom_hbox), guess_label,
+    gtk_box_pack_start (GTK_BOX (app_data.bottom_hbox), app_data.guess_label,
                         TRUE, TRUE, HPAD);
-    gtk_box_pack_start (GTK_BOX (bottom_hbox), guess_entry,
+    gtk_box_pack_start (GTK_BOX (app_data.bottom_hbox), app_data.guess_entry,
                         TRUE, TRUE, HPAD);
-    gtk_box_pack_start (GTK_BOX (bottom_hbox), time_label, TRUE, TRUE, HPAD);
-    gtk_container_add (GTK_CONTAINER (bottom_hbox), score_label);
-    gtk_box_pack_start (GTK_BOX (top_hbox), left_vbox, TRUE, TRUE, HPAD);
-    gtk_box_pack_start (GTK_BOX (top_hbox), scrolled_history, TRUE, TRUE, HPAD);
-    gtk_box_pack_start (GTK_BOX (top_hbox), scrolled_solutions, TRUE, TRUE,
-                        HPAD);
-    gtk_container_add (GTK_CONTAINER (main_win), main_vbox);
+    gtk_box_pack_start (GTK_BOX (app_data.bottom_hbox), app_data.time_label, TRUE, TRUE, HPAD);
+    gtk_container_add (GTK_CONTAINER (app_data.bottom_hbox), app_data.score_label);
+    gtk_box_pack_start (GTK_BOX (app_data.top_hbox), app_data.left_vbox,
+            TRUE, TRUE, HPAD);
+    gtk_box_pack_start (GTK_BOX (app_data.top_hbox), scrolled_history,
+            TRUE, TRUE, HPAD);
+    gtk_box_pack_start (GTK_BOX (app_data.top_hbox), scrolled_solutions,
+            TRUE, TRUE, HPAD);
+    gtk_container_add (GTK_CONTAINER (app_data.main_win), app_data.main_vbox);
 
-    g_signal_connect (G_OBJECT (main_win), "destroy", G_CALLBACK (exit), NULL);
-    g_signal_connect (G_OBJECT (new_game_button), "clicked",
+    g_signal_connect (G_OBJECT (app_data.main_win), "destroy", G_CALLBACK (exit), NULL);
+    g_signal_connect (G_OBJECT (app_data.new_game_button), "clicked",
                       G_CALLBACK (new_game_button_clicked), NULL);
 
-    gtk_widget_show_all(top_hbox);
-    gtk_widget_show(new_game_button);
-    gtk_widget_show(time_label);
-    gtk_widget_show(score_label);
-    gtk_widget_show(bottom_hbox);
-    gtk_widget_show(main_vbox);
-    gtk_widget_show(main_win);
+    gtk_widget_show_all(app_data.top_hbox);
+    gtk_widget_show(app_data.new_game_button);
+    gtk_widget_show(app_data.time_label);
+    gtk_widget_show(app_data.score_label);
+    gtk_widget_show(app_data.bottom_hbox);
+    gtk_widget_show(app_data.main_vbox);
+    gtk_widget_show(app_data.main_win);
     gtk_widget_show (menu_bar);
-    /* guess_label and guess_entry remain invisible */
+    /* app_data.guess_label and app_data.guess_entry remain invisible */
 
-    gtk_editable_set_editable (GTK_EDITABLE (guess_entry), FALSE);
+    gtk_editable_set_editable (GTK_EDITABLE (app_data.guess_entry), FALSE);
 }
 
 void
-create_preferences_dialog (GPtrArray *confs)
+create_preferences_dialog (void)
 {
     GtkWidget *dialog;
     GtkWidget *table;
@@ -431,7 +437,7 @@ create_preferences_dialog (GPtrArray *confs)
     gint i;
 
     dialog = gtk_dialog_new_with_buttons ("Preferences",
-                                          GTK_WINDOW (main_win),
+                                          GTK_WINDOW (app_data.main_win),
                                           GTK_DIALOG_MODAL |
                                               GTK_DIALOG_DESTROY_WITH_PARENT,
                                           GTK_STOCK_OK,
@@ -440,27 +446,27 @@ create_preferences_dialog (GPtrArray *confs)
                                           GTK_RESPONSE_CANCEL,
                                           NULL);
     lang_label = gtk_label_new ("Language:");
-    lang_combo = gtk_combo_box_new_text ();
-    for (i = 0; i < confs->len; ++i)
+    app_data.lang_combo = gtk_combo_box_new_text ();
+    for (i = 0; i < app_data.langconfs->len; ++i)
     {
         struct langconf *conf = 
-            (struct langconf *) g_ptr_array_index (confs, i);
+            (struct langconf *) g_ptr_array_index (app_data.langconfs, i);
         
         g_debug ("lang %d %s\n", i, conf->lang);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (lang_combo), conf->lang);
+        gtk_combo_box_append_text (GTK_COMBO_BOX (app_data.lang_combo), conf->lang);
     }
-    gtk_combo_box_set_active (GTK_COMBO_BOX (lang_combo), 0);
+    gtk_combo_box_set_active (GTK_COMBO_BOX (app_data.lang_combo), 0);
 
     table = gtk_table_new (2, 1, FALSE);
     gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), table);
     gtk_table_set_row_spacings (GTK_TABLE (table), 5);
     gtk_table_set_col_spacings (GTK_TABLE (table), 5);
     gtk_table_attach_defaults (GTK_TABLE (table), lang_label, 0, 1, 0, 1);
-    gtk_table_attach_defaults (GTK_TABLE (table), lang_combo, 1, 2, 0, 1);
+    gtk_table_attach_defaults (GTK_TABLE (table), app_data.lang_combo, 1, 2, 0, 1);
 
     gtk_widget_show_all (table);
 
-    preferences_dialog = dialog;
+    app_data.preferences_dialog = dialog;
 }
 
 gboolean
@@ -470,7 +476,7 @@ set_language (gint l)
     GNode *trie;
     const gchar * const *alph;
     
-    conf = (struct langconf *)g_ptr_array_index(langconfs, l);
+    conf = (struct langconf *)g_ptr_array_index(app_data.langconfs, l);
     alph = (const gchar * const *)conf->alphabet->pdata;
     trie = g_node_new (NULL);
     if(trie_load (trie, alph, conf->dictf) != 0)
@@ -479,59 +485,60 @@ set_language (gint l)
         return FALSE;
     }
 
-    if (dictionary)
-        g_node_destroy(dictionary);
-    dictionary = trie;
-    alphabet = alph;
-    weights = (guint *)conf->weights->data;
+    if (app_data.dictionary)
+        g_node_destroy(app_data.dictionary);
+    app_data.dictionary = trie;
+    app_data.alphabet = alph;
+    app_data.weights = (gint *)conf->weights->data;
     return TRUE;
 }
 
 void
 init_game ()
 {
-    timer_tag = 0;
-    solutions = NULL;
-    found_words = NULL;
-    guessed_words = 0;
-    brd = NULL;
+    app_data.timer_tag = 0;
+    app_data.solutions = NULL;
+    app_data.found_words = NULL;
+    app_data.guessed_words = 0;
+    app_data.brd = NULL;
 }
 
 void
 start_game ()
 {
 
-    board_dispose (brd);
-    solutions_dispose (solutions);
-    solutions = NULL;
+    board_dispose (app_data.brd);
+    solutions_dispose (app_data.solutions);
+    app_data.solutions = NULL;
     /* XXX free ptrarrays */
-    gtk_list_store_clear (history_list_store);
-    gtk_list_store_clear (solutions_list_store);
+    gtk_list_store_clear (app_data.history_list_store);
+    gtk_list_store_clear (app_data.solutions_list_store);
 
-    brd =  board_new (DEFAULT_BOARD_WIDTH, DEFAULT_BOARD_HEIGHT,
-                      alphabet, weights, dictionary);
-    found_words = g_ptr_array_new ();
-    guessed_words = g_ptr_array_new ();
-    score = 0;
-    gtk_label_set_text (GTK_LABEL (score_label), "");
+    app_data.brd =  board_new (DEFAULT_BOARD_WIDTH, DEFAULT_BOARD_HEIGHT,
+            app_data.alphabet, app_data.weights, app_data.dictionary);
+    app_data.found_words = g_ptr_array_new ();
+    app_data.guessed_words = g_ptr_array_new ();
+    app_data.score = 0;
+    gtk_label_set_text (GTK_LABEL (app_data.score_label), "");
 
-    board_widget_init_with_board ( BOARD_WIDGET (board_widget), brd);
+    board_widget_init_with_board ( BOARD_WIDGET (app_data.board_widget),
+            app_data.brd);
 
-    gtk_widget_set_sensitive (end_game_menu_item, TRUE);
-    gtk_widget_hide (new_game_button);
-    gtk_widget_show (guess_label);
-    gtk_widget_show (guess_entry);
-    gtk_editable_set_editable (GTK_EDITABLE (guess_entry), TRUE);
-    gtk_widget_grab_focus (guess_entry);
+    gtk_widget_set_sensitive (app_data.end_game_menu_item, TRUE);
+    gtk_widget_hide (app_data.new_game_button);
+    gtk_widget_show (app_data.guess_label);
+    gtk_widget_show (app_data.guess_entry);
+    gtk_editable_set_editable (GTK_EDITABLE (app_data.guess_entry), TRUE);
+    gtk_widget_grab_focus (app_data.guess_entry);
     
-    guess_changed_id = 
-        g_signal_connect (G_OBJECT (guess_entry), "changed", 
+    app_data.guess_changed_id = 
+        g_signal_connect (G_OBJECT (app_data.guess_entry), "changed", 
                           G_CALLBACK(guess_changed), NULL);
-    guess_keypressed_id =
-        g_signal_connect (G_OBJECT (guess_entry), "key-press-event", 
+    app_data.guess_keypressed_id =
+        g_signal_connect (G_OBJECT (app_data.guess_entry), "key-press-event", 
                           G_CALLBACK(guess_keypressed), NULL);
-    timer_tag = g_timeout_add (100, timer_func, NULL);    
-    g_get_current_time (&game_start);
+    app_data.timer_tag = g_timeout_add (100, timer_func, NULL);    
+    g_get_current_time (&app_data.game_start);
 }
 
 void
@@ -539,22 +546,24 @@ stop_game ()
 {
     guess_st st;
     
-    g_source_remove (timer_tag);
-    timer_tag = 0;
+    g_source_remove (app_data.timer_tag);
+    app_data.timer_tag = 0;
 
-    gtk_widget_hide (guess_label);
-    gtk_widget_hide (guess_entry);
-    gtk_widget_show (new_game_button);
-    gtk_widget_set_sensitive (end_game_menu_item, FALSE);
+    gtk_widget_hide (app_data.guess_label);
+    gtk_widget_hide (app_data.guess_entry);
+    gtk_widget_show (app_data.new_game_button);
+    gtk_widget_set_sensitive (app_data.end_game_menu_item, FALSE);
 
-    gtk_editable_set_editable (GTK_EDITABLE (guess_entry), FALSE);
-    g_signal_handler_disconnect (guess_entry, guess_changed_id);
-    g_signal_handler_disconnect (guess_entry, guess_keypressed_id);
-    gtk_entry_set_text (GTK_ENTRY (guess_entry), "");
+    gtk_editable_set_editable (GTK_EDITABLE (app_data.guess_entry), FALSE);
+    g_signal_handler_disconnect (app_data.guess_entry,
+            app_data.guess_changed_id);
+    g_signal_handler_disconnect (app_data.guess_entry, 
+            app_data.guess_keypressed_id);
+    gtk_entry_set_text (GTK_ENTRY (app_data.guess_entry), "");
 
-    solutions = g_ptr_array_new ();
-    st = search_solution (solutions, NULL, brd, TRUE);
-    list_solutions_and_score (solutions, found_words);
+    app_data.solutions = g_ptr_array_new ();
+    st = search_solution (app_data.solutions, NULL, app_data.brd, TRUE);
+    list_solutions_and_score (app_data.solutions, app_data.found_words);
 }
 
 
@@ -564,11 +573,12 @@ history_add (const gchar *word, guess_st st)
     GtkTreeIter iter;
     GtkTreePath *path;
 
-    gtk_list_store_insert (history_list_store, &iter, 0);
-    gtk_list_store_set (history_list_store, &iter, 0, word, 1, (guint)st, -1);
+    gtk_list_store_insert (app_data.history_list_store, &iter, 0);
+    gtk_list_store_set (app_data.history_list_store, &iter, 0, word, 1,
+            (guint)st, -1);
 
     path = gtk_tree_path_new_from_indices (0, -1);
-    gtk_tree_view_set_cursor (GTK_TREE_VIEW (history_tree_view), path,
+    gtk_tree_view_set_cursor (GTK_TREE_VIEW (app_data.history_tree_view), path,
                               NULL, FALSE);
     g_free (path);
 }
@@ -583,19 +593,20 @@ list_solutions_and_score (GPtrArray *solutions, GPtrArray *found_words)
     gint i;
     gchar *str;
     
-    missing_solutions (&words, &sol_index, brd, solutions, found_words);
+    missing_solutions (&words, &sol_index, app_data.brd, app_data.solutions,
+            app_data.found_words);
     for (i = 0; i < words->len; ++i)
     {
-        gtk_list_store_append (solutions_list_store, &iter);
-        gtk_list_store_set (solutions_list_store, &iter,
+        gtk_list_store_append (app_data.solutions_list_store, &iter);
+        gtk_list_store_set (app_data.solutions_list_store, &iter,
                             0, (gchar *)g_ptr_array_index (words, i),
                             1, g_array_index (sol_index, guint, i),
                             -1);
         /*g_debug ("%s added", (gchar *)g_ptr_array_index (words, i));*/
     }
 
-    str = g_strdup_printf ("Score: %d of %d", score, words->len);
-    gtk_label_set_text (GTK_LABEL (score_label), str);
+    str = g_strdup_printf ("Score: %d of %d", app_data.score, words->len);
+    gtk_label_set_text (GTK_LABEL (app_data.score_label), str);
     g_free (str);
 }
 
@@ -607,7 +618,7 @@ mark_path (coord **path)
     for (len = 0; path[len]; ++len);
     for (i = 0; i < len; ++i)
     {
-        board_widget_mark_field (BOARD_WIDGET (board_widget),
+        board_widget_mark_field (BOARD_WIDGET (app_data.board_widget),
                                  path[i]->x, path[i]->y, 
                                  len > 1 ? (gdouble)i  / (len - 1) :
                                  1);

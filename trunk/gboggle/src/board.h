@@ -19,8 +19,8 @@ struct _board
 
 struct _coord
 {
-    guint x;
-    guint y;
+    gint x;
+    gint y;
 };
 
 
@@ -28,7 +28,7 @@ board *
 board_new (gint width, 
            gint height,
            const gchar * const *alphabet,
-           const guint *weights,
+           const gint *weights,
            GNode *trie);
 
 void

@@ -305,7 +305,7 @@ normalize_guess (const gchar *guess)
 
 guess_st
 process_guess (const gchar *guess, board *brd, GPtrArray *guessed_words,
-               guint *word_val)
+               gint *word_val)
 {
     guess_st st;
     GPtrArray *solutions;
