@@ -155,6 +155,12 @@ preferences_callback (GtkMenuItem *menu_item, gpointer user_data)
     }
 }
 
+static void
+field_pressed_callback (GtkWidget *widget, coord *c, gpointer data)
+{
+    g_warning ("pressed: %d %d\n", c->x, c->y);
+}
+
 static gboolean
 timer_func (gpointer data)
 {
@@ -426,6 +432,10 @@ create_main_window (gint boardw, gint boardh)
     /* app_data.guess_label and app_data.guess_entry remain invisible */
 
     gtk_editable_set_editable (GTK_EDITABLE (app_data.guess_entry), FALSE);
+
+    /* XXX test */
+    g_signal_connect (G_OBJECT (app_data.board_widget), "field-pressed",
+        G_CALLBACK (field_pressed_callback), NULL);
 }
 
 void

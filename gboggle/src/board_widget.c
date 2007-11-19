@@ -4,15 +4,25 @@
 #include <gdk/gdk.h>
 
 #include "board_widget.h"
+#include "board.h"
 
 static void board_widget_class_init(BoardWidgetClass *klass);
 static void board_widget_init(BoardWidget *boardw);
+static void event_box_clicked_cb(GtkWidget *event_box, GdkEventButton *event,
+        gpointer user_data);
 
 static const GdkColor bgcolor_marked = BGCOLOR_MARKED;
 static const GdkColor bgcolor_unmarked = BGCOLOR_UNMARKED;
 static const GdkColor bgcolor_active = BGCOLOR_ACTIVE;
 
 #define FIELD(bw,i,j)    (bw)->fields[((j) * (bw)->width + (i))]
+
+enum {
+    FIELD_PRESSED_SIGNAL,
+    LAST_SIGNAL
+};
+
+static guint board_widget_signals[LAST_SIGNAL] = { 0 };
 
 GType board_widget_get_type()
 {
@@ -42,7 +52,14 @@ GType board_widget_get_type()
 
 static void board_widget_class_init(BoardWidgetClass *klass)   
 {
-    return;
+    board_widget_signals[FIELD_PRESSED_SIGNAL] =
+        g_signal_new ("field-pressed",
+                G_TYPE_FROM_CLASS (klass),
+                G_SIGNAL_RUN_FIRST | G_SIGNAL_ACTION,
+                0,
+                NULL, NULL,
+                g_cclosure_marshal_VOID__POINTER, G_TYPE_NONE,
+                1, G_TYPE_POINTER);
 }
 
 static void board_widget_init(BoardWidget *boardw)
@@ -70,6 +87,8 @@ board_widget_new (gint width, gint height)
             GtkWidget *evbox;
             
             evbox = gtk_event_box_new ();
+            g_signal_connect (G_OBJECT (evbox), "button-release-event",
+                    G_CALLBACK (event_box_clicked_cb), boardw);
             label = gtk_label_new ("");
             gtk_label_set_width_chars (GTK_LABEL (label), 2);
             gtk_container_add (GTK_CONTAINER (evbox), label);
@@ -171,4 +190,22 @@ board_widget_mark_field (BoardWidget *boardw, gint x, gint y,
 }
 
 
+void event_box_clicked_cb(GtkWidget *event_box, GdkEventButton *event,
+        gpointer user_data)
+{
+    gint i, j;
+    BoardWidget *boardw = BOARD_WIDGET (user_data);
 
+    for (i = 0; i < boardw->width; ++i)
+        for (j = 0; j < boardw->height; ++j) {
+            if (FIELD (boardw, i, j) == event_box) {
+                coord *c = g_new (coord, 1);
+                c->x = i;
+                c->y = j;
+                g_signal_emit (G_OBJECT (boardw),
+                               board_widget_signals[FIELD_PRESSED_SIGNAL], 0,
+                               c);
+                return;
+            }
+        }
+}
