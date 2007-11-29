@@ -236,7 +236,7 @@ coords2letters (const board *brd, const coord **path)
     int i, len;
     letter *l;
     
-    for (len = 0; path[len]; ++len);
+    len = coords_length (path);
     l = g_malloc ((len + 1) * sizeof (letter));
     for (i = 0; i < len; ++i)
     {
@@ -247,3 +247,23 @@ coords2letters (const board *brd, const coord **path)
 }
 
  
+void
+coords_free (coord **path)
+{
+    int i;
+
+    for (i = 0; path[i]; ++i)
+        g_free (path[i]);
+
+    g_free (path);
+}
+
+
+gint
+coords_length (coord **path)
+{
+    int len;
+
+    for (len = 0; path[len]; ++len);
+    return len;
+}

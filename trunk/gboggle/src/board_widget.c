@@ -52,6 +52,8 @@ GType board_widget_get_type()
 
 static void board_widget_class_init(BoardWidgetClass *klass)   
 {
+    /* emits "field-pressed" if one of the fields is clicked
+     * void callback (GtkWidget *, struct coord *, gpointer) */
     board_widget_signals[FIELD_PRESSED_SIGNAL] =
         g_signal_new ("field-pressed",
                 G_TYPE_FROM_CLASS (klass),

@@ -71,7 +71,7 @@ missing_solutions (GPtrArray **words, GArray **sol_index,
         gint j;
         
         path = (coord **)g_ptr_array_index (solutions, i);
-        for (len = 0; path[len]; ++len);
+        len = coords_length (path);
         word = g_new0 (gchar , len * 6 + 1);
         /* utf8 wide chars cannot exceed 6 bytes */
         for (j = 0; j < len; ++j)
@@ -166,7 +166,7 @@ depth_search (letter *guess, const board *brd, gint startx, gint starty,
     guess_st retval = not_in_board;
     gboolean found_solution = FALSE;
  
-    for (len = 0; path_prefix[len]; ++len);
+    len = coords_length (path_prefix);
     g_assert (len >= 0);
     g_assert (len < 16);
     DEBUGSTM (g_printf("depth_search depth: %d from %d %d\n", len, startx, starty));

@@ -68,5 +68,12 @@ letter *
 coords2letters (const board *brd,
                 const coord **path);
 
+/* frees NULL terminated coord ptr array with member coords */
+void
+coords_free (coord **path);
+
+gint
+coords_length (coord **path);
+
 #endif /* __BOARD_H__ */
 

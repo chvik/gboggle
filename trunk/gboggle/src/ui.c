@@ -21,6 +21,10 @@
 #define LIST_HEIGHT (DEFAULT_BOARD_HEIGHT * FIELDH)
 #define LIST_WIDTH 200 
 
+/* static function declarations */
+static void submit_guess (void);
+
+
 /*
  * callbacks
  */
@@ -42,10 +46,25 @@ guess_changed (GtkEditable *editable, gpointer data)
     
     if (st == good_guess)
     {
-        path = g_ptr_array_index (paths, 0);
+        path = g_ptr_array_remove_index (paths, 0);
         mark_path (path);
+        if (app_data.current_path)
+            coords_free (app_data.current_path);
+        app_data.current_path = path;
+    }
+    else
+    {
+        if (app_data.current_path)
+            coords_free (app_data.current_path);
+         app_data.current_path = NULL;
     }
     
+    while (paths->len) {
+        coord **path = g_ptr_array_remove_index (paths, 0);
+        coords_free (path);
+    }
+    g_ptr_array_free (paths, TRUE);
+
     DEBUGSTM(g_printf ("status %d\n", st));
 }
 
@@ -62,30 +81,46 @@ guess_keypressed (GtkEditable *editable, GdkEventKey *event, gpointer data)
         return FALSE;
     }
 
-    guess = gtk_entry_get_text (GTK_ENTRY (editable));
-    normalized_guess = normalize_guess (guess);
-    DEBUGSTM (g_printf ("guess submitted: %s\n", normalized_guess));
+    submit_guess ();
 
-    st = process_guess (normalized_guess, app_data.brd, 
-            app_data.guessed_words, &word_val);
-    DEBUGSTM (g_printf ("guess state: %d\n", st));    
-    if (st == good_guess)
+}
+
+static void
+guess_submit_clicked (GtkButton *button, gpointer data)
+{
+    submit_guess ();
+}
+
+static void
+guess_del_clicked (GtkButton *button, gpointer data)
+{
+    coord **path = app_data.current_path;
+    gint len = coords_length (path);
+    gint i;
+    const gchar *str;
+    gint pos = 0;
+
+    if (len > 0)
     {
-        gchar *str;
-
-        g_ptr_array_add (app_data.found_words, normalized_guess);
-        app_data.score += word_val;
-        str = g_strdup_printf("Score: %d", app_data.score);
-        gtk_label_set_text (GTK_LABEL (app_data.score_label), str);
-        g_free (str);
+        g_free (path[len - 1]);
+        path[len - 1] = NULL;
+        --len;
     }
-    DEBUGSTM (g_printf ("history add: %s %d\n", guess, st));
-    history_add (guess, st);
 
     board_widget_initbg (BOARD_WIDGET (app_data.board_widget));
-    gtk_entry_set_text (GTK_ENTRY (app_data.guess_entry), "");
+    mark_path (path);
 
-    return FALSE;
+    g_signal_handlers_block_by_func (app_data.guess_entry, guess_changed, 
+            NULL);
+    gtk_editable_delete_text ( GTK_EDITABLE (app_data.guess_entry), 0, -1);
+    for (i = 0; i < len; ++i)
+    {
+        str = board_gcharp_at (app_data.brd, path[i]->x, path[i]->y);
+        gtk_editable_insert_text (GTK_EDITABLE (app_data.guess_entry),
+                str, strlen (str), &pos);
+    }
+    g_signal_handlers_unblock_by_func (app_data.guess_entry, guess_changed, 
+            NULL);
 }
 
 static void
@@ -158,7 +193,60 @@ preferences_callback (GtkMenuItem *menu_item, gpointer user_data)
 static void
 field_pressed_callback (GtkWidget *widget, coord *c, gpointer data)
 {
+    coord *last_field;
+    coord **path;
+    gint len;
+    gint i;
+    gint pos;
+    const gchar *str;
+
     g_warning ("pressed: %d %d\n", c->x, c->y);
+    if (!app_data.current_path) {
+        path = g_new (coord *, 2);
+        path[0] = c;
+        path[1] = NULL;
+    } else {
+        len = coords_length (app_data.current_path);
+        last_field = app_data.current_path[len - 1];
+        if (abs (last_field->x - c->x) > 1 ||
+            abs (last_field->y - c->y) > 1)
+        {
+            /* illegal field */
+            g_debug("not a neighbour");
+            return;
+        }
+        for (i = 0; i < len; ++i)
+        {
+            coord *p = app_data.current_path[i];
+
+            if (p->x == c->x && p->y == c->y)
+            {
+                /* field is already marked */
+                return;
+            }
+        }
+
+        path = g_new (coord *, len + 2);
+        for (i = 0; i < len; ++i)
+            path[i] = app_data.current_path[i];
+        path[len] = c;
+        path[len + 1] = NULL;
+        g_free (app_data.current_path);
+    }
+
+    board_widget_initbg (BOARD_WIDGET (app_data.board_widget));
+    mark_path (path);
+    app_data.current_path = path;
+
+    str = board_gcharp_at (app_data.brd, c->x, c->y);
+    pos = strlen (gtk_entry_get_text (GTK_ENTRY (app_data.guess_entry)));
+    g_signal_handlers_block_by_func (app_data.guess_entry, guess_changed, 
+            NULL);
+    gtk_editable_insert_text (GTK_EDITABLE (app_data.guess_entry),
+            str, strlen (str), &pos);
+    gtk_entry_set_position (GTK_ENTRY (app_data.guess_entry), pos);
+    g_signal_handlers_unblock_by_func (app_data.guess_entry, guess_changed, 
+            NULL);
 }
 
 static gboolean
@@ -329,6 +417,14 @@ create_main_window (gint boardw, gint boardh)
     app_data.right_vbox = gtk_vbox_new (FALSE, 0);
     app_data.time_label = gtk_label_new ("Time: 0:00");
     app_data.score_label = gtk_label_new ("Score: 0");
+    app_data.guess_submit = gtk_button_new ();
+    gtk_button_set_image (GTK_BUTTON (app_data.guess_submit), 
+            gtk_image_new_from_stock (GTK_STOCK_APPLY,
+                GTK_ICON_SIZE_SMALL_TOOLBAR));
+    app_data.guess_del = gtk_button_new ();
+    gtk_button_set_image (GTK_BUTTON (app_data.guess_del), 
+            gtk_image_new_from_stock (GTK_STOCK_UNDO,
+                GTK_ICON_SIZE_SMALL_TOOLBAR));
 
     /* guess history */
     app_data.history_list_store = gtk_list_store_new (2, G_TYPE_STRING, G_TYPE_INT);
@@ -407,6 +503,10 @@ create_main_window (gint boardw, gint boardh)
                         TRUE, TRUE, HPAD);
     gtk_box_pack_start (GTK_BOX (app_data.bottom_hbox), app_data.guess_entry,
                         TRUE, TRUE, HPAD);
+    gtk_box_pack_start (GTK_BOX (app_data.bottom_hbox), app_data.guess_del,
+                        FALSE, FALSE, HPAD);
+    gtk_box_pack_start (GTK_BOX (app_data.bottom_hbox), app_data.guess_submit,
+                        FALSE, FALSE, HPAD);
     gtk_box_pack_start (GTK_BOX (app_data.bottom_hbox), app_data.time_label, TRUE, TRUE, HPAD);
     gtk_container_add (GTK_CONTAINER (app_data.bottom_hbox), app_data.score_label);
     gtk_box_pack_start (GTK_BOX (app_data.top_hbox), app_data.left_vbox,
@@ -420,6 +520,12 @@ create_main_window (gint boardw, gint boardh)
     g_signal_connect (G_OBJECT (app_data.main_win), "destroy", G_CALLBACK (exit), NULL);
     g_signal_connect (G_OBJECT (app_data.new_game_button), "clicked",
                       G_CALLBACK (new_game_button_clicked), NULL);
+    g_signal_connect (G_OBJECT (app_data.board_widget), "field-pressed",
+        G_CALLBACK (field_pressed_callback), NULL);
+    g_signal_connect (G_OBJECT (app_data.guess_submit), "clicked",
+        G_CALLBACK (guess_submit_clicked), NULL);
+    g_signal_connect (G_OBJECT (app_data.guess_del), "clicked",
+        G_CALLBACK (guess_del_clicked), NULL);
 
     gtk_widget_show_all(app_data.top_hbox);
     gtk_widget_show(app_data.new_game_button);
@@ -429,13 +535,10 @@ create_main_window (gint boardw, gint boardh)
     gtk_widget_show(app_data.main_vbox);
     gtk_widget_show(app_data.main_win);
     gtk_widget_show (menu_bar);
-    /* app_data.guess_label and app_data.guess_entry remain invisible */
+    /* app_data.guess_* remain invisible */
 
     gtk_editable_set_editable (GTK_EDITABLE (app_data.guess_entry), FALSE);
 
-    /* XXX test */
-    g_signal_connect (G_OBJECT (app_data.board_widget), "field-pressed",
-        G_CALLBACK (field_pressed_callback), NULL);
 }
 
 void
@@ -511,6 +614,7 @@ init_game ()
     app_data.found_words = NULL;
     app_data.guessed_words = 0;
     app_data.brd = NULL;
+    app_data.current_path = NULL;
 }
 
 void
@@ -530,6 +634,9 @@ start_game ()
     app_data.guessed_words = g_ptr_array_new ();
     app_data.score = 0;
     gtk_label_set_text (GTK_LABEL (app_data.score_label), "");
+    if (app_data.current_path)
+        coords_free (app_data.current_path);
+    app_data.current_path = NULL;
 
     board_widget_init_with_board ( BOARD_WIDGET (app_data.board_widget),
             app_data.brd);
@@ -538,6 +645,8 @@ start_game ()
     gtk_widget_hide (app_data.new_game_button);
     gtk_widget_show (app_data.guess_label);
     gtk_widget_show (app_data.guess_entry);
+    gtk_widget_show (app_data.guess_del);
+    gtk_widget_show (app_data.guess_submit);
     gtk_editable_set_editable (GTK_EDITABLE (app_data.guess_entry), TRUE);
     gtk_widget_grab_focus (app_data.guess_entry);
     
@@ -626,12 +735,50 @@ mark_path (coord **path)
 {
     gint len, i;
 
-    for (len = 0; path[len]; ++len);
+    len = coords_length (path);
     for (i = 0; i < len; ++i)
     {
+        g_debug ("%d %d %d", i, path[i]->x, path[i]->y);
         board_widget_mark_field (BOARD_WIDGET (app_data.board_widget),
                                  path[i]->x, path[i]->y, 
                                  len > 1 ? (gdouble)i  / (len - 1) :
                                  1);
     }
 }
+
+static void
+submit_guess (void)
+{
+    guess_st st;
+    const gchar *guess;
+    gchar *normalized_guess;
+    gint word_val;
+
+    guess = gtk_entry_get_text (GTK_ENTRY (app_data.guess_entry));
+    normalized_guess = normalize_guess (guess);
+    DEBUGSTM (g_printf ("guess submitted: %s\n", normalized_guess));
+
+    st = process_guess (normalized_guess, app_data.brd, 
+            app_data.guessed_words, &word_val);
+    DEBUGSTM (g_printf ("guess state: %d\n", st));    
+    if (st == good_guess)
+    {
+        gchar *str;
+
+        g_ptr_array_add (app_data.found_words, normalized_guess);
+        app_data.score += word_val;
+        str = g_strdup_printf("Score: %d", app_data.score);
+        gtk_label_set_text (GTK_LABEL (app_data.score_label), str);
+        g_free (str);
+    }
+    DEBUGSTM (g_printf ("history add: %s %d\n", guess, st));
+    history_add (guess, st);
+
+    board_widget_initbg (BOARD_WIDGET (app_data.board_widget));
+    gtk_entry_set_text (GTK_ENTRY (app_data.guess_entry), "");
+    if (app_data.current_path)
+        coords_free (app_data.current_path);
+    app_data.current_path = NULL;
+}
+
+
