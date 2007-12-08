@@ -173,19 +173,31 @@ game_end_callback (GtkMenuItem *menu_item, gpointer user_data)
 static void
 preferences_callback (GtkMenuItem *menu_item, gpointer user_data)
 {
-    gint l, oldl;
+    gint l;
+    gint result;
     
-    oldl = gtk_combo_box_get_active (GTK_COMBO_BOX (app_data.lang_combo));
-    gtk_dialog_run (GTK_DIALOG (app_data.preferences_dialog));
+    gtk_combo_box_set_active (GTK_COMBO_BOX (app_data.lang_combo),
+            app_data.sel_lang);
+    result = gtk_dialog_run (GTK_DIALOG (app_data.preferences_dialog));
     gtk_widget_hide (app_data.preferences_dialog);
+    if (result != GTK_RESPONSE_OK)
+        return;
+
+    while (gtk_events_pending ())
+        gtk_main_iteration();
+
     l = gtk_combo_box_get_active (GTK_COMBO_BOX (app_data.lang_combo));
     g_debug ("lang %d selected\n", l);
-    if (l >= 0)
+    if (l != app_data.sel_lang)
     {
-        if (!set_language (l))
+        if (set_language (l))
         {
-            g_debug ("lang set to %d failed, revert to %d\n", l, oldl);
-            gtk_combo_box_set_active (GTK_COMBO_BOX (app_data.lang_combo), oldl);
+            app_data.sel_lang = l;
+        }
+        else
+        {
+            g_debug ("lang set to %d failed, revert to %d\n", l,
+                    app_data.sel_lang);
         }
     }
 }
@@ -597,6 +609,7 @@ set_language (gint l)
         g_printf ("%s: failed to open\n", conf->dictf);
         return FALSE;
     }
+    g_debug ("dictionary loaded");
 
     if (app_data.dictionary)
         g_node_destroy(app_data.dictionary);
