@@ -34,6 +34,7 @@ struct _BoardWidget
     int height;
     int fieldw;
     int fieldh;
+    gboolean is_active;
     GtkWidget **fields;
 };
 
@@ -65,6 +66,10 @@ board_widget_mark_field (BoardWidget *boardw,
                          gint x,
                          gint y, 
                          gdouble scale);
+
+/* sets board widget sensitive/insensitive to field clicks */
+void
+board_widget_set_active (BoardWidget *boardw, gboolean is_active);
 
 G_END_DECLS
 
