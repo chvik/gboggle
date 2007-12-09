@@ -68,6 +68,9 @@ static void board_widget_init(BoardWidget *boardw)
 {
     boardw->fieldw = FIELDW;
     boardw->fieldh = FIELDH;
+    boardw->width = 0;
+    boardw->height = 0;
+    boardw->is_active = FALSE;
 }
 
 GtkWidget *
@@ -171,32 +174,23 @@ board_widget_mark_field (BoardWidget *boardw, gint x, gint y,
     color.blue = compl;
     gtk_widget_modify_bg (FIELD(boardw, x, y), GTK_STATE_NORMAL,
                           &color);
-
-    /*
-    switch (st)
-    {
-        case ACTIVE:
-            gtk_widget_modify_bg (FIELD(boardw, x, y), GTK_STATE_NORMAL,
-                                 &bgcolor_active);
-            break;
-        case MARKED:
-            gtk_widget_modify_bg (FIELD(boardw, x, y), GTK_STATE_NORMAL,
-                                  &bgcolor_marked);
-            break;
-        case UNMARKED:
-            gtk_widget_modify_bg (FIELD(boardw, x, y), GTK_STATE_NORMAL,
-                                  &bgcolor_unmarked);
-            break;
-    }
-    */
 }
 
+void
+board_widget_set_active (BoardWidget *boardw, gboolean is_active)
+{
+    boardw->is_active = is_active;
+}
 
-void event_box_clicked_cb(GtkWidget *event_box, GdkEventButton *event,
+static void
+event_box_clicked_cb(GtkWidget *event_box, GdkEventButton *event,
         gpointer user_data)
 {
     gint i, j;
     BoardWidget *boardw = BOARD_WIDGET (user_data);
+
+    if (!boardw->is_active)
+        return;
 
     for (i = 0; i < boardw->width; ++i)
         for (j = 0; j < boardw->height; ++j) {
@@ -211,3 +205,5 @@ void event_box_clicked_cb(GtkWidget *event_box, GdkEventButton *event,
             }
         }
 }
+
+
