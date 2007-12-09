@@ -89,17 +89,22 @@ static void
 guess_submit_clicked (GtkButton *button, gpointer data)
 {
     submit_guess ();
+    gtk_widget_grab_focus (app_data.guess_entry);
 }
 
 static void
 guess_del_clicked (GtkButton *button, gpointer data)
 {
     coord **path = app_data.current_path;
-    gint len = coords_length (path);
+    gint len;
     gint i;
     const gchar *str;
     gint pos = 0;
 
+    if (!path)
+        return;
+
+    len = coords_length (path);
     if (len > 0)
     {
         g_free (path[len - 1]);
@@ -112,15 +117,17 @@ guess_del_clicked (GtkButton *button, gpointer data)
 
     g_signal_handlers_block_by_func (app_data.guess_entry, guess_changed, 
             NULL);
-    gtk_editable_delete_text ( GTK_EDITABLE (app_data.guess_entry), 0, -1);
+    gtk_editable_delete_text (GTK_EDITABLE (app_data.guess_entry), 0, -1);
     for (i = 0; i < len; ++i)
     {
         str = board_gcharp_at (app_data.brd, path[i]->x, path[i]->y);
         gtk_editable_insert_text (GTK_EDITABLE (app_data.guess_entry),
-                str, strlen (str), &pos);
+                str, -1, &pos);
     }
     g_signal_handlers_unblock_by_func (app_data.guess_entry, guess_changed, 
             NULL);
+    gtk_widget_grab_focus (app_data.guess_entry);
+    gtk_editable_select_region (GTK_EDITABLE (app_data.guess_entry), -1, -1);
 }
 
 static void
@@ -213,7 +220,8 @@ field_pressed_callback (GtkWidget *widget, coord *c, gpointer data)
     const gchar *str;
 
     g_warning ("pressed: %d %d\n", c->x, c->y);
-    if (!app_data.current_path) {
+    if (!app_data.current_path || 
+            coords_length (app_data.current_path) == 0) {
         path = g_new (coord *, 2);
         path[0] = c;
         path[1] = NULL;
@@ -251,12 +259,13 @@ field_pressed_callback (GtkWidget *widget, coord *c, gpointer data)
     app_data.current_path = path;
 
     str = board_gcharp_at (app_data.brd, c->x, c->y);
-    pos = strlen (gtk_entry_get_text (GTK_ENTRY (app_data.guess_entry)));
     g_signal_handlers_block_by_func (app_data.guess_entry, guess_changed, 
             NULL);
+    gtk_entry_set_position (GTK_ENTRY (app_data.guess_entry), -1);
+    pos = gtk_editable_get_position (GTK_EDITABLE (app_data.guess_entry));
     gtk_editable_insert_text (GTK_EDITABLE (app_data.guess_entry),
-            str, strlen (str), &pos);
-    gtk_entry_set_position (GTK_ENTRY (app_data.guess_entry), pos);
+            str, -1, &pos);
+    gtk_editable_set_position (GTK_EDITABLE (app_data.guess_entry), pos);
     g_signal_handlers_unblock_by_func (app_data.guess_entry, guess_changed, 
             NULL);
 }
@@ -503,24 +512,32 @@ create_main_window (gint boardw, gint boardh)
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (menu_item), settings_menu);
     gtk_widget_show (menu_item);
     
-    gtk_box_pack_start (GTK_BOX (app_data.left_vbox), app_data.board_widget, FALSE, FALSE, VPAD);
-    gtk_box_pack_start (GTK_BOX (app_data.main_vbox), menu_bar, FALSE, FALSE, 2);
-    gtk_box_pack_start (GTK_BOX (app_data.main_vbox), app_data.top_hbox, TRUE, TRUE, VPAD);
-    gtk_box_pack_start (GTK_BOX (app_data.main_vbox), app_data.bottom_hbox, TRUE, TRUE, VPAD);
-    gtk_container_add (GTK_CONTAINER (scrolled_history), app_data.history_tree_view);
-    gtk_container_add (GTK_CONTAINER (scrolled_solutions), solutions_tree_view);
-    gtk_box_pack_start (GTK_BOX (app_data.bottom_hbox), app_data.new_game_button, FALSE, FALSE,
-                        HPAD);
+    gtk_box_pack_start (GTK_BOX (app_data.left_vbox), 
+            app_data.board_widget, FALSE, FALSE, VPAD);
+    gtk_box_pack_start (GTK_BOX (app_data.main_vbox), menu_bar, 
+            FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (app_data.main_vbox), app_data.top_hbox, 
+            TRUE, TRUE, VPAD);
+    gtk_box_pack_start (GTK_BOX (app_data.main_vbox), app_data.bottom_hbox,
+            TRUE, TRUE, VPAD);
+    gtk_container_add (GTK_CONTAINER (scrolled_history),
+            app_data.history_tree_view);
+    gtk_container_add (GTK_CONTAINER (scrolled_solutions),
+            solutions_tree_view);
+    gtk_box_pack_start (GTK_BOX (app_data.bottom_hbox),
+            app_data.new_game_button, FALSE, FALSE, HPAD);
     gtk_box_pack_start (GTK_BOX (app_data.bottom_hbox), app_data.guess_label,
-                        TRUE, TRUE, HPAD);
+            TRUE, TRUE, HPAD);
     gtk_box_pack_start (GTK_BOX (app_data.bottom_hbox), app_data.guess_entry,
-                        TRUE, TRUE, HPAD);
+            TRUE, TRUE, HPAD);
     gtk_box_pack_start (GTK_BOX (app_data.bottom_hbox), app_data.guess_del,
-                        FALSE, FALSE, HPAD);
+            FALSE, FALSE, HPAD);
     gtk_box_pack_start (GTK_BOX (app_data.bottom_hbox), app_data.guess_submit,
-                        FALSE, FALSE, HPAD);
-    gtk_box_pack_start (GTK_BOX (app_data.bottom_hbox), app_data.time_label, TRUE, TRUE, HPAD);
-    gtk_container_add (GTK_CONTAINER (app_data.bottom_hbox), app_data.score_label);
+            FALSE, FALSE, HPAD);
+    gtk_box_pack_start (GTK_BOX (app_data.bottom_hbox), app_data.time_label,
+            TRUE, TRUE, HPAD);
+    gtk_container_add (GTK_CONTAINER (app_data.bottom_hbox),
+            app_data.score_label);
     gtk_box_pack_start (GTK_BOX (app_data.top_hbox), app_data.left_vbox,
             TRUE, TRUE, HPAD);
     gtk_box_pack_start (GTK_BOX (app_data.top_hbox), scrolled_history,
@@ -683,6 +700,8 @@ stop_game ()
 
     gtk_widget_hide (app_data.guess_label);
     gtk_widget_hide (app_data.guess_entry);
+    gtk_widget_hide (app_data.guess_submit);
+    gtk_widget_hide (app_data.guess_del);
     gtk_widget_show (app_data.new_game_button);
     gtk_widget_set_sensitive (app_data.end_game_menu_item, FALSE);
 
