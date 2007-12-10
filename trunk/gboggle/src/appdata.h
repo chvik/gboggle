@@ -26,6 +26,7 @@ struct _AppData {
     GtkWidget *preferences_dialog;
     GtkWidget *lang_combo;
     GtkWidget *end_game_menu_item;
+    GtkWidget *wordlist_notebook;
 
     GtkListStore *history_list_store;
     GtkListStore *solutions_list_store;

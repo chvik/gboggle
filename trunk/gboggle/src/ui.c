@@ -376,7 +376,6 @@ create_history_tree_view (GtkTreeModel *model)
     gtk_tree_view_column_set_cell_data_func (col, renderer, 
                                              history_data_cell_func,
                                              NULL, NULL);
-    g_object_set (G_OBJECT (col), "title", "Guesses", NULL);
 
     g_object_unref (model);
     gtk_tree_selection_set_mode (
@@ -401,7 +400,6 @@ create_solution_tree_view (GtkTreeModel *model)
     renderer = gtk_cell_renderer_text_new ();
     gtk_tree_view_column_pack_start (col, renderer, TRUE);
     gtk_tree_view_column_set_attributes (col, renderer, "text", 0, NULL);
-    g_object_set (G_OBJECT (col), "title", "Missed words", NULL);
     g_object_set (G_OBJECT (tree_view), "enable-search", FALSE, NULL);
 
     g_object_unref (model);
@@ -424,6 +422,7 @@ create_main_window (gint boardw, gint boardh)
     GtkWidget *main_vbox;
     GtkWidget *table;
     GtkWidget *guess_hbox;
+    GtkWidget *time_score_hbox;
 
     app_data.main_win = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title ( GTK_WINDOW (app_data.main_win), "gboggle");
@@ -439,8 +438,10 @@ create_main_window (gint boardw, gint boardh)
     app_data.new_game_button = gtk_button_new_with_label ("New Game");
     gtk_entry_set_width_chars (GTK_ENTRY (app_data.guess_entry), 10);
     main_vbox = gtk_vbox_new (FALSE, 0);
-    table = gtk_table_new (3, 2, FALSE);
+    table = gtk_table_new (2, 2, FALSE);
     guess_hbox = gtk_hbox_new (FALSE, 0);
+    time_score_hbox = gtk_hbox_new (FALSE, 0);
+    app_data.wordlist_notebook = gtk_notebook_new ();
     app_data.time_label = gtk_label_new ("Time: 0:00");
     app_data.score_label = gtk_label_new (ZERO_SCORE);
     app_data.guess_submit = gtk_button_new ();
@@ -458,9 +459,13 @@ create_main_window (gint boardw, gint boardh)
     scrolled_history = gtk_scrolled_window_new (NULL, NULL);
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_history),
                                     GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-    app_data.history_tree_view = create_history_tree_view (GTK_TREE_MODEL (app_data.history_list_store));
+    app_data.history_tree_view = 
+        create_history_tree_view 
+        (GTK_TREE_MODEL (app_data.history_list_store));
     gtk_widget_set_size_request (app_data.history_tree_view, LIST_WIDTH, 
             LIST_HEIGHT);
+    gtk_tree_view_set_headers_visible 
+        (GTK_TREE_VIEW (app_data.history_tree_view), FALSE);
     
     /* solutions */
     app_data.solutions_list_store = 
@@ -471,6 +476,8 @@ create_main_window (gint boardw, gint boardh)
     solutions_tree_view = create_solution_tree_view (
                              GTK_TREE_MODEL (app_data.solutions_list_store));
     gtk_widget_set_size_request (solutions_tree_view, LIST_WIDTH, LIST_HEIGHT);
+    gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (solutions_tree_view),
+            FALSE);
     
     /* menu */
     menu_bar = gtk_menu_bar_new ();
@@ -478,14 +485,15 @@ create_main_window (gint boardw, gint boardh)
     settings_menu = gtk_menu_new ();
 
     /* Game/New */
-    menu_item = gtk_menu_item_new_with_label ("New game");
+    menu_item = gtk_image_menu_item_new_from_stock (GTK_STOCK_NEW, NULL);
     gtk_menu_shell_append (GTK_MENU_SHELL (game_menu), menu_item);
     g_signal_connect (G_OBJECT (menu_item), "activate",
                       G_CALLBACK (game_new_callback), NULL);
     gtk_widget_show (menu_item);
 
-    /* Game/End */
-    app_data.end_game_menu_item = gtk_menu_item_new_with_label ("End game");
+    /* Game/Stop */
+    app_data.end_game_menu_item = 
+        gtk_image_menu_item_new_from_stock (GTK_STOCK_STOP, NULL);
     gtk_menu_shell_append (GTK_MENU_SHELL (game_menu), app_data.end_game_menu_item);
     g_signal_connect (G_OBJECT (app_data.end_game_menu_item), "activate",
                       G_CALLBACK (game_end_callback), NULL);
@@ -493,7 +501,7 @@ create_main_window (gint boardw, gint boardh)
     gtk_widget_show (app_data.end_game_menu_item);
     
     /* Game/Exit */
-    menu_item = gtk_menu_item_new_with_label ("Exit");
+    menu_item = gtk_image_menu_item_new_from_stock (GTK_STOCK_QUIT, NULL);
     gtk_menu_shell_append (GTK_MENU_SHELL (game_menu), menu_item);
     g_signal_connect (G_OBJECT (menu_item), "activate",
                       G_CALLBACK (gtk_main_quit), NULL);
@@ -506,7 +514,8 @@ create_main_window (gint boardw, gint boardh)
     gtk_widget_show (menu_item);
     
     /* Settings/Preferences */
-    menu_item = gtk_menu_item_new_with_label ("Preferences");
+    menu_item = gtk_image_menu_item_new_from_stock (GTK_STOCK_PREFERENCES,
+            NULL);
     gtk_menu_shell_append (GTK_MENU_SHELL (settings_menu), menu_item);
     g_signal_connect (G_OBJECT (menu_item), "activate",
                       G_CALLBACK (preferences_callback), NULL);
@@ -521,18 +530,21 @@ create_main_window (gint boardw, gint boardh)
     /* table layout */
     gtk_table_attach_defaults (GTK_TABLE (table), app_data.board_widget, 
             0, 1, 0, 1);
-    gtk_table_attach_defaults (GTK_TABLE (table), scrolled_history, 
+    gtk_table_attach_defaults (GTK_TABLE (table), app_data.wordlist_notebook, 
             1, 2, 0, 1);
-    gtk_table_attach_defaults (GTK_TABLE (table), scrolled_solutions, 
-            2, 3, 0, 1);
     gtk_table_attach_defaults (GTK_TABLE (table), guess_hbox, 
             0, 1, 1, 2);
-    gtk_table_attach_defaults (GTK_TABLE (table), app_data.time_label, 
+    gtk_table_attach_defaults (GTK_TABLE (table), time_score_hbox,
             1, 2, 1, 2);
-    gtk_table_attach_defaults (GTK_TABLE (table), app_data.score_label, 
-            2, 3, 1, 2);
     gtk_table_set_row_spacings (GTK_TABLE (table), VPAD);
     gtk_table_set_col_spacings (GTK_TABLE (table), HPAD);
+
+    gtk_notebook_append_page (GTK_NOTEBOOK (app_data.wordlist_notebook),
+            scrolled_history,
+            gtk_label_new ("Guesses"));
+    gtk_notebook_append_page (GTK_NOTEBOOK (app_data.wordlist_notebook),
+            scrolled_solutions,
+            gtk_label_new ("Missed words"));
 
     gtk_box_pack_start (GTK_BOX (main_vbox), menu_bar, 
             FALSE, FALSE, 2);
@@ -552,6 +564,10 @@ create_main_window (gint boardw, gint boardh)
             FALSE, FALSE, GUESS_HPAD);
     gtk_box_pack_start (GTK_BOX (guess_hbox), app_data.guess_submit,
             FALSE, FALSE, GUESS_HPAD);
+    gtk_box_pack_start (GTK_BOX (time_score_hbox), app_data.time_label,
+            FALSE, FALSE, GUESS_HPAD);
+    gtk_box_pack_start (GTK_BOX (time_score_hbox), app_data.score_label,
+            FALSE, FALSE, GUESS_HPAD);
     gtk_container_add (GTK_CONTAINER (app_data.main_win), main_vbox);
 
     g_signal_connect (G_OBJECT (app_data.main_win), "destroy", G_CALLBACK (exit), NULL);
@@ -568,6 +584,8 @@ create_main_window (gint boardw, gint boardh)
     gtk_widget_show_all (scrolled_history);
     gtk_widget_show_all (scrolled_solutions);
     gtk_widget_show (guess_hbox);
+    gtk_widget_show (time_score_hbox);
+    gtk_widget_show (app_data.wordlist_notebook);
     gtk_widget_show (app_data.new_game_button);
     gtk_widget_show (app_data.time_label);
     gtk_widget_show (app_data.score_label);
@@ -659,7 +677,7 @@ init_game ()
 }
 
 void
-start_game ()
+start_game (void)
 {
 
     board_dispose (app_data.brd);
@@ -691,6 +709,8 @@ start_game ()
     gtk_widget_show (app_data.guess_submit);
     gtk_editable_set_editable (GTK_EDITABLE (app_data.guess_entry), TRUE);
     gtk_widget_grab_focus (app_data.guess_entry);
+    gtk_notebook_set_current_page (GTK_NOTEBOOK (app_data.wordlist_notebook),
+            0);
     
     app_data.guess_changed_id = 
         g_signal_connect (G_OBJECT (app_data.guess_entry), "changed", 
@@ -703,7 +723,7 @@ start_game ()
 }
 
 void
-stop_game ()
+stop_game (void)
 {
     guess_st st;
     
@@ -717,6 +737,8 @@ stop_game ()
     gtk_widget_show (app_data.new_game_button);
     gtk_widget_set_sensitive (app_data.end_game_menu_item, FALSE);
     board_widget_set_active (BOARD_WIDGET (app_data.board_widget), FALSE);
+    gtk_notebook_set_current_page (GTK_NOTEBOOK (app_data.wordlist_notebook),
+            1);
 
     gtk_editable_set_editable (GTK_EDITABLE (app_data.guess_entry), FALSE);
     g_signal_handler_disconnect (app_data.guess_entry,
