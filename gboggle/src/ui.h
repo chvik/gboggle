@@ -42,5 +42,7 @@ list_solutions_and_score (GPtrArray *solutions,
 void
 mark_path (coord **path);
 
+void
+update_title (void);
 
 #endif /* __UI_H__ */

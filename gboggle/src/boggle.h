@@ -22,7 +22,9 @@ enum _guess_st
 gint
 trie_load (GNode *root,
            const gchar * const *alphabet,
-           const gchar *filename);
+           const gchar *filename,
+           void (*progress_cb) (gdouble, gpointer),
+           gpointer cb_data);
 
 void
 trie_add (GNode *root, 

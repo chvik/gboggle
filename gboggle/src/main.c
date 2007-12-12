@@ -22,13 +22,13 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    set_language (0);
-    init_game ();
         
     gtk_init (&argc, &argv);
     
     create_preferences_dialog ();
     create_main_window (DEFAULT_BOARD_WIDTH, DEFAULT_BOARD_HEIGHT);
+    set_language (0);
+    init_game ();
 
     gtk_main ();
 
