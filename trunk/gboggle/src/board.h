@@ -73,7 +73,7 @@ void
 coords_free (coord **path);
 
 gint
-coords_length (coord **path);
+coords_length (const coord **path);
 
 #endif /* __BOARD_H__ */
 

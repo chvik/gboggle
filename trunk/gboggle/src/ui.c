@@ -23,10 +23,11 @@
 #define LIST_WIDTH 200 
 
 #define ZERO_SCORE "Score: 0"
+#define APPNAME "gboggle"
 
 /* static function declarations */
 static void submit_guess (void);
-
+void create_progress_dialog (GtkWidget **dialog, GtkWidget **pbar);
 
 /*
  * callbacks
@@ -202,7 +203,7 @@ preferences_callback (GtkMenuItem *menu_item, gpointer user_data)
     {
         if (set_language (l))
         {
-            app_data.sel_lang = l;
+            update_title ();
         }
         else
         {
@@ -296,6 +297,19 @@ timer_func (gpointer data)
 
     return TRUE;
 }
+
+static void
+update_pbar (gdouble frac, gpointer data)
+{
+    GtkWidget *pbar = GTK_WIDGET (data);
+
+    g_debug ("progress: %f", frac);
+    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (pbar), frac);
+    while (gtk_events_pending ())
+        gtk_main_iteration();
+
+}
+
 
 /*
  * functions
@@ -425,7 +439,7 @@ create_main_window (gint boardw, gint boardh)
     GtkWidget *time_score_hbox;
 
     app_data.main_win = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title ( GTK_WINDOW (app_data.main_win), "gboggle");
+    update_title ();
     gtk_container_set_border_width (GTK_CONTAINER (app_data.main_win), 10);
 
     app_data.board_width = boardw;
@@ -646,15 +660,22 @@ set_language (gint l)
     struct langconf *conf;
     GNode *trie;
     const gchar * const *alph;
+    GtkWidget *pdialog;
+    GtkWidget *pbar;
     
     conf = (struct langconf *)g_ptr_array_index(app_data.langconfs, l);
     alph = (const gchar * const *)conf->alphabet->pdata;
     trie = g_node_new (NULL);
-    if(trie_load (trie, alph, conf->dictf) != 0)
+    create_progress_dialog (&pdialog, &pbar);
+
+    if(trie_load (trie, alph, conf->dictf, update_pbar, (gpointer)pbar) != 0)
     {
         g_printf ("%s: failed to open\n", conf->dictf);
+        gtk_widget_destroy (pdialog);
+        /* XXX need to destroy subwidgets? */
         return FALSE;
     }
+    gtk_widget_destroy (pdialog);
     g_debug ("dictionary loaded");
 
     if (app_data.dictionary)
@@ -662,6 +683,8 @@ set_language (gint l)
     app_data.dictionary = trie;
     app_data.alphabet = alph;
     app_data.weights = (gint *)conf->weights->data;
+    app_data.sel_lang = l;
+
     return TRUE;
 }
 
@@ -813,6 +836,19 @@ mark_path (coord **path)
     }
 }
 
+void
+update_title (void)
+{
+    char *title;
+    struct langconf *conf = 
+        (struct langconf *) g_ptr_array_index (app_data.langconfs, 
+                app_data.sel_lang);
+        
+    title = g_strdup_printf ("%s - %s", APPNAME, conf->lang);
+    gtk_window_set_title (GTK_WINDOW (app_data.main_win), title);
+    g_free (title);
+}
+
 static void
 submit_guess (void)
 {
@@ -848,4 +884,16 @@ submit_guess (void)
     app_data.current_path = NULL;
 }
 
+void
+create_progress_dialog (GtkWidget **dialog, GtkWidget **pbar)
+{
+    GtkWidget *d = *dialog;
 
+    d = gtk_dialog_new ();
+    gtk_window_set_position (GTK_WINDOW (d), GTK_WIN_POS_CENTER);    
+    gtk_window_set_title (GTK_WINDOW (d), "Loading dictionary");
+    gtk_window_set_modal (GTK_WINDOW (d), TRUE);
+    *pbar = gtk_progress_bar_new ();
+    gtk_container_add (GTK_CONTAINER (GTK_DIALOG (d)->vbox), *pbar);
+    gtk_widget_show_all (d);
+}

@@ -398,21 +398,37 @@ find_str_on_board (GPtrArray *paths, const gchar *str, board *brd)
 #define BUFLENGTH 256
 
 gint
-trie_load (GNode *root, const gchar * const *alphabet, const gchar *filename)
+trie_load (GNode *root, const gchar * const *alphabet, 
+        const gchar *filename, void (*progress_cb) (gdouble, gpointer), 
+        gpointer cb_data)
 {
     FILE *dictf;
     char buf[BUFLENGTH];
     letter *letters;
     gint gcharlen, letterlen;
     GPtrArray *letters_arr;
+    glong filelen;
+    gint word_count = 0;
 
     dictf = g_fopen (filename, "r");
     if (!dictf)
         return -1;
 
+    fseek (dictf, 0, SEEK_END);    
+    filelen = ftell (dictf);
+    fseek (dictf, 0, SEEK_SET);
+
     while (fgets (buf, BUFLENGTH - 1, dictf))
     {
         gint i;
+
+        ++word_count;
+        /* call progress_cb at every 100th word */
+        if (progress_cb && word_count % 100 == 0)
+        {
+            glong pos = ftell (dictf);
+            progress_cb ((gdouble)pos / (gdouble)filelen, cb_data);
+        }
 
         gcharlen = strlen (buf);
         if (gcharlen == BUFLENGTH - 1 && buf[BUFLENGTH-2] != '\n')
