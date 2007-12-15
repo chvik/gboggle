@@ -231,39 +231,45 @@ str2letters_ (const gchar * const *alphabet, const gchar *str)
 
 
 letter *
-coords2letters (const board *brd, const coord **path)
+path2letters (const board *brd, GArray *path)
 {
     int i, len;
     letter *l;
     
-    len = coords_length (path);
+    len = path_length (path);
     l = g_malloc ((len + 1) * sizeof (letter));
     for (i = 0; i < len; ++i)
     {
-        l[i] = brd->letters[path[i]->y * brd->width + path[i]->x];
+        coord c = path_index (path, i);
+        l[i] = brd->letters[c.y * brd->width + c.x];
     }
     l[len] = 0;
     return l;
 }
 
- 
-void
-coords_free (coord **path)
+GArray *
+path_new ()
 {
-    int i;
+    g_array_new (TRUE, TRUE, sizeof (coord));
+}
 
-    for (i = 0; path[i]; ++i)
-        g_free (path[i]);
+coord
+path_index (GArray *path, gint i)
+{
+    return g_array_index (path, coord, i);
+}
 
-    g_free (path);
+void
+path_free (GArray *path)
+{
+    g_array_free (path, TRUE);
 }
 
 
 gint
-coords_length (const coord **path)
+path_length (GArray *path)
 {
     int len;
 
-    for (len = 0; path[len]; ++len);
-    return len;
+    return path->len;
 }

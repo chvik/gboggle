@@ -34,7 +34,7 @@ struct _AppData {
     GPtrArray *found_words;
     GPtrArray *guessed_words;
     GPtrArray *solutions;
-    coord **current_path;
+    GArray *current_path;
 
     gint score;
 

@@ -12,7 +12,7 @@
 
 static guess_st
 depth_search (letter *guess, const board *brd, gint startx, gint starty,
-              GPtrArray *solutions, const coord **path_prefix,
+              GPtrArray *solutions, GArray *path_prefix,
               GNode *trie_node, const gboolean *seen);
 
 static gint
@@ -65,20 +65,22 @@ missing_solutions (GPtrArray **words, GArray **sol_index,
                                NULL, NULL, NULL);
     for (i = 0; i < solutions->len; ++i)
     {
-        coord **path;
+        GArray *path;
         gchar *word;
         gint len;
         gint j;
         
-        path = (coord **)g_ptr_array_index (solutions, i);
-        len = coords_length (path);
+        path = (GArray *)g_ptr_array_index (solutions, i);
+        len = path_length (path);
         word = g_new0 (gchar , len * 6 + 1);
         /* utf8 wide chars cannot exceed 6 bytes */
         for (j = 0; j < len; ++j)
         {
             const gchar *chp;
-            
-            chp = board_gcharp_at (brd, path[j]->x, path[j]->y);
+            coord c;
+
+            c = path_index (path, j);
+            chp = board_gcharp_at (brd, c.x, c.y);
             strncat (word, chp, len * 6 - strlen (word));
         }
         if (!g_tree_lookup (soltree, (gconstpointer)word))
@@ -122,15 +124,15 @@ search_solution (GPtrArray *solutions, letter *guess, const board *brd,
 {
     gboolean *seen;
     gint x, y;
-    const coord *path;
+    GArray *path;
     guess_st st;
     
     seen = g_new0 (gboolean, brd->width * brd->height);
-    path = NULL;
+    path = path_new ();
     for (y = 0; y < brd->height; ++y)
         for (x = 0; x < brd->width; ++x)
         {
-            st = depth_search (guess, brd, x, y, solutions, &path,
+            st = depth_search (guess, brd, x, y, solutions, path,
                                use_trie ? brd->trie : NULL, seen);
             g_assert (use_trie || st != not_in_dictionary);
             if (guess && 
@@ -151,7 +153,7 @@ search_solution (GPtrArray *solutions, letter *guess, const board *brd,
 
 guess_st
 depth_search (letter *guess, const board *brd, gint startx, gint starty,
-              GPtrArray *solutions, const coord **path_prefix,
+              GPtrArray *solutions, GArray *path_prefix,
               GNode *trie_node, const gboolean *seen)
 {
     gint dx, dy;
@@ -159,14 +161,14 @@ depth_search (letter *guess, const board *brd, gint startx, gint starty,
     gboolean found_leaf;
     gint len;
     GNode *child = NULL;
-    const coord **new_path_prefix;            
+    GArray *new_path_prefix;
     int i;
     gboolean *new_seen;
-    coord *here;
+    coord here;
     guess_st retval = not_in_board;
     gboolean found_solution = FALSE;
  
-    len = coords_length (path_prefix);
+    len = path_length (path_prefix);
     g_assert (len >= 0);
     g_assert (len < 16);
     DEBUGSTM (g_printf("depth_search depth: %d from %d %d\n", len, startx, starty));
@@ -193,16 +195,15 @@ depth_search (letter *guess, const board *brd, gint startx, gint starty,
     }
 
     /* copy path_prefix into new_path_prefix */
-    new_path_prefix = g_new (const coord *, len + 2);
+    new_path_prefix = path_new ();
     for (i = 0; i < len; ++i)
     {
-        new_path_prefix[i] = path_prefix[i];
+        coord c = path_index (path_prefix, i);
+        g_array_append_val (new_path_prefix, c);
     }
-    here = g_new (coord, 1);
-    here->x = startx;
-    here->y = starty;
-    new_path_prefix[len] = here;
-    new_path_prefix[len + 1] = NULL;
+    here.x = startx;
+    here.y = starty;
+    g_array_append_val (new_path_prefix, here);
 
     /* copy seen into new_seen */
     new_seen = g_new (gboolean, brd->width * brd->height);
@@ -233,17 +234,16 @@ depth_search (letter *guess, const board *brd, gint startx, gint starty,
 
     if (found_solution)
     {
-            coord **path_prefix_copy;
+            GArray *path_prefix_copy;
             gint i;
 
             /* add copy of the path to solutions */
-            path_prefix_copy = g_new (coord *, len + 2);
+            path_prefix_copy = path_new ();
             for (i = 0; i < len + 1; ++i)
             {
-                path_prefix_copy[i] = g_new (coord, 1);
-                *path_prefix_copy[i] = *new_path_prefix[i];
+                coord c = path_index (new_path_prefix, i);
+                g_array_append_val (path_prefix_copy, c);
             }
-            path_prefix_copy[len + 1] = NULL;
             g_ptr_array_add (solutions, (gpointer)path_prefix_copy);
             if (guess)
                 return good_guess;
@@ -283,8 +283,7 @@ depth_search (letter *guess, const board *brd, gint startx, gint starty,
         } /* for */
 
     /* free memory allocated by this call */
-    g_free (here);
-    g_free (new_path_prefix);
+    path_free (new_path_prefix);
     g_free (new_seen);
 
     if (guess)
@@ -423,8 +422,8 @@ trie_load (GNode *root, const gchar * const *alphabet,
         gint i;
 
         ++word_count;
-        /* call progress_cb at every 100th word */
-        if (progress_cb && word_count % 100 == 0)
+        /* call progress_cb at every 1000th word */
+        if (progress_cb && word_count % 1000 == 0)
         {
             glong pos = ftell (dictf);
             progress_cb ((gdouble)pos / (gdouble)filelen, cb_data);
