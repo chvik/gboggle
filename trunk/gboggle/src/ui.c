@@ -27,7 +27,7 @@
 
 /* static function declarations */
 static void submit_guess (void);
-void create_progress_dialog (GtkWidget **dialog, GtkWidget **pbar);
+static void create_progress_dialog (GtkWidget **dialog, GtkWidget **pbar);
 
 /*
  * callbacks
@@ -39,7 +39,7 @@ guess_changed (GtkEditable *editable, gpointer data)
     const gchar *guess;
     guess_st st;
     GPtrArray *paths;
-    coord **path;
+    GArray *path;
  
     board_widget_initbg (BOARD_WIDGET (app_data.board_widget));
 
@@ -53,19 +53,19 @@ guess_changed (GtkEditable *editable, gpointer data)
         path = g_ptr_array_remove_index (paths, 0);
         mark_path (path);
         if (app_data.current_path)
-            coords_free (app_data.current_path);
+            path_free (app_data.current_path);
         app_data.current_path = path;
     }
     else
     {
         if (app_data.current_path)
-            coords_free (app_data.current_path);
+            path_free (app_data.current_path);
          app_data.current_path = NULL;
     }
     
     while (paths->len) {
-        coord **path = g_ptr_array_remove_index (paths, 0);
-        coords_free (path);
+        GArray *path = g_ptr_array_remove_index (paths, 0);
+        path_free (path);
     }
     g_ptr_array_free (paths, TRUE);
 
@@ -99,7 +99,7 @@ guess_submit_clicked (GtkButton *button, gpointer data)
 static void
 guess_del_clicked (GtkButton *button, gpointer data)
 {
-    coord **path = app_data.current_path;
+    GArray *path = app_data.current_path;
     gint len;
     gint i;
     const gchar *str;
@@ -108,12 +108,11 @@ guess_del_clicked (GtkButton *button, gpointer data)
     if (!path)
         return;
 
-    len = coords_length (path);
+    len = path_length (path);
     if (len > 0)
     {
-        g_free (path[len - 1]);
-        path[len - 1] = NULL;
-        --len;
+        g_array_remove_index (path, len - 1);
+        len = path_length (path);
     }
 
     board_widget_initbg (BOARD_WIDGET (app_data.board_widget));
@@ -124,7 +123,9 @@ guess_del_clicked (GtkButton *button, gpointer data)
     gtk_editable_delete_text (GTK_EDITABLE (app_data.guess_entry), 0, -1);
     for (i = 0; i < len; ++i)
     {
-        str = board_gcharp_at (app_data.brd, path[i]->x, path[i]->y);
+        coord c = path_index (path, i);
+
+        str = board_gcharp_at (app_data.brd, c.x, c.y);
         gtk_editable_insert_text (GTK_EDITABLE (app_data.guess_entry),
                 str, -1, &pos);
     }
@@ -140,7 +141,7 @@ solutions_tree_view_changed (GtkTreeSelection *selection, gpointer data)
     GtkTreeIter iter;
     GtkTreeModel *model;
     guint sol_index;
-    coord **path;
+    GArray *path;
 
     if (!gtk_tree_selection_get_selected (selection, &model, &iter))
     {
@@ -148,7 +149,7 @@ solutions_tree_view_changed (GtkTreeSelection *selection, gpointer data)
     }
     
     gtk_tree_model_get (model, &iter, 1, &sol_index, -1);
-    path = (coord **)g_ptr_array_index (app_data.solutions, sol_index);
+    path = (GArray *)g_ptr_array_index (app_data.solutions, sol_index);
     board_widget_initbg (BOARD_WIDGET (app_data.board_widget));
     mark_path (path);
 }
@@ -214,26 +215,25 @@ preferences_callback (GtkMenuItem *menu_item, gpointer user_data)
 }
 
 static void
-field_pressed_callback (GtkWidget *widget, coord *c, gpointer data)
+field_pressed_callback (GtkWidget *widget, coord *cp, gpointer data)
 {
-    coord *last_field;
-    coord **path;
+    coord last_field;
+    GArray *path;
     gint len;
     gint i;
     gint pos;
     const gchar *str;
 
-    g_warning ("pressed: %d %d\n", c->x, c->y);
+    g_warning ("pressed: %d %d\n", cp->x, cp->y);
     if (!app_data.current_path || 
-            coords_length (app_data.current_path) == 0) {
-        path = g_new (coord *, 2);
-        path[0] = c;
-        path[1] = NULL;
+            path_length (app_data.current_path) == 0) {
+        path = path_new ();
+        g_array_append_val (path, *cp);
     } else {
-        len = coords_length (app_data.current_path);
-        last_field = app_data.current_path[len - 1];
-        if (abs (last_field->x - c->x) > 1 ||
-            abs (last_field->y - c->y) > 1)
+        len = path_length (app_data.current_path);
+        last_field = path_index (app_data.current_path, len - 1);
+        if (abs (last_field.x - cp->x) > 1 ||
+            abs (last_field.y - cp->y) > 1)
         {
             /* illegal field */
             g_debug("not a neighbour");
@@ -241,28 +241,30 @@ field_pressed_callback (GtkWidget *widget, coord *c, gpointer data)
         }
         for (i = 0; i < len; ++i)
         {
-            coord *p = app_data.current_path[i];
+            coord p = path_index (app_data.current_path, i);
 
-            if (p->x == c->x && p->y == c->y)
+            if (p.x == cp->x && p.y == cp->y)
             {
                 /* field is already marked */
                 return;
             }
         }
 
-        path = g_new (coord *, len + 2);
+        path = path_new ();
         for (i = 0; i < len; ++i)
-            path[i] = app_data.current_path[i];
-        path[len] = c;
-        path[len + 1] = NULL;
-        g_free (app_data.current_path);
+        {
+            coord c = path_index (app_data.current_path, i);
+            g_array_append_val (path, c);
+        }
+        g_array_append_val (path, *cp);
+        path_free (app_data.current_path);
     }
 
     board_widget_initbg (BOARD_WIDGET (app_data.board_widget));
     mark_path (path);
     app_data.current_path = path;
 
-    str = board_gcharp_at (app_data.brd, c->x, c->y);
+    str = board_gcharp_at (app_data.brd, cp->x, cp->y);
     g_signal_handlers_block_by_func (app_data.guess_entry, guess_changed, 
             NULL);
     gtk_entry_set_position (GTK_ENTRY (app_data.guess_entry), -1);
@@ -303,7 +305,6 @@ update_pbar (gdouble frac, gpointer data)
 {
     GtkWidget *pbar = GTK_WIDGET (data);
 
-    g_debug ("progress: %f", frac);
     gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (pbar), frac);
     while (gtk_events_pending ())
         gtk_main_iteration();
@@ -675,7 +676,8 @@ set_language (gint l)
         /* XXX need to destroy subwidgets? */
         return FALSE;
     }
-    gtk_widget_destroy (pdialog);
+    gtk_window_set_modal (GTK_WINDOW (pdialog), FALSE);
+//    gtk_widget_destroy (pdialog);
     g_debug ("dictionary loaded");
 
     if (app_data.dictionary)
@@ -717,7 +719,7 @@ start_game (void)
     app_data.score = 0;
     gtk_label_set_text (GTK_LABEL (app_data.score_label), ZERO_SCORE);
     if (app_data.current_path)
-        coords_free (app_data.current_path);
+        path_free (app_data.current_path);
     app_data.current_path = NULL;
 
     board_widget_init_with_board ( BOARD_WIDGET (app_data.board_widget),
@@ -821,18 +823,19 @@ list_solutions_and_score (GPtrArray *solutions, GPtrArray *found_words)
 }
 
 void
-mark_path (coord **path)
+mark_path (GArray *path)
 {
     gint len, i;
 
-    len = coords_length (path);
+    len = path_length (path);
     for (i = 0; i < len; ++i)
     {
-        g_debug ("%d %d %d", i, path[i]->x, path[i]->y);
+        coord c = path_index (path, i);
+        g_debug ("%d %d %d", i, c.x, c.y);
         board_widget_mark_field (BOARD_WIDGET (app_data.board_widget),
-                                 path[i]->x, path[i]->y, 
-                                 len > 1 ? (gdouble)i  / (len - 1) :
-                                 1);
+                c.x, c.y, 
+                len > 1 ? (gdouble)i  / (len - 1) :
+                1);
     }
 }
 
@@ -880,20 +883,21 @@ submit_guess (void)
     board_widget_initbg (BOARD_WIDGET (app_data.board_widget));
     gtk_entry_set_text (GTK_ENTRY (app_data.guess_entry), "");
     if (app_data.current_path)
-        coords_free (app_data.current_path);
+        path_free (app_data.current_path);
     app_data.current_path = NULL;
 }
 
-void
+static void
 create_progress_dialog (GtkWidget **dialog, GtkWidget **pbar)
 {
     GtkWidget *d = *dialog;
 
     d = gtk_dialog_new ();
+    d = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_position (GTK_WINDOW (d), GTK_WIN_POS_CENTER);    
     gtk_window_set_title (GTK_WINDOW (d), "Loading dictionary");
-    gtk_window_set_modal (GTK_WINDOW (d), TRUE);
+//XXX    gtk_window_set_modal (GTK_WINDOW (d), TRUE);
     *pbar = gtk_progress_bar_new ();
-    gtk_container_add (GTK_CONTAINER (GTK_DIALOG (d)->vbox), *pbar);
+    gtk_container_add (GTK_CONTAINER (d), *pbar);
     gtk_widget_show_all (d);
 }

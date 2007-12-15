@@ -65,15 +65,22 @@ str2letters_ (const gchar * const *alphabet,
 
 /* returns zero terminated array, must be freed by the caller */
 letter *
-coords2letters (const board *brd,
-                const coord **path);
+path2letters (const board *brd,
+                GArray *path);
 
-/* frees NULL terminated coord ptr array with member coords */
+/* creates empty path */
+GArray *
+path_new ();
+
+coord
+path_index (GArray *path, gint i);
+
+/* frees coord array with member coords */
 void
-coords_free (coord **path);
+path_free (GArray *path);
 
 gint
-coords_length (const coord **path);
+path_length (GArray *path);
 
 #endif /* __BOARD_H__ */
 

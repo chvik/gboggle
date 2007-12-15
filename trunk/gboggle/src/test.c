@@ -56,14 +56,15 @@ static void trie_traverse (GNode *root, gchar **prefix)
 }
        
 static void
-print_path (board *brd, coord **path)
+print_path (board *brd, GArray *path)
 {
     gint i;
 
     for (i = 0; path[i]; ++i)
     {
-        g_printf ("%d %d %s\n", path[i]->x, path[i]->y, 
-                  board_gcharp_at (brd, path[i]->x, path[i]->y));
+        coord c = path_index (path, i);
+        g_printf ("%d %d %s\n", c.x, c.y, 
+                  board_gcharp_at (brd, c.x, c.y));
     }
     g_printf ("end of path\n");
 }

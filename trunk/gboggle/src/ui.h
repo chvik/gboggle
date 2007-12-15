@@ -40,7 +40,7 @@ list_solutions_and_score (GPtrArray *solutions,
                           GPtrArray *found_words);
 
 void
-mark_path (coord **path);
+mark_path (GArray *path);
 
 void
 update_title (void);
