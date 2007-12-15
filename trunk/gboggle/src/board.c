@@ -7,16 +7,16 @@
 static void
 rec_str2letters (GPtrArray *array,
                  GArray *letters,
-                 const gchar * const *alphabet,
+                 GPtrArray *alphabet,
                  const gchar *str);
 
 /* returns random letter from alphabet according to weights */
 
-letter random_letter(const gchar * const *alphabet, const gint *weights)
+letter random_letter(GPtrArray *alphabet, const gint *weights)
 {
     gint i, c, cml, lb, ub;
-    guint len = g_strv_length((gchar **)alphabet);
-    gint *cmlweights = g_malloc((len+1) * sizeof(gint));
+    guint len = alphabet->len;
+    gint *cmlweights = g_malloc ((len+1) * sizeof(gint));
 
     cml = 0;
     cmlweights[0] = 0;
@@ -45,7 +45,7 @@ letter random_letter(const gchar * const *alphabet, const gint *weights)
 }
  
 board *
-board_new (gint width, gint height, const gchar * const *alphabet,
+board_new (gint width, gint height, GPtrArray *alphabet,
            const gint *weights, GNode *trie)
 {
     int i;
@@ -57,7 +57,6 @@ board_new (gint width, gint height, const gchar * const *alphabet,
     for(i = 0; i < width * height; ++i)
     {
         letter l = random_letter(alphabet, weights);
-/*        g_printf("%s\n", alphabet[l]);*/
         brd->letters[i] = l;
     }
     brd->height = height;
@@ -76,10 +75,10 @@ board_dispose (board *brd)
     g_free (brd);
 }
 
-const gchar *letter2gcharp(const gchar * const *alphabet, letter l)
+const gchar *letter2gcharp (GPtrArray *alphabet, letter l)
 {
     /* letter starts from 1 */
-    return alphabet[l - 1];
+    return g_ptr_array_index (alphabet, l - 1);
 }
 
 const gchar *
@@ -95,17 +94,18 @@ board_letter_at (const board *brd, gint x, gint y)
 }
 
 letter
-gcharp2letter (const gchar * const *alphabet, const gchar *ch)
+gcharp2letter (GPtrArray *alphabet, const gchar *ch)
 {
     letter l = 0;
     
-    while (alphabet[l] && strcmp((const char *)alphabet[l],
-                                 (const char *)ch) != 0) 
+    while (l < alphabet->len && 
+            strcmp((const char *)g_ptr_array_index (alphabet, l),
+                (const char *)ch) != 0) 
     {
         ++l;
     }
     
-    if (!alphabet[l])
+    if (l == alphabet->len)
         return 0;  /* not found */
 
     return l + 1;
@@ -113,7 +113,7 @@ gcharp2letter (const gchar * const *alphabet, const gchar *ch)
 
 
 GPtrArray *
-str2letters (const gchar * const *alphabet, const gchar *str)
+str2letters (GPtrArray *alphabet, const gchar *str)
 {
     GPtrArray *array;
     GArray *letters;
@@ -133,7 +133,7 @@ str2letters (const gchar * const *alphabet, const gchar *str)
 
 static void
 rec_str2letters (GPtrArray *array, GArray *letters,
-                 const gchar * const *alphabet,
+                 GPtrArray *alphabet,
                  const gchar *str)
 {
     gint i;
@@ -150,9 +150,10 @@ rec_str2letters (GPtrArray *array, GArray *letters,
         return;
     }
 
-    for (i = 0; alphabet[i]; ++i)
+    for (i = 0; i < alphabet->len; ++i)
     {
-        if (g_str_has_prefix (str, alphabet[i]))
+        gchar *lstr = g_ptr_array_index (alphabet, i);
+        if (g_str_has_prefix (str, lstr))
         {
             letter l = i+1;
             GArray *letters2 = g_array_sized_new (TRUE, TRUE, sizeof(letter),
@@ -160,74 +161,11 @@ rec_str2letters (GPtrArray *array, GArray *letters,
             g_array_append_vals (letters2, letters->data, letters->len);
             g_array_append_val (letters2, l);
             rec_str2letters (array, letters2, alphabet, 
-                             str + strlen(alphabet[i]));
+                             str + strlen(lstr));
             g_array_free (letters2, TRUE);
         }
     }
 }
-
-
-letter *
-str2letters_ (const gchar * const *alphabet, const gchar *str)
-{
-    const gchar *p = str;
-    gint len = strlen ((const char *)str);
-    letter *letters = (letter *)g_malloc ((len + 1) * sizeof(gchar));
-    GPtrArray *array = g_ptr_array_new();
-    gint i;
-    
-    if (!g_utf8_validate (str, len, NULL))
-    {
-        g_free (letters);
-        g_ptr_array_free (array, TRUE);
-        return NULL;
-    }
-    
-    i = 0;
-    while (*p)
-    {
-        gunichar unich;
-        gchar utf8buf[6];
-        gint len;
-        gint i;
-            
-        unich = g_utf8_get_char (p);
-        len = g_unichar_to_utf8 (unich, utf8buf);
-        utf8buf[len] = 0;
-/*        g_printf ("utf8buf %d %c\n", l, *p);*/
-        letters[i] = gcharp2letter (alphabet, utf8buf);        
-/*        g_printf ("letter %d\n", letters[i]);*/
-        
-        if (!letters[i])
-        {
-            /* read ahead, check if it's a 2-gram letter */
-            gchar *q;
-            gchar utf8buf2[12];
-            gint k;
-            gunichar unich2;
-            
-            q = g_utf8_next_char (p);
-            unich2 = g_utf8_get_char (q);
-            strcpy (utf8buf2, utf8buf);
-            k = g_unichar_to_utf8 (unich2, utf8buf2 + len);
-            utf8buf2[len + k] = 0;
-            letters[i] = gcharp2letter (alphabet, utf8buf2);
-
-            if(!letters[i])
-            {
-                g_free (letters);
-                return NULL;
-            }
-            p = q;
-        }
-
-        p = g_utf8_next_char (p);
-        ++i;
-    }
-    letters[i] = 0;
-
-    return letters;
-} 
 
 
 letter *

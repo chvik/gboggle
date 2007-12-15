@@ -29,7 +29,7 @@ append_index (gpointer word, gpointer index, gpointer sol_index);
  */
 
 void
-trie_add (GNode *root, const gchar * const *alphabet, const letter *word)
+trie_add (GNode *root, GPtrArray *alphabet, const letter *word)
 {
     GNode *child;
     const gchar *p = NULL;
@@ -397,9 +397,8 @@ find_str_on_board (GPtrArray *paths, const gchar *str, board *brd)
 #define BUFLENGTH 256
 
 gint
-trie_load (GNode *root, const gchar * const *alphabet, 
-        const gchar *filename, void (*progress_cb) (gdouble, gpointer), 
-        gpointer cb_data)
+trie_load (GNode *root, GPtrArray *alphabet, const gchar *filename, 
+        void (*progress_cb) (gdouble, gpointer), gpointer cb_data)
 {
     FILE *dictf;
     char buf[BUFLENGTH];

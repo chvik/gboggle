@@ -6,7 +6,7 @@
 #include "board.h"
 
 struct _AppData {
-    const gchar * const *alphabet;
+    GPtrArray *alphabet;
     gint *weights;
     GNode *dictionary;
     board *brd;

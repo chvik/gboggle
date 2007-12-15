@@ -10,7 +10,7 @@ typedef guchar letter; /* indexes of alphabet incremented by one
 
 struct _board
 {
-    const gchar * const *alphabet;  /* NULL terminated array of UTF-8 strings */
+    GPtrArray *alphabet;  /* NULL terminated array of UTF-8 strings */
     letter *letters;   /* width*height sized array */
     GNode *trie;
     gint width;
@@ -27,7 +27,7 @@ struct _coord
 board *
 board_new (gint width, 
            gint height,
-           const gchar * const *alphabet,
+           GPtrArray *alphabet,
            const gint *weights,
            GNode *trie);
 
@@ -45,23 +45,18 @@ board_letter_at (const board *brd,
                  gint y);
 
 const gchar *
-letter2gcharp (const gchar * const *alphabet,
+letter2gcharp (GPtrArray *alphabet,
                letter l);
 
 letter
-gcharp2letter (const gchar * const *alphabet,
+gcharp2letter (GPtrArray *alphabet,
                const gchar *ch);
 
 /* returns GPtrArray of newly allocated array of letters
  * returns NULL if str contains characters not contained by alphabet */
 GPtrArray *
-str2letters (const gchar * const *alphabet,
+str2letters (GPtrArray *alphabet,
              const gchar *str);
-letter *
-str2letters_ (const gchar * const *alphabet,
-             const gchar *str);
-
-
 
 /* returns zero terminated array, must be freed by the caller */
 letter *
