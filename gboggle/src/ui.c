@@ -660,12 +660,12 @@ set_language (gint l)
 {
     struct langconf *conf;
     GNode *trie;
-    const gchar * const *alph;
+    GPtrArray *alph;
     GtkWidget *pdialog;
     GtkWidget *pbar;
     
     conf = (struct langconf *)g_ptr_array_index(app_data.langconfs, l);
-    alph = (const gchar * const *)conf->alphabet->pdata;
+    alph = conf->alphabet;
     trie = g_node_new (NULL);
     create_progress_dialog (&pdialog, &pbar);
 
@@ -676,8 +676,8 @@ set_language (gint l)
         /* XXX need to destroy subwidgets? */
         return FALSE;
     }
-    gtk_window_set_modal (GTK_WINDOW (pdialog), FALSE);
-//    gtk_widget_destroy (pdialog);
+
+    gtk_widget_destroy (pdialog);
     g_debug ("dictionary loaded");
 
     if (app_data.dictionary)
@@ -831,7 +831,6 @@ mark_path (GArray *path)
     for (i = 0; i < len; ++i)
     {
         coord c = path_index (path, i);
-        g_debug ("%d %d %d", i, c.x, c.y);
         board_widget_mark_field (BOARD_WIDGET (app_data.board_widget),
                 c.x, c.y, 
                 len > 1 ? (gdouble)i  / (len - 1) :
@@ -890,14 +889,14 @@ submit_guess (void)
 static void
 create_progress_dialog (GtkWidget **dialog, GtkWidget **pbar)
 {
-    GtkWidget *d = *dialog;
+    GtkWidget *d;
 
     d = gtk_dialog_new ();
-    d = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_position (GTK_WINDOW (d), GTK_WIN_POS_CENTER);    
     gtk_window_set_title (GTK_WINDOW (d), "Loading dictionary");
-//XXX    gtk_window_set_modal (GTK_WINDOW (d), TRUE);
+    gtk_window_set_modal (GTK_WINDOW (d), TRUE);
     *pbar = gtk_progress_bar_new ();
-    gtk_container_add (GTK_CONTAINER (d), *pbar);
+    gtk_container_add (GTK_CONTAINER (GTK_DIALOG (d)->vbox), *pbar);
     gtk_widget_show_all (d);
+    *dialog = d;
 }

@@ -165,7 +165,8 @@ read_langconf_from (gchar *filename)
                     error_occured = TRUE;
                     break;
                 }
-                g_ptr_array_add (conf->alphabet, g_strdup (scanner->value.v_string));
+                g_ptr_array_add (conf->alphabet, 
+                        g_strdup (scanner->value.v_string));
                 state = PARSER_WEIGHT;
                 break;
 
