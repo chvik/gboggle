@@ -631,6 +631,8 @@ create_preferences_dialog (void)
                                           GTK_STOCK_CANCEL,
                                           GTK_RESPONSE_CANCEL,
                                           NULL);
+    gtk_window_set_position (GTK_WINDOW (dialog), GTK_WIN_POS_CENTER_ON_PARENT);
+
     lang_label = gtk_label_new ("Language:");
     app_data.lang_combo = gtk_combo_box_new_text ();
     for (i = 0; i < app_data.langconfs->len; ++i)
@@ -887,16 +889,22 @@ submit_guess (void)
 }
 
 static void
-create_progress_dialog (GtkWidget **dialog, GtkWidget **pbar)
+create_progress_dialog (GtkWidget **dialogp, GtkWidget **pbar)
 {
-    GtkWidget *d;
+    GtkWidget *dialog;
+    GtkWidget *label;
 
-    d = gtk_dialog_new ();
-    gtk_window_set_position (GTK_WINDOW (d), GTK_WIN_POS_CENTER);    
-    gtk_window_set_title (GTK_WINDOW (d), "Loading dictionary");
-    gtk_window_set_modal (GTK_WINDOW (d), TRUE);
+    dialog = gtk_dialog_new ();
+    gtk_window_set_title (GTK_WINDOW (dialog), "");
+    gtk_window_set_modal (GTK_WINDOW (dialog), TRUE);
+    gtk_window_set_transient_for (GTK_WINDOW (dialog), 
+                    GTK_WINDOW (app_data.main_win));
+    gtk_window_set_position (GTK_WINDOW (dialog), GTK_WIN_POS_CENTER_ON_PARENT);
+
+    label = gtk_label_new ("Loading dictionary");
+    gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), label);
     *pbar = gtk_progress_bar_new ();
-    gtk_container_add (GTK_CONTAINER (GTK_DIALOG (d)->vbox), *pbar);
-    gtk_widget_show_all (d);
-    *dialog = d;
+    gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), *pbar);
+    gtk_widget_show_all (dialog);
+    *dialogp = dialog;
 }
