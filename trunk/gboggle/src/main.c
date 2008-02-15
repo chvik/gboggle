@@ -25,8 +25,8 @@ int main(int argc, char **argv)
         
     gtk_init (&argc, &argv);
     
-    create_preferences_dialog ();
     create_main_window (DEFAULT_BOARD_WIDTH, DEFAULT_BOARD_HEIGHT);
+    create_preferences_dialog ();
     set_language (0);
     init_game ();
 
