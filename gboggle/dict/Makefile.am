@@ -1,2 +1,2 @@
 dictdir = $(datadir)/dict
-dict_DATA = hungarian
+dist_dict_DATA = hungarian
