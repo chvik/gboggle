@@ -1,0 +1,63 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Viktor Nagy
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: ch at elte dot hu\n"
+"POT-Creation-Date: 2008-02-17 02:32+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/main.c:30
+msgid "No valid language configuration found\n"
+msgstr ""
+
+#. TRANSLATORS: message for a proper guess
+#: src/ui.c:341
+#, c-format
+msgid "%s - ok"
+msgstr ""
+
+#: src/ui.c:347
+#, c-format
+msgid "%s - not in dictionary"
+msgstr ""
+
+#: src/ui.c:354
+#, c-format
+msgid "%s - not on board"
+msgstr ""
+
+#: src/ui.c:361
+#, c-format
+msgid "%s - already guessed"
+msgstr ""
+
+#: src/ui.c:368
+#, c-format
+msgid "%s - too short"
+msgstr ""
+
+#: src/ui.c:454
+msgid "Guess:"
+msgstr ""
+
+#: src/ui.c:456
+msgid "New Game"
+msgstr ""
+
+#: src/ui.c:533
+msgid "Game"
+msgstr ""
+
+#: src/ui.c:547
+msgid "Settings"
+msgstr ""

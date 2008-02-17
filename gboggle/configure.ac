@@ -24,7 +24,13 @@ AC_C_CONST
 # Checks for library functions.
 AC_CHECK_FUNCS([pow])
 
-AC_CONFIG_FILES([Makefile
+# i18n support from GNU gettext.
+AM_GNU_GETTEXT_VERSION([0.16.1])
+AM_GNU_GETTEXT([external])
+
+
+AC_CONFIG_FILES([Makefile po/Makefile.in
                  src/Makefile
-                 dict/Makefile])
+                 dict/Makefile
+                ])
 AC_OUTPUT

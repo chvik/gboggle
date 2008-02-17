@@ -52,4 +52,8 @@ typedef struct _AppData AppData;
 
 extern AppData app_data;
 
+#define _(Str) gettext (Str)
+
+#define APPNAME "gboggle"
+
 #endif /* __APPDATA_H__ */
