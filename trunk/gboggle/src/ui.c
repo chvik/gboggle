@@ -4,6 +4,7 @@
 #include <glib.h>
 #include <glib/gprintf.h>
 #include <gdk/gdkkeysyms.h>
+#include <libintl.h>
 
 #include "ui.h"
 #include "appdata.h"
@@ -22,12 +23,13 @@
 #define LIST_HEIGHT (DEFAULT_BOARD_HEIGHT * FIELDH)
 #define LIST_WIDTH 200 
 
-#define ZERO_SCORE "Score: 0"
-#define APPNAME "gboggle"
+#define SCORE_FORMAT "Found: %d"
+#define TIME_FORMAT "Time: %d:%02d"
 
 /* static function declarations */
 static void submit_guess (void);
 static void create_progress_dialog (GtkWidget **dialog, GtkWidget **pbar);
+static void reset_score_label (GtkWidget *label);
 
 /*
  * callbacks
@@ -289,7 +291,7 @@ timer_func (gpointer data)
         sec = 0;
     min = sec / 60;
     sec %= 60;
-    g_snprintf (buf, sizeof (buf), "Time: %d:%02d", min, sec);
+    g_snprintf (buf, sizeof (buf), _(TIME_FORMAT), min, sec);
     gtk_label_set_text (GTK_LABEL (app_data.time_label), buf);
 
     if(min == 0 && sec == 0)
@@ -336,34 +338,35 @@ history_data_cell_func (GtkTreeViewColumn *col,
     switch (st)
     {
         case good_guess:
-            g_snprintf (buf, sizeof (buf), "%s - ok", trunc_word);
+            /* TRANSLATORS: message for a proper guess */
+            g_snprintf (buf, sizeof (buf), _("%s - ok"), trunc_word);
             g_object_set (renderer, "foreground", "Green",
                           "foreground-set", TRUE, NULL);
             break;
 
         case not_in_dictionary:
-            g_snprintf (buf, sizeof (buf), "%s - not in dictionary",
+            g_snprintf (buf, sizeof (buf), _("%s - not in dictionary"),
                         trunc_word);
             g_object_set (renderer, "foreground", "Red",
                           "foreground-set", TRUE, NULL);
             break;
 
         case not_in_board:
-            g_snprintf (buf, sizeof (buf), "%s - not on board", 
+            g_snprintf (buf, sizeof (buf), _("%s - not on board"), 
                         trunc_word);
             g_object_set (renderer, "foreground", "Red",
                           "foreground-set", TRUE, NULL);
             break;
 
         case already_guessed:
-            g_snprintf (buf, sizeof (buf), "%s - already guessed",
+            g_snprintf (buf, sizeof (buf), _("%s - already guessed"),
                         trunc_word);
             g_object_set (renderer, "foreground", "Red",
                           "foreground-set", TRUE, NULL);
             break;
 
         case too_short:
-            g_snprintf (buf, sizeof (buf), "%s - too short",
+            g_snprintf (buf, sizeof (buf), _("%s - too short"),
                         trunc_word);
             g_object_set (renderer, "foreground", "Red",
                           "foreground-set", TRUE, NULL);
@@ -438,6 +441,7 @@ create_main_window (gint boardw, gint boardh)
     GtkWidget *table;
     GtkWidget *guess_hbox;
     GtkWidget *time_score_hbox;
+    gchar *zero_time;
 
     app_data.main_win = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     update_title ();
@@ -448,17 +452,23 @@ create_main_window (gint boardw, gint boardh)
 
     app_data.board_widget = board_widget_new (boardw, boardh);
     board_widget_set_active (BOARD_WIDGET (app_data.board_widget), FALSE);
-    app_data.guess_label = gtk_label_new ("Guess:");
+    app_data.guess_label = gtk_label_new (_("Guess:"));
     app_data.guess_entry = gtk_entry_new ();
-    app_data.new_game_button = gtk_button_new_with_label ("New Game");
+    app_data.new_game_button = gtk_button_new_with_label (_("New Game"));
     gtk_entry_set_width_chars (GTK_ENTRY (app_data.guess_entry), 10);
     main_vbox = gtk_vbox_new (FALSE, 0);
     table = gtk_table_new (2, 2, FALSE);
     guess_hbox = gtk_hbox_new (FALSE, 0);
     time_score_hbox = gtk_hbox_new (FALSE, 0);
     app_data.wordlist_notebook = gtk_notebook_new ();
-    app_data.time_label = gtk_label_new ("Time: 0:00");
-    app_data.score_label = gtk_label_new (ZERO_SCORE);
+
+    zero_time = g_strdup_printf (_(TIME_FORMAT), 0, 0);
+    app_data.time_label = gtk_label_new (zero_time);
+    g_free (zero_time);
+
+    app_data.score_label = gtk_label_new ("");
+    reset_score_label (app_data.score_label);
+
     app_data.guess_submit = gtk_button_new ();
     gtk_button_set_image (GTK_BUTTON (app_data.guess_submit), 
             gtk_image_new_from_stock (GTK_STOCK_APPLY,
@@ -523,7 +533,7 @@ create_main_window (gint boardw, gint boardh)
     gtk_widget_show (menu_item);
 
     /* Game */
-    menu_item = gtk_menu_item_new_with_label ("Game");
+    menu_item = gtk_menu_item_new_with_label (_("Game"));
     gtk_menu_shell_append (GTK_MENU_SHELL (menu_bar), menu_item);
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (menu_item), game_menu);
     gtk_widget_show (menu_item);
@@ -537,7 +547,7 @@ create_main_window (gint boardw, gint boardh)
     gtk_widget_show (menu_item);
 
     /* Settings */
-    menu_item = gtk_menu_item_new_with_label ("Settings");
+    menu_item = gtk_menu_item_new_with_label (_("Settings"));
     gtk_menu_shell_append (GTK_MENU_SHELL (menu_bar), menu_item);
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (menu_item), settings_menu);
     gtk_widget_show (menu_item);
@@ -706,7 +716,6 @@ init_game ()
 void
 start_game (void)
 {
-
     board_dispose (app_data.brd);
     solutions_dispose (app_data.solutions);
     app_data.solutions = NULL;
@@ -719,7 +728,7 @@ start_game (void)
     app_data.found_words = g_ptr_array_new ();
     app_data.guessed_words = g_ptr_array_new ();
     app_data.score = 0;
-    gtk_label_set_text (GTK_LABEL (app_data.score_label), ZERO_SCORE);
+    reset_score_label (app_data.score_label);
     if (app_data.current_path)
         path_free (app_data.current_path);
     app_data.current_path = NULL;
@@ -907,4 +916,14 @@ create_progress_dialog (GtkWidget **dialogp, GtkWidget **pbar)
     gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), *pbar);
     gtk_widget_show_all (dialog);
     *dialogp = dialog;
+}
+
+static void
+reset_score_label (GtkWidget *label)
+{
+    gchar *zero_score;
+
+    zero_score = g_strdup_printf (_(SCORE_FORMAT), 0);
+    gtk_label_set_text (GTK_LABEL (label), zero_score);
+    g_free (zero_score);
 }

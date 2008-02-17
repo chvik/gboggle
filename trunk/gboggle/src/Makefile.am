@@ -1,5 +1,5 @@
 AM_CPPFLAGS = @PACKAGE_CFLAGS@
-bin_PROGRAMS = gboggle #test
+bin_PROGRAMS = gboggle
 sources = board_widget.c board_widget.h \
 	  board.c board.h \
 	  boggle.h boggle.c \
@@ -9,10 +9,10 @@ INCLUDES = -DSYSCONFDIR=\"@sysconfdir@\"
 sysconf_DATA = gbogglerc
 
 gboggle_SOURCES = $(sources) main.c
-gboggle_LDADD = @PACKAGE_LIBS@
+gboggle_LDADD = @PACKAGE_LIBS@ $(LIBINTL)
 
-#test_SOURCES = $(sources) test.c
-#test_LDADD = @PACKAGE_LIBS@
+localedir = $(datadir)/locale
+DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@
 
 gbogglerc: gbogglerc.in
 	sed s,'@DICTDIR@',@datadir@/dict, $< >$@
