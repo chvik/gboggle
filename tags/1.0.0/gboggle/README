@@ -1,0 +1,7 @@
+GBoggle
+
+GBoggle is a traditional boggle game and it's under development.  Word list is
+expected to be in /usr/share/dict/words. You can change this path in gbogglerc
+(located in /usr/local/etc by default).
+
+NAGY Viktor ch@elte.hu
