@@ -12,6 +12,7 @@
 #include "board.h"
 #include "boggle.h"
 #include "langconf.h"
+#include "util.h"
 
 /*
  * constants
@@ -47,7 +48,7 @@ guess_changed (GtkEditable *editable, gpointer data)
     board_widget_initbg (BOARD_WIDGET (app_data.board_widget));
 
     guess = gtk_entry_get_text (GTK_ENTRY (editable));
-    DEBUGSTM (g_printf ("guess %s\n", guess));
+    DEBUGMSG ("guess %s\n", guess);
     paths = g_ptr_array_new ();
     st = find_str_on_board (paths, guess, app_data.brd);
     
@@ -72,17 +73,12 @@ guess_changed (GtkEditable *editable, gpointer data)
     }
     g_ptr_array_free (paths, TRUE);
 
-    DEBUGSTM(g_printf ("status %d\n", st));
+    DEBUGMSG ("status %d\n", st);
 }
 
 static gboolean
 guess_keypressed (GtkEditable *editable, GdkEventKey *event, gpointer data)
 {
-    guess_st st;
-    const gchar *guess;
-    gchar *normalized_guess;
-    gint word_val;
-
     if (event->keyval != GDK_Return)
     {
         return FALSE;
@@ -90,6 +86,7 @@ guess_keypressed (GtkEditable *editable, GdkEventKey *event, gpointer data)
 
     submit_guess ();
 
+    return TRUE;
 }
 
 static void
@@ -202,7 +199,7 @@ preferences_callback (GtkMenuItem *menu_item, gpointer user_data)
         gtk_main_iteration();
 
     l = gtk_combo_box_get_active (GTK_COMBO_BOX (app_data.lang_combo));
-    g_debug ("lang %d selected\n", l);
+    DEBUGMSG ("lang %d selected\n", l);
     if (l != app_data.sel_lang)
     {
         if (set_language (l))
@@ -211,7 +208,7 @@ preferences_callback (GtkMenuItem *menu_item, gpointer user_data)
         }
         else
         {
-            g_debug ("lang set to %d failed, revert to %d\n", l,
+            DEBUGMSG ("lang set to %d failed, revert to %d\n", l,
                     app_data.sel_lang);
         }
     }
@@ -227,7 +224,7 @@ field_pressed_callback (GtkWidget *widget, coord *cp, gpointer data)
     gint pos;
     const gchar *str;
 
-    g_warning ("pressed: %d %d\n", cp->x, cp->y);
+    DEBUGMSG ("pressed: %d %d\n", cp->x, cp->y);
     if (!app_data.current_path || 
             path_length (app_data.current_path) == 0) {
         path = path_new ();
@@ -239,7 +236,7 @@ field_pressed_callback (GtkWidget *widget, coord *cp, gpointer data)
             abs (last_field.y - cp->y) > 1)
         {
             /* illegal field */
-            g_debug("not a neighbour");
+            DEBUGMSG("not a neighbour");
             return;
         }
         for (i = 0; i < len; ++i)
@@ -651,7 +648,7 @@ create_preferences_dialog (void)
         struct langconf *conf = 
             (struct langconf *) g_ptr_array_index (app_data.langconfs, i);
         
-        g_debug ("lang %d %s\n", i, conf->lang);
+        DEBUGMSG ("lang %d %s\n", i, conf->lang);
         gtk_combo_box_append_text (GTK_COMBO_BOX (app_data.lang_combo), conf->lang);
     }
     gtk_combo_box_set_active (GTK_COMBO_BOX (app_data.lang_combo), 0);
@@ -691,7 +688,7 @@ set_language (gint l)
     }
 
     gtk_widget_destroy (pdialog);
-    g_debug ("dictionary loaded");
+    DEBUGMSG("dictionary loaded");
 
     if (app_data.dictionary)
         g_node_destroy(app_data.dictionary);
@@ -873,11 +870,11 @@ submit_guess (void)
 
     guess = gtk_entry_get_text (GTK_ENTRY (app_data.guess_entry));
     normalized_guess = normalize_guess (guess);
-    DEBUGSTM (g_printf ("guess submitted: %s\n", normalized_guess));
+    DEBUGMSG ("guess submitted: %s\n", normalized_guess);
 
     st = process_guess (normalized_guess, app_data.brd, 
             app_data.guessed_words, &word_val);
-    DEBUGSTM (g_printf ("guess state: %d\n", st));    
+    DEBUGMSG ("guess state: %d\n", st);
     if (st == good_guess)
     {
         gchar *str;
@@ -888,7 +885,7 @@ submit_guess (void)
         gtk_label_set_text (GTK_LABEL (app_data.score_label), str);
         g_free (str);
     }
-    DEBUGSTM (g_printf ("history add: %s %d\n", guess, st));
+    DEBUGMSG ("history add: %s %d\n", guess, st);
     history_add (guess, st);
 
     board_widget_initbg (BOARD_WIDGET (app_data.board_widget));

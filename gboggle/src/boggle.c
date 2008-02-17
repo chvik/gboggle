@@ -4,7 +4,9 @@
 #include <glib.h>
 #include <glib/gprintf.h>
 #include <glib/gstdio.h>
+
 #include "boggle.h"
+#include "util.h"
 
 /*
  * Static declarations
@@ -171,14 +173,13 @@ depth_search (letter *guess, const board *brd, gint startx, gint starty,
     len = path_length (path_prefix);
     g_assert (len >= 0);
     g_assert (len < 16);
-    DEBUGSTM (g_printf("depth_search depth: %d from %d %d\n", len, startx, starty));
+    DEBUGMSG("depth_search depth: %d from %d %d\n", len, startx, starty);
 
     if (guess && board_letter_at (brd, startx, starty) != *guess)
         return not_in_board;
     
-    DEBUGSTM(g_printf("%s at %d %d\n",
-                      board_gcharp_at (brd, startx, starty),
-                      startx, starty));
+    DEBUGMSG("%s at %d %d\n", board_gcharp_at (brd, startx, starty),
+                    startx, starty);
 
     /* match letter with trie */
     if (trie_node)
@@ -191,7 +192,7 @@ depth_search (letter *guess, const board *brd, gint startx, gint starty,
         {
             return not_in_dictionary;
         }
-        DEBUGSTM(g_printf("found in trie\n"));
+        DEBUGMSG("found in trie\n");
     }
 
     /* copy path_prefix into new_path_prefix */
@@ -217,7 +218,7 @@ depth_search (letter *guess, const board *brd, gint startx, gint starty,
                           NULL);
         if (found_leaf && (!guess || !*(guess + 1)))
         {
-            DEBUG_PRINTF1 ("leaf found\n");
+            DEBUGMSG("leaf found\n");
             found_solution = TRUE;
         }
         if (!found_leaf && guess && !*(guess + 1))
@@ -387,7 +388,7 @@ find_str_on_board (GPtrArray *paths, const gchar *str, board *brd)
         ltr = g_ptr_array_index (ltr_arr, i);
         st = search_solution (paths, ltr, brd, FALSE);
         g_assert (st != not_in_dictionary);
-        DEBUGSTM (g_printf ("search result: %d\n", st));
+        DEBUGMSG ("search result: %d\n", st);
         if (st == good_guess)
             return st;
     }

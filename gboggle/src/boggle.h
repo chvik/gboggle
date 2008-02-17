@@ -66,14 +66,4 @@ find_str_on_board (GPtrArray *paths,
 void
 solutions_dispose (GPtrArray *solutions);
 
-#ifdef DEBUG
-#define DEBUG_PRINTF1(a) g_printf(a)
-#define DEBUG_PRINTF2(a,b) g_printf(a,b)
-#define DEBUGSTM(a) (a)
-#else
-#define DEBUG_PRINTF1(a)
-#define DEBUG_PRINTF2(a,b)
-#define DEBUGSTM(a)
-#endif /* DEBUG */
-
 #endif /* __BOGGLE_H__ */

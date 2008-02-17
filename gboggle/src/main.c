@@ -11,6 +11,7 @@
 #include "boggle.h"
 #include "ui.h"
 #include "langconf.h"
+#include "util.h"
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
