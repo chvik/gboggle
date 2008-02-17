@@ -5,7 +5,9 @@ sources = board_widget.c board_widget.h \
 	  boggle.h boggle.c \
 	  ui.h ui.c \
 	  langconf.h langconf.c \
-	  appdata.h main.c
+	  appdata.h \
+	  util.h \
+	  main.c
 INCLUDES = -DSYSCONFDIR=\"@sysconfdir@\"
 sysconf_DATA = gbogglerc
 

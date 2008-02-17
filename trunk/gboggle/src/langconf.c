@@ -7,6 +7,7 @@
 #include <stdio.h>
 
 #include "langconf.h"
+#include "util.h"
 
 const GScannerConfig scanner_conf = {
     /* skip chars */
@@ -100,7 +101,7 @@ read_langconf_from (gchar *filename)
                 if (conf)
                 {
                     g_ptr_array_add (lang_conf, conf);
-                    g_debug ("lang %s added\n", conf->lang);
+                    DEBUGMSG ("lang %s added\n", conf->lang);
                 }
                 state = PARSER_LANG;
                 conf = g_new0 (struct langconf, 1);
@@ -209,7 +210,7 @@ read_langconf_from (gchar *filename)
         if (conf)
         {
             g_ptr_array_add (lang_conf, conf);
-            g_debug ("lang %s added\n", conf->lang);
+            DEBUGMSG ("lang %s added\n", conf->lang);
         }
     }
 

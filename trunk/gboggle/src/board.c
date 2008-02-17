@@ -188,7 +188,7 @@ path2letters (const board *brd, GArray *path)
 GArray *
 path_new ()
 {
-    g_array_new (TRUE, TRUE, sizeof (coord));
+    return g_array_new (TRUE, TRUE, sizeof (coord));
 }
 
 coord
@@ -207,7 +207,5 @@ path_free (GArray *path)
 gint
 path_length (GArray *path)
 {
-    int len;
-
     return path->len;
 }
