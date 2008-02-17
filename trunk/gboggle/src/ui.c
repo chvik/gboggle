@@ -23,8 +23,9 @@
 #define LIST_HEIGHT (DEFAULT_BOARD_HEIGHT * FIELDH)
 #define LIST_WIDTH 200 
 
-#define SCORE_FORMAT "Found: %d"
-#define TIME_FORMAT "Time: %d:%02d"
+#define SCORE_FORMAT _("Found: %d")
+#define FINAL_SCORE_FORMAT _("Found: %d of %d")
+#define TIME_FORMAT _("Time: %d:%02d")
 
 /* static function declarations */
 static void submit_guess (void);
@@ -291,7 +292,7 @@ timer_func (gpointer data)
         sec = 0;
     min = sec / 60;
     sec %= 60;
-    g_snprintf (buf, sizeof (buf), _(TIME_FORMAT), min, sec);
+    g_snprintf (buf, sizeof (buf), TIME_FORMAT, min, sec);
     gtk_label_set_text (GTK_LABEL (app_data.time_label), buf);
 
     if(min == 0 && sec == 0)
@@ -462,7 +463,7 @@ create_main_window (gint boardw, gint boardh)
     time_score_hbox = gtk_hbox_new (FALSE, 0);
     app_data.wordlist_notebook = gtk_notebook_new ();
 
-    zero_time = g_strdup_printf (_(TIME_FORMAT), 0, 0);
+    zero_time = g_strdup_printf (TIME_FORMAT, 0, 0);
     app_data.time_label = gtk_label_new (zero_time);
     g_free (zero_time);
 
@@ -533,7 +534,7 @@ create_main_window (gint boardw, gint boardh)
     gtk_widget_show (menu_item);
 
     /* Game */
-    menu_item = gtk_menu_item_new_with_label (_("Game"));
+    menu_item = gtk_menu_item_new_with_mnemonic (_("_Game"));
     gtk_menu_shell_append (GTK_MENU_SHELL (menu_bar), menu_item);
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (menu_item), game_menu);
     gtk_widget_show (menu_item);
@@ -547,7 +548,7 @@ create_main_window (gint boardw, gint boardh)
     gtk_widget_show (menu_item);
 
     /* Settings */
-    menu_item = gtk_menu_item_new_with_label (_("Settings"));
+    menu_item = gtk_menu_item_new_with_mnemonic (_("_Settings"));
     gtk_menu_shell_append (GTK_MENU_SHELL (menu_bar), menu_item);
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (menu_item), settings_menu);
     gtk_widget_show (menu_item);
@@ -566,10 +567,10 @@ create_main_window (gint boardw, gint boardh)
 
     gtk_notebook_append_page (GTK_NOTEBOOK (app_data.wordlist_notebook),
             scrolled_history,
-            gtk_label_new ("Guesses"));
+            gtk_label_new (_("Guesses")));
     gtk_notebook_append_page (GTK_NOTEBOOK (app_data.wordlist_notebook),
             scrolled_solutions,
-            gtk_label_new ("Missed words"));
+            gtk_label_new (_("Missed words")));
 
     gtk_box_pack_start (GTK_BOX (main_vbox), menu_bar, 
             FALSE, FALSE, 2);
@@ -632,7 +633,7 @@ create_preferences_dialog (void)
     GtkWidget *lang_label;
     gint i;
 
-    dialog = gtk_dialog_new_with_buttons ("Preferences",
+    dialog = gtk_dialog_new_with_buttons (_("Preferences"),
                                           GTK_WINDOW (app_data.main_win),
                                           GTK_DIALOG_MODAL |
                                               GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -643,7 +644,7 @@ create_preferences_dialog (void)
                                           NULL);
     gtk_window_set_position (GTK_WINDOW (dialog), GTK_WIN_POS_CENTER_ON_PARENT);
 
-    lang_label = gtk_label_new ("Language:");
+    lang_label = gtk_label_new (_("Language:"));
     app_data.lang_combo = gtk_combo_box_new_text ();
     for (i = 0; i < app_data.langconfs->len; ++i)
     {
@@ -827,7 +828,7 @@ list_solutions_and_score (GPtrArray *solutions, GPtrArray *found_words)
         /*g_debug ("%s added", (gchar *)g_ptr_array_index (words, i));*/
     }
 
-    str = g_strdup_printf ("Score: %d of %d", app_data.score, 
+    str = g_strdup_printf (FINAL_SCORE_FORMAT, app_data.score, 
             app_data.score + words->len);
     gtk_label_set_text (GTK_LABEL (app_data.score_label), str);
     g_free (str);
@@ -883,7 +884,7 @@ submit_guess (void)
 
         g_ptr_array_add (app_data.found_words, normalized_guess);
         app_data.score += word_val;
-        str = g_strdup_printf("Score: %d", app_data.score);
+        str = g_strdup_printf(SCORE_FORMAT, app_data.score);
         gtk_label_set_text (GTK_LABEL (app_data.score_label), str);
         g_free (str);
     }
@@ -910,7 +911,7 @@ create_progress_dialog (GtkWidget **dialogp, GtkWidget **pbar)
                     GTK_WINDOW (app_data.main_win));
     gtk_window_set_position (GTK_WINDOW (dialog), GTK_WIN_POS_CENTER_ON_PARENT);
 
-    label = gtk_label_new ("Loading dictionary");
+    label = gtk_label_new (_("Loading dictionary"));
     gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), label);
     *pbar = gtk_progress_bar_new ();
     gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), *pbar);
@@ -923,7 +924,7 @@ reset_score_label (GtkWidget *label)
 {
     gchar *zero_score;
 
-    zero_score = g_strdup_printf (_(SCORE_FORMAT), 0);
+    zero_score = g_strdup_printf (SCORE_FORMAT, 0);
     gtk_label_set_text (GTK_LABEL (label), zero_score);
     g_free (zero_score);
 }
