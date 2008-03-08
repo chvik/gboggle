@@ -1,0 +1,98 @@
+# English translations for gboggle package.
+# Copyright (C) 2008 THE gboggle'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the gboggle package.
+# NAGY Viktor <ch@elte.hu>, 2008.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gboggle 0.5\n"
+"Report-Msgid-Bugs-To: ch@elte.hu\n"
+"POT-Creation-Date: 2008-02-17 15:14+0100\n"
+"PO-Revision-Date: 2008-02-17 00:49+0100\n"
+"Last-Translator: NAGY Viktor <ch@elte.hu>\n"
+"Language-Team: English\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/main.c:31
+msgid "No valid language configuration found\n"
+msgstr "Nincs érvényes nyelvi beállításfájl\n"
+
+#: src/ui.c:27
+#, c-format
+msgid "Found: %d"
+msgstr "Találat: %d"
+
+#: src/ui.c:28
+#, c-format
+msgid "Found: %d of %d"
+msgstr "Találat: %d/%d"
+
+#: src/ui.c:29
+#, c-format
+msgid "Time: %d:%02d"
+msgstr "Idő: %d:%02d"
+
+#. TRANSLATORS: message for a proper guess
+#: src/ui.c:340
+#, c-format
+msgid "%s - ok"
+msgstr "%s - ok"
+
+#: src/ui.c:346
+#, c-format
+msgid "%s - not in dictionary"
+msgstr "%s - nincs a szótárban"
+
+#: src/ui.c:353
+#, c-format
+msgid "%s - not on board"
+msgstr "%s - nincs a táblán"
+
+#: src/ui.c:360
+#, c-format
+msgid "%s - already guessed"
+msgstr "%s - már volt"
+
+#: src/ui.c:367
+#, c-format
+msgid "%s - too short"
+msgstr "%s - túl rövid"
+
+#: src/ui.c:453
+msgid "Guess:"
+msgstr "Szó:"
+
+#: src/ui.c:455
+msgid "New Game"
+msgstr "Új játék"
+
+#: src/ui.c:534
+msgid "_Game"
+msgstr "_Játék"
+
+#: src/ui.c:548
+msgid "_Settings"
+msgstr "_Beállítások"
+
+#: src/ui.c:567
+msgid "Guesses"
+msgstr "Próbálkozások"
+
+#: src/ui.c:570
+msgid "Missed words"
+msgstr "Kihagyott szavak"
+
+#: src/ui.c:633
+msgid "Preferences"
+msgstr "Beállítások"
+
+#: src/ui.c:644
+msgid "Language:"
+msgstr "Nyelv:"
+
+#: src/ui.c:911
+msgid "Loading dictionary"
+msgstr "A szótár töltődik"
