@@ -1,4 +1,4 @@
-AM_CPPFLAGS = @PACKAGE_CFLAGS@
+AM_CPPFLAGS = @PACKAGE_CFLAGS@ @MAEMO_CFLAGS@
 bin_PROGRAMS = gboggle
 sources = board_widget.c board_widget.h \
 	  board.c board.h \
@@ -12,7 +12,7 @@ INCLUDES = -DSYSCONFDIR=\"@sysconfdir@\"
 sysconf_DATA = gbogglerc
 
 gboggle_SOURCES = $(sources)
-gboggle_LDADD = @PACKAGE_LIBS@ $(LIBINTL)
+gboggle_LDADD = @PACKAGE_LIBS@ @MAEMO_LIBS@ $(LIBINTL)
 
 EXTRA_DIST = gbogglerc.in
 CLEANFILES = gbogglerc

@@ -14,6 +14,23 @@ AC_SUBST(CFLAGS)
 # Checks for libraries.
 PKG_CHECK_MODULES(PACKAGE, gtk+-2.0)
 
+# Checks platform
+PKG_CHECK_MODULES(MAEMO, hildon-1, [detected_maemo=yes],[detected_maemo=no])
+AC_ARG_WITH(maemo,
+    AC_HELP_STRING([--with-maemo], [Compiling for maemo platform]),
+    [],
+    [if test "$detected_maemo" = yes; then
+         with_maemo=yes
+     fi])
+     
+if test "${with_maemo}" = yes; then
+    AC_MSG_NOTICE([Compiling for maemo platform])
+    AC_DEFINE([HAVE_MAEMO], [1], [Define if you want build for maemo])
+    NEEDS_DEFAULT_DICT=british
+fi
+
+AC_SUBST(NEEDS_DEFAULT_DICT)
+
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([stdlib.h string.h])
