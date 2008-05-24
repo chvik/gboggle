@@ -36,8 +36,13 @@ struct _AppData {
     GtkWidget *history_tree_view;
     GtkWidget *preferences_dialog;
     GtkWidget *lang_combo;
-    GtkWidget *end_game_menu_item;
     GtkWidget *wordlist_notebook;
+    GtkWidget *new_menuitem;
+    GtkWidget *stop_menuitem;
+    GtkWidget *prefs_menuitem;
+    GtkWidget *new_toolitem;
+    GtkWidget *stop_toolitem;
+    GtkWidget *prefs_toolitem;
 
     GtkListStore *history_list_store;
     GtkListStore *solutions_list_store;
