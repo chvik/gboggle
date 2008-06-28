@@ -17,6 +17,10 @@
 #include "config.h"
 #endif
 
+#ifdef HAVE_MAEMO
+#include <hildon/hildon-program.h>
+#endif
+
 AppData app_data;
 
 int main(int argc, char **argv)
@@ -33,7 +37,12 @@ int main(int argc, char **argv)
     }
         
     gtk_init (&argc, &argv);
-    
+
+#ifdef HAVE_MAEMO
+    app_data.program = hildon_program_get_instance ();
+#endif
+    g_set_application_name(APPNAME);
+
     create_main_window (DEFAULT_BOARD_WIDTH, DEFAULT_BOARD_HEIGHT);
     create_preferences_dialog ();
     set_language (0);

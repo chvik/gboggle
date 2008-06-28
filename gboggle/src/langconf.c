@@ -9,6 +9,9 @@
 #include "langconf.h"
 #include "util.h"
 
+static void
+remove_langs_without_dictionary(GPtrArray *lang_conf);
+
 const GScannerConfig scanner_conf = {
     /* skip chars */
     " \t\n",
@@ -205,15 +208,37 @@ read_langconf_from (gchar *filename)
         g_ptr_array_free (lang_conf, TRUE);
         return NULL;
     }
-    else
+
+    /* adding last language */
+    if (conf)
     {
-        if (conf)
-        {
-            g_ptr_array_add (lang_conf, conf);
-            DEBUGMSG ("lang %s added\n", conf->lang);
-        }
+        g_ptr_array_add (lang_conf, conf);
+        DEBUGMSG ("lang %s added\n", conf->lang);
     }
 
-           
+    remove_langs_without_dictionary(lang_conf);
+
     return lang_conf;
+}
+
+static void
+remove_langs_without_dictionary(GPtrArray *lang_conf)
+{
+    gint i = 0;
+
+    while (i < lang_conf->len)
+    {
+        struct langconf *conf = g_ptr_array_index (lang_conf, i);
+        if (!g_file_test(conf->dictf, G_FILE_TEST_EXISTS) ||
+            !g_file_test(conf->dictf, G_FILE_TEST_IS_REGULAR))
+        {
+            g_warning ("%s not found, removing %s", conf->dictf, conf->lang);
+            g_ptr_array_remove_index (lang_conf, i);
+            g_free (conf);
+        }
+        else
+        {
+            ++i;
+        }
+    }
 }
