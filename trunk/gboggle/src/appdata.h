@@ -4,6 +4,13 @@
 #include <gtk/gtk.h>
 #include "langconf.h"
 #include "board.h"
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#ifdef HAVE_MAEMO
+#include <hildon/hildon-program.h>
+#endif
 
 struct _AppData {
     GPtrArray *alphabet;
@@ -12,6 +19,10 @@ struct _AppData {
     board *brd;
     GPtrArray *langconfs;
     gint sel_lang;
+
+#ifdef HAVE_MAEMO
+    HildonProgram *program;
+#endif
 
     GtkWidget *main_win;
     GtkWidget *board_widget;
@@ -25,8 +36,13 @@ struct _AppData {
     GtkWidget *history_tree_view;
     GtkWidget *preferences_dialog;
     GtkWidget *lang_combo;
-    GtkWidget *end_game_menu_item;
     GtkWidget *wordlist_notebook;
+    GtkWidget *new_menuitem;
+    GtkWidget *stop_menuitem;
+    GtkWidget *prefs_menuitem;
+    GtkWidget *new_toolitem;
+    GtkWidget *stop_toolitem;
+    GtkWidget *prefs_toolitem;
 
     GtkListStore *history_list_store;
     GtkListStore *solutions_list_store;
