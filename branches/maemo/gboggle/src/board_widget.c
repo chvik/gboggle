@@ -10,6 +10,11 @@ static void board_widget_class_init(BoardWidgetClass *klass);
 static void board_widget_init(BoardWidget *boardw);
 static void event_box_clicked_cb(GtkWidget *event_box, GdkEventButton *event,
         gpointer user_data);
+static void board_widget_reset_content(BoardWidget *boardw);
+static void size_request_cb(GtkWidget *boardw, GtkRequisition *requisition,
+                            gpointer user_data);
+static void size_allocate_cb(GtkWidget *boardw, GtkAllocation *allocation,
+                             gpointer user_data);
 
 static const GdkColor bgcolor_marked = BGCOLOR_MARKED;
 static const GdkColor bgcolor_unmarked = BGCOLOR_UNMARKED;
@@ -71,6 +76,15 @@ static void board_widget_init(BoardWidget *boardw)
     boardw->width = 0;
     boardw->height = 0;
     boardw->is_active = FALSE;
+    boardw->font_size = BOARD_WIDGET_FONT_SIZE;
+    boardw->brd = NULL;
+
+    g_signal_connect(G_OBJECT(boardw), "size-request", 
+                     G_CALLBACK(size_request_cb),
+                     boardw);
+    g_signal_connect(G_OBJECT(boardw), "size-allocate", 
+                     G_CALLBACK(size_allocate_cb),
+                     boardw);
 }
 
 GtkWidget *
@@ -121,23 +135,8 @@ board_widget_init_with_board (BoardWidget *boardw, board *brd)
     g_assert (brd->width == boardw->width);
     g_assert (brd->height == boardw->height);
 
-    for(i = 0; i < boardw->width; ++i)
-        for(j = 0; j < boardw->height; ++j) {
-            GtkWidget *label;
-            gchar *upper;
-            gchar *markup;
-
-            label = gtk_bin_get_child (GTK_BIN (FIELD (boardw, i, j)));
-            upper = g_utf8_strup (board_gcharp_at (brd, i, j), -1);
-            markup = g_strdup_printf ("<span font_desc=\"%d\">%s</span>",
-                                      BOARD_WIDGET_FONT_SIZE,
-                                      upper);
-/*            gtk_label_set_text (GTK_LABEL (label), upper);*/
-            gtk_label_set_markup (GTK_LABEL (label), markup);
-            g_free (upper);
-            g_free (markup);
-        }
-
+    boardw->brd = brd;
+    board_widget_reset_content(boardw);
     board_widget_initbg (boardw);
 }
 
@@ -206,4 +205,55 @@ event_box_clicked_cb(GtkWidget *event_box, GdkEventButton *event,
         }
 }
 
+static void                
+size_request_cb(GtkWidget *widget,
+                GtkRequisition *requisition,
+                gpointer user_data)
+{
+    g_debug ("request: %d, %d", requisition->width, requisition->height);
+}
+
+static void
+size_allocate_cb (GtkWidget *widget,
+                  GtkAllocation *allocation,
+                  gpointer user_data)
+{
+    BoardWidget *boardw = BOARD_WIDGET(widget);
+    gint font_size = 
+        MIN (allocation->width / boardw->width,
+             allocation->height / boardw->height) / 
+        BOARD_WIDGET_FIELD_FONT_RATIO;
+    g_debug ("allocation: %d %d", allocation->width, allocation->height);
+    if (font_size != boardw->font_size) {
+        boardw->font_size = font_size;
+        board_widget_reset_content (boardw);
+    }
+}
+
+static void
+board_widget_reset_content(BoardWidget *boardw)
+{
+    gint i, j;
+
+    g_debug("reset content %d", boardw->font_size);
+
+    if (!boardw->brd)
+        return;
+
+    for (i = 0; i < boardw->width; ++i)
+        for (j = 0; j < boardw->height; ++j) {
+            GtkWidget *label;
+            gchar *upper;
+            gchar *markup;
+
+            label = gtk_bin_get_child (GTK_BIN (FIELD (boardw, i, j)));
+            upper = g_utf8_strup (board_gcharp_at (boardw->brd, i, j), -1);
+            markup = g_strdup_printf ("<span font_desc=\"%d\">%s</span>",
+                                      boardw->font_size,
+                                      upper);
+            gtk_label_set_markup (GTK_LABEL (label), markup);
+            g_free (upper);
+            g_free (markup);
+        }
+}
 

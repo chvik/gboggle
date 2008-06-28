@@ -5,9 +5,14 @@
 #include <glib-object.h>
 #include <gtk/gtktable.h>
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "board.h"
 
-#define BOARD_WIDGET_FONT_SIZE 20
+#define BOARD_WIDGET_FONT_SIZE 24
+#define BOARD_WIDGET_FIELD_FONT_RATIO (5 / 2)
 
 G_BEGIN_DECLS
 
@@ -17,9 +22,15 @@ G_BEGIN_DECLS
 #define IS_BOARD_WIDGET(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), BOARD_WIDGET_TYPE))
 #define IS_BOARD_WIDGET_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), BOARD_WIDGET_TYPE))
 
-#define FIELDW (BOARD_WIDGET_FONT_SIZE * 3)
-#define FIELDH (BOARD_WIDGET_FONT_SIZE * 3)
+#define FIELDW (BOARD_WIDGET_FONT_SIZE * BOARD_WIDGET_FIELD_FONT_RATIO)
+#define FIELDH (BOARD_WIDGET_FONT_SIZE * BOARD_WIDGET_FIELD_FONT_RATIO)
+
+#ifdef HAVE_MAEMO
+#define BGCOLOR_UNMARKED { 0, 0xf0f0, 0xf0f0, 0xf0f0 }
+#else
 #define BGCOLOR_UNMARKED { 0, 0xffff, 0xffff, 0xffff }
+#endif
+
 #define BGCOLOR_MARKED { 0, 0x7fff, 0xffff, 0x7fff }
 #define BGCOLOR_ACTIVE { 0, 0, 0xefff, 0 }
 
@@ -30,12 +41,16 @@ struct _BoardWidget
 {
     GtkTable table;
 
-    int width;
-    int height;
-    int fieldw;
-    int fieldh;
+    gint width;
+    gint height;
+    gint fieldw;
+    gint fieldh;
+    gint font_size;
+
     gboolean is_active;
     GtkWidget **fields;
+
+    board *brd;
 };
 
 struct _BoardWidgetClass

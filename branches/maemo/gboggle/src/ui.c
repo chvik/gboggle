@@ -24,7 +24,12 @@
  * constants
  */
 
+#ifdef HAVE_MAEMO
+#define VPAD 5
+#else
 #define VPAD 12
+#endif
+
 #define HPAD 12
 #define GUESS_HPAD 3
 #define LIST_HEIGHT (DEFAULT_BOARD_HEIGHT * FIELDH)
@@ -514,20 +519,20 @@ static GtkWidget *create_toolbar (void)
     gtk_toolbar_insert (GTK_TOOLBAR (toolbar), new_tb, -1);
     g_signal_connect (G_OBJECT (new_tb), "clicked", 
                       G_CALLBACK (new_game_button_clicked), NULL);
-    app_data.new_toolitem = new_tb;
+    app_data.new_toolitem = GTK_WIDGET(new_tb);
 
     stop_tb = gtk_tool_button_new_from_stock (GTK_STOCK_STOP);
     gtk_toolbar_insert (GTK_TOOLBAR (toolbar), stop_tb, -1);
     g_signal_connect (G_OBJECT (stop_tb), "clicked", 
                       G_CALLBACK (game_end_callback), NULL);
-    gtk_widget_set_sensitive (stop_tb, FALSE);
-    app_data.stop_toolitem = stop_tb;
+    gtk_widget_set_sensitive (GTK_WIDGET(stop_tb), FALSE);
+    app_data.stop_toolitem = GTK_WIDGET(stop_tb);
 
     prefs_tb = gtk_tool_button_new_from_stock (GTK_STOCK_PREFERENCES);
     gtk_toolbar_insert (GTK_TOOLBAR (toolbar), prefs_tb, -1);
     g_signal_connect (G_OBJECT (prefs_tb), "clicked", 
                       G_CALLBACK (preferences_callback), NULL);
-    app_data.prefs_toolitem = prefs_tb;
+    app_data.prefs_toolitem = GTK_WIDGET(prefs_tb);
 
     return toolbar;
 }
@@ -598,11 +603,11 @@ create_main_window (gint boardw, gint boardh)
     app_data.guess_submit = gtk_button_new ();
     gtk_button_set_image (GTK_BUTTON (app_data.guess_submit), 
             gtk_image_new_from_stock (GTK_STOCK_APPLY,
-                GTK_ICON_SIZE_SMALL_TOOLBAR));
+                GTK_ICON_SIZE_BUTTON));
     app_data.guess_del = gtk_button_new ();
     gtk_button_set_image (GTK_BUTTON (app_data.guess_del), 
             gtk_image_new_from_stock (GTK_STOCK_UNDO,
-                GTK_ICON_SIZE_SMALL_TOOLBAR));
+                GTK_ICON_SIZE_BUTTON));
 
     /* guess history */
     app_data.history_list_store = gtk_list_store_new (2, G_TYPE_STRING,
@@ -613,8 +618,7 @@ create_main_window (gint boardw, gint boardh)
     app_data.history_tree_view = 
         create_history_tree_view 
         (GTK_TREE_MODEL (app_data.history_list_store));
-    gtk_widget_set_size_request (app_data.history_tree_view, LIST_WIDTH, 
-            LIST_HEIGHT);
+    gtk_widget_set_size_request (app_data.history_tree_view, LIST_WIDTH, -1);
     gtk_tree_view_set_headers_visible 
         (GTK_TREE_VIEW (app_data.history_tree_view), FALSE);
     
@@ -626,23 +630,12 @@ create_main_window (gint boardw, gint boardh)
                                     GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
     solutions_tree_view = create_solution_tree_view (
                              GTK_TREE_MODEL (app_data.solutions_list_store));
-    gtk_widget_set_size_request (solutions_tree_view, LIST_WIDTH, LIST_HEIGHT);
+    gtk_widget_set_size_request (solutions_tree_view, LIST_WIDTH, -1);
     gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (solutions_tree_view),
             FALSE);
     
     main_menu = create_main_menu();
     
-    /* table layout */
-/* XXX    gtk_table_attach_defaults (GTK_TABLE (table), app_data.board_widget, 
-            0, 1, 0, 1);
-    gtk_table_attach_defaults (GTK_TABLE (table), app_data.wordlist_notebook, 
-            1, 2, 0, 1);
-    gtk_table_attach_defaults (GTK_TABLE (table), guess_hbox, 
-            0, 1, 1, 2);
-    gtk_table_attach_defaults (GTK_TABLE (table), time_score_hbox,
-            1, 2, 1, 2);
-    gtk_table_set_row_spacings (GTK_TABLE (table), VPAD);
-    gtk_table_set_col_spacings (GTK_TABLE (table), HPAD); */
     gtk_container_add (GTK_CONTAINER (board_align), app_data.board_widget);
     gtk_box_pack_start (GTK_BOX (upper_hbox), board_align,
                         TRUE, TRUE, 10);
@@ -672,6 +665,7 @@ create_main_window (gint boardw, gint boardh)
     gtk_widget_show_all (toolbar);
     hildon_window_add_toolbar (HILDON_WINDOW (app_data.main_win),
                                GTK_TOOLBAR (toolbar));
+    gtk_widget_set_size_request(app_data.board_widget, 300, 300);
 #else
     gtk_box_pack_start (GTK_BOX (main_vbox), main_menu, 
                         FALSE, FALSE, 2);
@@ -695,9 +689,9 @@ create_main_window (gint boardw, gint boardh)
             TRUE, TRUE, GUESS_HPAD);
     gtk_box_pack_start (GTK_BOX (guess_hbox), app_data.guess_entry,
             TRUE, TRUE, GUESS_HPAD);
-    gtk_box_pack_start (GTK_BOX (guess_hbox), app_data.guess_del,
-            FALSE, FALSE, GUESS_HPAD);
     gtk_box_pack_start (GTK_BOX (guess_hbox), app_data.guess_submit,
+            FALSE, FALSE, GUESS_HPAD);
+    gtk_box_pack_start (GTK_BOX (guess_hbox), app_data.guess_del,
             FALSE, FALSE, GUESS_HPAD);
     gtk_box_pack_start (GTK_BOX (time_score_hbox), app_data.time_label,
             FALSE, FALSE, GUESS_HPAD);
@@ -869,9 +863,9 @@ start_game (void)
     gtk_widget_show (app_data.guess_del);
     gtk_widget_show (app_data.guess_submit);
     gtk_editable_set_editable (GTK_EDITABLE (app_data.guess_entry), TRUE);
-    gtk_widget_grab_focus (app_data.guess_entry);
     gtk_notebook_set_current_page (GTK_NOTEBOOK (app_data.wordlist_notebook),
             0);
+    gtk_widget_grab_focus (app_data.guess_entry);
     
     app_data.guess_changed_id = 
         g_signal_connect (G_OBJECT (app_data.guess_entry), "changed", 
