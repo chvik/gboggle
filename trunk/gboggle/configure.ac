@@ -27,9 +27,13 @@ if test "${with_maemo}" = yes; then
     AC_MSG_NOTICE([Compiling for maemo platform])
     AC_DEFINE([HAVE_MAEMO], [1], [Define if you want build for maemo])
     NEEDS_DEFAULT_DICT=british
+    desktopentrydir=`pkg-config osso-af-settings --variable=desktopentrydir`
+else
+    desktopentrydir="$datadir/applications"
 fi
 
 AC_SUBST(NEEDS_DEFAULT_DICT)
+AC_SUBST(desktopentrydir)
 
 # Checks for header files.
 AC_HEADER_STDC
@@ -48,6 +52,7 @@ AM_GNU_GETTEXT([external])
 
 AC_CONFIG_FILES([Makefile po/Makefile.in
                  src/Makefile
-                 dict/Makefile
+                 src/gboggle.desktop
+                 dict/Makefile                 
                 ])
 AC_OUTPUT
