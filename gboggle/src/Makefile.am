@@ -10,12 +10,12 @@ sources = board_widget.c board_widget.h \
 	  main.c
 INCLUDES = -DSYSCONFDIR=\"@sysconfdir@\"
 sysconf_DATA = gbogglerc
+desktopentry_DATA = gboggle.desktop
 
 gboggle_SOURCES = $(sources)
 gboggle_LDADD = @PACKAGE_LIBS@ @MAEMO_LIBS@ $(LIBINTL)
 
-EXTRA_DIST = gbogglerc.in
-CLEANFILES = gbogglerc
+EXTRA_DIST = $(sysconf_DATA) $(desktopentry_DATA)
 
 localedir = $(datadir)/locale
 DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@
