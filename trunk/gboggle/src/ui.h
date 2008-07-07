@@ -22,6 +22,11 @@ create_preferences_dialog (void);
 gboolean
 set_language (gint l);
 
+/* language: name of the language
+ * returns DALSE if loading of the dictionary fails */
+gboolean
+set_language_by_name (const gchar *language);
+
 void
 init_game (void);
 

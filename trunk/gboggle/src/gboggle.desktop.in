@@ -6,3 +6,4 @@ Name=gboggle
 Exec=@prefix@/bin/gboggle
 MimeType=application/x-executable;
 Categories=Game
+Icon=gboggle

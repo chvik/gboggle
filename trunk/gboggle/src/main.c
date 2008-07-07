@@ -43,9 +43,6 @@ int main(int argc, char **argv)
 #endif
     g_set_application_name(APPNAME);
 
-    create_main_window (DEFAULT_BOARD_WIDTH, DEFAULT_BOARD_HEIGHT);
-    create_preferences_dialog ();
-    set_language (0);
     init_game ();
 
     gtk_main ();
