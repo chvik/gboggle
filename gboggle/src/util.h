@@ -12,4 +12,12 @@
 #define DEBUGMSG(...)
 #endif
 
+typedef struct _GBoggleSettings GBoggleSettings;
+struct _GBoggleSettings {    
+    gchar *language;
+};
+
+GBoggleSettings *load_settings(void);
+void save_settings(const GBoggleSettings *);
+
 #endif /* UTIL_H */

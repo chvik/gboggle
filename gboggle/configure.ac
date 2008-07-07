@@ -12,7 +12,7 @@ AC_PROG_CC
 AC_SUBST(CFLAGS)
 
 # Checks for libraries.
-PKG_CHECK_MODULES(PACKAGE, gtk+-2.0)
+PKG_CHECK_MODULES(PACKAGE, gtk+-2.0 gconf-2.0)
 
 # Checks platform
 PKG_CHECK_MODULES(MAEMO, hildon-1, [detected_maemo=yes],[detected_maemo=no])
@@ -28,12 +28,15 @@ if test "${with_maemo}" = yes; then
     AC_DEFINE([HAVE_MAEMO], [1], [Define if you want build for maemo])
     NEEDS_DEFAULT_DICT=british
     desktopentrydir=`pkg-config osso-af-settings --variable=desktopentrydir`
+    icondir="$datadir/icons/hicolor/scalable/hildon"
 else
     desktopentrydir="$datadir/applications"
+    icondir="$datadir/icons/hicolor/64x64/apps"
 fi
 
 AC_SUBST(NEEDS_DEFAULT_DICT)
 AC_SUBST(desktopentrydir)
+AC_SUBST(icondir)
 
 # Checks for header files.
 AC_HEADER_STDC

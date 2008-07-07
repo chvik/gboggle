@@ -202,6 +202,7 @@ preferences_callback (GtkMenuItem *menu_item, gpointer user_data)
 {
     gint l;
     gint result;
+    GBoggleSettings settings = { .language = NULL };
     
     gtk_combo_box_set_active (GTK_COMBO_BOX (app_data.lang_combo),
             app_data.sel_lang);
@@ -213,8 +214,15 @@ preferences_callback (GtkMenuItem *menu_item, gpointer user_data)
     while (gtk_events_pending ())
         gtk_main_iteration();
 
+
     l = gtk_combo_box_get_active (GTK_COMBO_BOX (app_data.lang_combo));
     DEBUGMSG ("lang %d selected\n", l);
+    struct langconf *conf = 
+        (struct langconf *) g_ptr_array_index (app_data.langconfs, 
+                                               l);
+    settings.language = conf->lang;
+    save_settings(&settings);
+
     if (l != app_data.sel_lang)
     {
         if (set_language (l))
@@ -567,7 +575,6 @@ create_main_window (gint boardw, gint boardh)
     app_data.main_win = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 #endif
 
-    update_title ();
     gtk_container_set_border_width (GTK_CONTAINER (app_data.main_win), 10);
 
     app_data.board_width = boardw;
@@ -581,6 +588,7 @@ create_main_window (gint boardw, gint boardh)
     app_data.new_game_button = gtk_button_new_with_label (_("New Game"));
 #endif
     gtk_entry_set_width_chars (GTK_ENTRY (app_data.guess_entry), 10);
+    gtk_entry_set_activates_default (GTK_ENTRY (app_data.guess_entry), TRUE);
     main_vbox = gtk_vbox_new (FALSE, 0);
     upper_hbox = gtk_hbox_new (FALSE, 0);
     lower_hbox = gtk_hbox_new (FALSE, 0);
@@ -604,6 +612,7 @@ create_main_window (gint boardw, gint boardh)
     gtk_button_set_image (GTK_BUTTON (app_data.guess_submit), 
             gtk_image_new_from_stock (GTK_STOCK_APPLY,
                 GTK_ICON_SIZE_BUTTON));
+    gtk_widget_grab_default (app_data.guess_submit);
     app_data.guess_del = gtk_button_new ();
     gtk_button_set_image (GTK_BUTTON (app_data.guess_del), 
             gtk_image_new_from_stock (GTK_STOCK_UNDO,
@@ -780,6 +789,23 @@ create_preferences_dialog (void)
 }
 
 gboolean
+set_language_by_name (const gchar *language)
+{
+    gint i;
+
+    for (i = 0; i < app_data.langconfs->len; ++i) {
+        struct langconf *conf = 
+            (struct langconf *)g_ptr_array_index(app_data.langconfs, i);
+        if (g_str_equal(conf->lang, language)) {
+            return set_language (i);
+        }
+    }
+
+    g_warning("language not found: %s", language);
+    return FALSE;
+}
+
+gboolean
 set_language (gint l)
 {
     struct langconf *conf;
@@ -797,7 +823,6 @@ set_language (gint l)
     {
         g_printf ("%s: failed to open\n", conf->dictf);
         gtk_widget_destroy (pdialog);
-        /* XXX need to destroy subwidgets? */
         return FALSE;
     }
 
@@ -817,12 +842,23 @@ set_language (gint l)
 void
 init_game ()
 {
+    GBoggleSettings *settings;
+
     app_data.timer_tag = 0;
     app_data.solutions = NULL;
     app_data.found_words = NULL;
     app_data.guessed_words = 0;
     app_data.brd = NULL;
     app_data.current_path = NULL;
+
+    create_main_window (DEFAULT_BOARD_WIDTH, DEFAULT_BOARD_HEIGHT);
+    create_preferences_dialog ();
+    settings = load_settings ();
+    
+    if (!settings->language || !set_language_by_name (settings->language))
+        set_language (0);
+
+    update_title ();
 }
 
 void
@@ -1031,7 +1067,7 @@ create_progress_dialog (GtkWidget **dialogp, GtkWidget **pbar)
     GtkWidget *label;
 
     dialog = gtk_dialog_new ();
-    gtk_window_set_title (GTK_WINDOW (dialog), "");
+    gtk_window_set_title (GTK_WINDOW (dialog), APPNAME);
     gtk_window_set_modal (GTK_WINDOW (dialog), TRUE);
     gtk_window_set_transient_for (GTK_WINDOW (dialog), 
                     GTK_WINDOW (app_data.main_win));
