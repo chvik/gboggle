@@ -114,9 +114,6 @@ board_widget_new (gint width, gint height)
             FIELD (boardw, i, j) = evbox;
             gtk_table_attach_defaults (GTK_TABLE (boardw), 
                     evbox, i, i+1, j, j+1);
-            gtk_widget_set_size_request (evbox,
-                                         boardw->fieldw,
-                                         boardw->fieldh);
             
             gtk_widget_show (label);
             gtk_widget_show (evbox);
@@ -220,10 +217,13 @@ size_allocate_cb (GtkWidget *widget,
 {
     BoardWidget *boardw = BOARD_WIDGET(widget);
     gint font_size = 
-        MIN (allocation->width / boardw->width,
-             allocation->height / boardw->height) / 
+        MIN ((double)allocation->width / boardw->width,
+             (double)allocation->height / boardw->height) / 
         BOARD_WIDGET_FIELD_FONT_RATIO;
     g_debug ("allocation: %d %d", allocation->width, allocation->height);
+    boardw->fieldw = allocation->width / boardw->width;
+    boardw->fieldh = allocation->height / boardw->height;
+ 
     if (font_size != boardw->font_size) {
         boardw->font_size = font_size;
         board_widget_reset_content (boardw);
