@@ -554,7 +554,6 @@ create_main_window (gint boardw, gint boardh)
     GtkWidget *main_vbox;
     GtkWidget *upper_hbox;
     GtkWidget *lower_hbox;
-    GtkWidget *board_align;
     GtkWidget *wordlist_align;
     GtkWidget *guess_align;
     GtkWidget *time_score_align;
@@ -586,13 +585,13 @@ create_main_window (gint boardw, gint boardh)
     app_data.guess_entry = gtk_entry_new ();
 #ifndef HAVE_MAEMO
     app_data.new_game_button = gtk_button_new_with_label (_("New Game"));
+    gtk_widget_set_size_request(GTK_WIDGET(app_data.board_widget), 200, 200);
 #endif
     gtk_entry_set_width_chars (GTK_ENTRY (app_data.guess_entry), 10);
     gtk_entry_set_activates_default (GTK_ENTRY (app_data.guess_entry), TRUE);
     main_vbox = gtk_vbox_new (FALSE, 0);
     upper_hbox = gtk_hbox_new (FALSE, 0);
     lower_hbox = gtk_hbox_new (FALSE, 0);
-    board_align = gtk_alignment_new (0.5, 0.5, 0, 0);
     wordlist_align = gtk_alignment_new (1, 0, 1, 1);
     guess_align = gtk_alignment_new (0, 0, 0, 0);
     time_score_align = gtk_alignment_new (1, 0, 0, 0);
@@ -645,12 +644,12 @@ create_main_window (gint boardw, gint boardh)
     
     main_menu = create_main_menu();
     
-    gtk_container_add (GTK_CONTAINER (board_align), app_data.board_widget);
-    gtk_box_pack_start (GTK_BOX (upper_hbox), board_align,
+    gtk_box_pack_start (GTK_BOX (upper_hbox), app_data.board_widget,
                         TRUE, TRUE, 10);
-    gtk_container_add (GTK_CONTAINER (wordlist_align), 
-                       app_data.wordlist_notebook);
-    gtk_box_pack_start (GTK_BOX (upper_hbox), wordlist_align,
+//    gtk_container_add (GTK_CONTAINER (wordlist_align), 
+//                       app_data.wordlist_notebook);
+//    gtk_box_pack_start (GTK_BOX (upper_hbox), wordlist_align,
+    gtk_box_pack_start (GTK_BOX (upper_hbox), app_data.wordlist_notebook,
                         TRUE, TRUE, 10);
     gtk_container_add (GTK_CONTAINER (guess_align), guess_hbox);
     gtk_box_pack_start (GTK_BOX (lower_hbox), guess_align,
