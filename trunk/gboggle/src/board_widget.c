@@ -207,7 +207,7 @@ size_request_cb(GtkWidget *widget,
                 GtkRequisition *requisition,
                 gpointer user_data)
 {
-    g_debug ("request: %d, %d", requisition->width, requisition->height);
+//    g_debug ("request: %d, %d", requisition->width, requisition->height);
 }
 
 static void
@@ -220,7 +220,7 @@ size_allocate_cb (GtkWidget *widget,
         MIN ((double)allocation->width / boardw->width,
              (double)allocation->height / boardw->height) / 
         BOARD_WIDGET_FIELD_FONT_RATIO;
-    g_debug ("allocation: %d %d", allocation->width, allocation->height);
+//    g_debug ("allocation: %d %d", allocation->width, allocation->height);
     boardw->fieldw = allocation->width / boardw->width;
     boardw->fieldh = allocation->height / boardw->height;
  
@@ -235,7 +235,7 @@ board_widget_reset_content(BoardWidget *boardw)
 {
     gint i, j;
 
-    g_debug("reset content %d", boardw->font_size);
+//    g_debug("reset content %d", boardw->font_size);
 
     if (!boardw->brd)
         return;
