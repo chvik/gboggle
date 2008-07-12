@@ -297,10 +297,13 @@ depth_search (letter *guess, const board *brd, gint startx, gint starty,
 gchar *
 normalize_guess (const gchar *guess)
 {
-    gchar *norm;
+    gchar *norm, *down;
 
-    norm = g_utf8_strdown (g_utf8_normalize (guess, -1, G_NORMALIZE_DEFAULT_COMPOSE), -1);
-    return norm;
+    norm = g_utf8_normalize (guess, -1, G_NORMALIZE_DEFAULT_COMPOSE);
+    down = g_utf8_strdown (norm, -1);
+    g_free (norm);
+
+    return down;
 }
 
 guess_st

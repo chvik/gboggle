@@ -609,7 +609,6 @@ create_main_window (gint boardw, gint boardh)
     gtk_button_set_image (GTK_BUTTON (app_data.guess_submit), 
             gtk_image_new_from_stock (GTK_STOCK_APPLY,
                 GTK_ICON_SIZE_BUTTON));
-    gtk_widget_grab_default (app_data.guess_submit);
     app_data.guess_del = gtk_button_new ();
     gtk_button_set_image (GTK_BUTTON (app_data.guess_del), 
             gtk_image_new_from_stock (GTK_STOCK_UNDO,
@@ -1029,21 +1028,24 @@ submit_guess (void)
 {
     guess_st st;
     const gchar *guess;
-    gchar *normalized_guess;
+    gchar *nguess;
     gint word_val;
 
     guess = gtk_entry_get_text (GTK_ENTRY (app_data.guess_entry));
-    normalized_guess = normalize_guess (guess);
-    DEBUGMSG ("guess submitted: %s\n", normalized_guess);
+    nguess = normalize_guess (guess);
 
-    st = process_guess (normalized_guess, app_data.brd, 
+    if (g_str_equal(nguess, ""))
+        return;
+    DEBUGMSG ("guess submitted: %s\n", nguess);
+
+    st = process_guess (nguess, app_data.brd, 
             app_data.guessed_words, &word_val);
     DEBUGMSG ("guess state: %d\n", st);
     if (st == good_guess)
     {
         gchar *str;
 
-        g_ptr_array_add (app_data.found_words, normalized_guess);
+        g_ptr_array_add (app_data.found_words, nguess);
         app_data.score += word_val;
         str = g_strdup_printf(SCORE_FORMAT, app_data.score);
         gtk_label_set_text (GTK_LABEL (app_data.score_label), str);
