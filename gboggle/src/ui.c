@@ -679,6 +679,7 @@ create_main_window (gint boardw, gint boardh)
 #else
     gtk_box_pack_start (GTK_BOX (main_vbox), main_menu, 
                         FALSE, FALSE, 2);
+    gtk_widget_set_size_request(app_data.board_widget, 200, 200);
 #endif
     gtk_box_pack_start (GTK_BOX (main_vbox), upper_hbox, 
             TRUE, TRUE, VPAD);
