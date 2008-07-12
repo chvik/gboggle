@@ -95,14 +95,14 @@ guess_changed (GtkEditable *editable, gpointer data)
 static gboolean
 guess_keypressed (GtkEditable *editable, GdkEventKey *event, gpointer data)
 {
-    if (event->keyval != GDK_Return)
-    {
-        return FALSE;
+    switch (event->keyval) {
+        case GDK_Return:
+        case GDK_KP_Enter:
+            submit_guess ();
+            return TRUE;
+        default:
+            return FALSE;
     }
-
-    submit_guess ();
-
-    return TRUE;
 }
 
 static void
