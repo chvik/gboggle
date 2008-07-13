@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gboggle 0.5\n"
 "Report-Msgid-Bugs-To: ch@elte.hu\n"
-"POT-Creation-Date: 2008-07-05 20:01+0200\n"
+"POT-Creation-Date: 2008-07-13 15:50+0200\n"
 "PO-Revision-Date: 2008-02-17 00:49+0100\n"
 "Last-Translator: NAGY Viktor <ch@elte.hu>\n"
 "Language-Team: English\n"
@@ -20,79 +20,79 @@ msgstr ""
 msgid "No valid language configuration found\n"
 msgstr "Nincs érvényes nyelvi beállításfájl\n"
 
-#: src/ui.c:38
+#: src/ui.c:39
 #, c-format
 msgid "Found: %d"
 msgstr "Találat: %d"
 
-#: src/ui.c:39
+#: src/ui.c:40
 #, c-format
 msgid "Found: %d of %d"
 msgstr "Találat: %d/%d"
 
-#: src/ui.c:40
+#: src/ui.c:41
 #, c-format
 msgid "Time: %d:%02d"
 msgstr "Idő: %d:%02d"
 
 #. TRANSLATORS: message for a proper guess
-#: src/ui.c:355
+#: src/ui.c:364
 #, c-format
 msgid "%s - ok"
 msgstr "%s - ok"
 
-#: src/ui.c:361
+#: src/ui.c:370
 #, c-format
 msgid "%s - not in dictionary"
 msgstr "%s - nincs a szótárban"
 
-#: src/ui.c:368
+#: src/ui.c:377
 #, c-format
 msgid "%s - not on board"
 msgstr "%s - nincs a táblán"
 
-#: src/ui.c:375
+#: src/ui.c:384
 #, c-format
 msgid "%s - already guessed"
 msgstr "%s - már volt"
 
-#: src/ui.c:382
+#: src/ui.c:391
 #, c-format
 msgid "%s - too short"
 msgstr "%s - túl rövid"
 
-#: src/ui.c:484
+#: src/ui.c:493
 msgid "_Game"
 msgstr "_Játék"
 
-#: src/ui.c:499
+#: src/ui.c:508
 msgid "_Settings"
 msgstr "_Beállítások"
 
-#: src/ui.c:578
+#: src/ui.c:584
 msgid "Guess:"
 msgstr "Szó:"
 
-#: src/ui.c:581
+#: src/ui.c:587
 msgid "New Game"
 msgstr "Új játék"
 
-#: src/ui.c:656
+#: src/ui.c:661
 msgid "Guesses"
 msgstr "Próbálkozások"
 
-#: src/ui.c:659
+#: src/ui.c:664
 msgid "Missed words"
 msgstr "Kihagyott szavak"
 
-#: src/ui.c:747
+#: src/ui.c:754
 msgid "Preferences"
 msgstr "Beállítások"
 
-#: src/ui.c:758
+#: src/ui.c:765
 msgid "Language:"
 msgstr "Nyelv:"
 
-#: src/ui.c:1040
+#: src/ui.c:1077
 msgid "Loading dictionary"
 msgstr "A szótár töltődik"
