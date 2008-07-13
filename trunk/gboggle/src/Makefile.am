@@ -17,6 +17,7 @@ icon_DATA = gboggle.png
 gboggle_SOURCES = $(sources)
 gboggle_LDADD = @PACKAGE_LIBS@ @MAEMO_LIBS@ $(LIBINTL)
 
+EXTRA_DIST = $(icon_DATA) gbogglerc.in
 CLEANFILES = $(sysconf_DATA) $(desktopentry_DATA)
 
 localedir = $(datadir)/locale

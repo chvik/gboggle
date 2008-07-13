@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([gboggle],[1.0.0],[ch@elte.hu])
+AC_INIT([gboggle],[1.1.0],[ch@elte.hu])
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION) 
 #AC_CONFIG_SRCDIR([config.h.in])
 AM_CONFIG_HEADER(config.h)
@@ -26,7 +26,6 @@ AC_ARG_WITH(maemo,
 if test "${with_maemo}" = yes; then
     AC_MSG_NOTICE([Compiling for maemo platform])
     AC_DEFINE([HAVE_MAEMO], [1], [Define if you want build for maemo])
-    NEEDS_DEFAULT_DICT=british
     desktopentrydir=`pkg-config osso-af-settings --variable=desktopentrydir`
     icondir="$datadir/icons/hicolor/scalable/hildon"
 else
@@ -34,7 +33,6 @@ else
     icondir="$datadir/icons/hicolor/64x64/apps"
 fi
 
-AC_SUBST(NEEDS_DEFAULT_DICT)
 AC_SUBST(desktopentrydir)
 AC_SUBST(icondir)
 
