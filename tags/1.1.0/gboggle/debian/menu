@@ -1,2 +1,0 @@
-?package(gboggle):needs="X11" section="Apps/Games"\
-  title="gboggle" command="/usr/bin/gboggle"
