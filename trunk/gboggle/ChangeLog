@@ -1,3 +1,10 @@
+2008-12-14 Viktor Nagy <ch@elte.hu>
+
+	* Release of 1.1.1
+
+	* GtkTreePath must be freed by gtk_tree_path_free - 
+	  contribution by Mike Olson <mish.olson.public@gmail.com>
+
 2008-07-12 Viktor Nagy <ch@elte.hu>
 
 	* Release of 1.1.0
