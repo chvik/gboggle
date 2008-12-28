@@ -1,3 +1,10 @@
+gboggle (1.1.1) unstable; urgency=low
+
+  * GtkTreePath must be freed by gtk_tree_path_free - 
+    contribution by Mike Olson <mish.olson.public@gmail.com>
+
+ -- NAGY Viktor <ch@elte.hu>  Sun, 28 Dec 2008 13:19:52 +0100
+
 gboggle (1.1.0) unstable; urgency=low
 
   * Some bug fixes
