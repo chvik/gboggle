@@ -802,6 +802,7 @@ create_preferences_dialog (void)
     gtk_window_set_position (GTK_WINDOW (dialog), GTK_WIN_POS_CENTER_ON_PARENT);
 
     lang_label = gtk_label_new (_("Language:"));
+    gtk_misc_set_alignment (GTK_MISC (lang_label), 0, 0.5);
     app_data.lang_combo = gtk_combo_box_new_text ();
     for (i = 0; i < app_data.langconfs->len; ++i)
     {
@@ -813,8 +814,9 @@ create_preferences_dialog (void)
     }
     gtk_combo_box_set_active (GTK_COMBO_BOX (app_data.lang_combo), 0);
     
-    // Add a widget to select how long (in minutes) the game should last.
-    time_pref_label = gtk_label_new(_("Game Time:"));
+    // Add a widget to select how long (in seconds) the game should last.
+    time_pref_label = gtk_label_new(_("Game Time (secs):"));
+    gtk_misc_set_alignment (GTK_MISC (time_pref_label), 0, 0.5);
     app_data.time_pref_spinner_adjust =  GTK_ADJUSTMENT( gtk_adjustment_new(app_data.game_time, 0, 3600, 30, 0, 0) );
     app_data.time_pref_entry = gtk_spin_button_new(app_data.time_pref_spinner_adjust, 30, 0);
     
