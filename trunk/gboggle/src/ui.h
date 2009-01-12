@@ -8,7 +8,6 @@
 
 #define DEFAULT_BOARD_WIDTH 4
 #define DEFAULT_BOARD_HEIGHT 4
-#define GAME_LENGTH_SEC 120
 
 void
 create_main_window (gint boardw,

@@ -12,9 +12,12 @@
 #define DEBUGMSG(...)
 #endif
 
+#define GAME_LENGTH_SEC 120
+
 typedef struct _GBoggleSettings GBoggleSettings;
 struct _GBoggleSettings {    
     gchar *language;
+    gint game_time;
 };
 
 GBoggleSettings *load_settings(void);
