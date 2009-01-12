@@ -1118,6 +1118,13 @@ submit_guess (gboolean keep_state)
     DEBUGMSG ("history add: %s %d\n", guess, st);
     history_add (guess, st);
 
+    if (app_data.score == g_tree_nnodes(app_data.all_words))
+    {
+        // found all the words, stop the game
+        stop_game ();
+        return;
+    }
+
     // If flag is set, do not clear.
     // Allows user to hit Ctrl-Enter to submit a guess
     // and then continue from that point (for example to
