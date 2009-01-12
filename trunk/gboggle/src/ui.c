@@ -41,7 +41,7 @@
 #define TIME_FORMAT _("Time: %d:%02d")
 
 /* static function declarations */
-static void submit_guess (void);
+static void submit_guess (gboolean keep_state);
 static void create_progress_dialog (GtkWidget **dialog, GtkWidget **pbar);
 static void reset_score_label (GtkWidget *label);
 static GtkWidget *create_main_menu (void);
@@ -98,8 +98,16 @@ guess_keypressed (GtkEditable *editable, GdkEventKey *event, gpointer data)
     switch (event->keyval) {
         case GDK_Return:
         case GDK_KP_Enter:
-            submit_guess ();
+            submit_guess (FALSE);
             return TRUE;
+        case GDK_space:
+			// If the space button is pressed,
+			// keep the current state of the board so the user can continue
+			// entering from where they left off, for example, typing
+			// a singular word then simply typing s-Enter to submit its
+			// plural form.
+        	submit_guess(TRUE);
+        	return TRUE;
         default:
             return FALSE;
     }
@@ -108,7 +116,7 @@ guess_keypressed (GtkEditable *editable, GdkEventKey *event, gpointer data)
 static void
 guess_submit_clicked (GtkButton *button, gpointer data)
 {
-    submit_guess ();
+    submit_guess (FALSE);
     gtk_widget_grab_focus (app_data.guess_entry);
 }
 
@@ -1024,7 +1032,7 @@ update_title (void)
 }
 
 static void
-submit_guess (void)
+submit_guess (gboolean keep_state)
 {
     guess_st st;
     const gchar *guess;
@@ -1054,11 +1062,20 @@ submit_guess (void)
     DEBUGMSG ("history add: %s %d\n", guess, st);
     history_add (guess, st);
 
-    board_widget_initbg (BOARD_WIDGET (app_data.board_widget));
-    gtk_entry_set_text (GTK_ENTRY (app_data.guess_entry), "");
-    if (app_data.current_path)
-        path_free (app_data.current_path);
-    app_data.current_path = NULL;
+    // If flag is set, do not clear.
+    // Allows user to hit Ctrl-Enter to submit a guess
+    // and then continue from that point (for example to
+    // submit a singular word and then simply type s-Enter to
+    // submit its plural form).
+    if (!keep_state)
+    {
+        DEBUGMSG("Clearing state...\n");
+        board_widget_initbg (BOARD_WIDGET (app_data.board_widget));
+        gtk_entry_set_text (GTK_ENTRY (app_data.guess_entry), "");
+        if (app_data.current_path)
+            path_free (app_data.current_path);
+        app_data.current_path = NULL;
+    }
 }
 
 static void
