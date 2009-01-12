@@ -64,42 +64,8 @@ missing_solutions (GPtrArray **words, GArray **sol_index,
     GTree *soltree;
     gint i;
     
-	soltree = all_solutions;
+    soltree = all_solutions;
 
-	/* Did all this in find_all_solutions
-    soltree = g_tree_new_full ((GCompareDataFunc)str_compare,
-                               NULL, NULL, NULL);
-    for (i = 0; i < solutions->len; ++i)
-    {
-        GArray *path;
-        gchar *word;
-        gint len;
-        gint j;
-        
-        path = (GArray *)g_ptr_array_index (solutions, i);
-        len = path_length (path);
-        word = g_new0 (gchar , len * 6 + 1);
-        // utf8 wide chars cannot exceed 6 bytes
-        for (j = 0; j < len; ++j)
-        {
-            const gchar *chp;
-            coord c;
-
-            c = path_index (path, j);
-            chp = board_gcharp_at (brd, c.x, c.y);
-            strncat (word, chp, len * 6 - strlen (word));
-        }
-        if (!g_tree_lookup (soltree, (gconstpointer)word))
-        {
-            guint *index;
-
-            index = g_new (guint, 1);
-            *index = i;
-            g_tree_insert (soltree, (gpointer)word, (gpointer)index);
-        }
-    }
-	*/
-	
     for (i = 0; i < found_words->len; ++i)
     {
         gchar *fw;
@@ -531,11 +497,10 @@ str_compare (gconstpointer a, gconstpointer b, gpointer data)
     // Sort by length first, and then alphabetically.
     int lena, lenb;
     gint val;
-    lena = strlen((char *) a);
-    lenb = strlen((char *) b);
+    lena = g_utf8_strlen((char *) a, -1);
+    lenb = g_utf8_strlen((char *) b, -1);
     if (lena == lenb) { return g_utf8_collate(a, b); }
     else { return (gint) (lenb - lena); }
-    //return g_utf8_collate (a, b);
 }
 
 gboolean
