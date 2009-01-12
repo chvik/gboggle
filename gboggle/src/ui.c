@@ -607,6 +607,10 @@ create_main_window (gint boardw, gint boardh)
     app_data.guess_entry = gtk_entry_new ();
 #ifndef HAVE_MAEMO
     app_data.new_game_button = gtk_button_new_with_label (_("New Game"));
+    app_data.game_stop_button = gtk_button_new ();
+    gtk_button_set_image (GTK_BUTTON (app_data.game_stop_button), 
+            gtk_image_new_from_stock (GTK_STOCK_STOP,
+                GTK_ICON_SIZE_BUTTON));
 #endif
     gtk_entry_set_width_chars (GTK_ENTRY (app_data.guess_entry), 10);
     gtk_entry_set_activates_default (GTK_ENTRY (app_data.guess_entry), TRUE);
@@ -634,11 +638,6 @@ create_main_window (gint boardw, gint boardh)
     app_data.guess_del = gtk_button_new ();
     gtk_button_set_image (GTK_BUTTON (app_data.guess_del), 
             gtk_image_new_from_stock (GTK_STOCK_UNDO,
-                GTK_ICON_SIZE_BUTTON));
-    // Setup stop game button.
-    app_data.game_stop_button = gtk_button_new ();
-    gtk_button_set_image (GTK_BUTTON (app_data.game_stop_button), 
-            gtk_image_new_from_stock (GTK_STOCK_STOP,
                 GTK_ICON_SIZE_BUTTON));
 
     /* guess history */
@@ -701,9 +700,6 @@ create_main_window (gint boardw, gint boardh)
                                 GUESS_BUTTON_SIZE);
     gtk_widget_set_size_request(app_data.guess_del, GUESS_BUTTON_SIZE,
                                 GUESS_BUTTON_SIZE);
-    // Added game stop button
-    gtk_widget_set_size_request(app_data.game_stop_button, GUESS_BUTTON_SIZE,
-                                GUESS_BUTTON_SIZE);
     gtk_widget_set_size_request(lower_hbox, -1, GUESS_BUTTON_SIZE);
 #else
     gtk_box_pack_start (GTK_BOX (main_vbox), main_menu, 
@@ -735,15 +731,18 @@ create_main_window (gint boardw, gint boardh)
             FALSE, FALSE, GUESS_HPAD);
     gtk_box_pack_start (GTK_BOX (time_score_hbox), app_data.score_label,
             FALSE, FALSE, GUESS_HPAD);
-    // Setting up game stop button.
+#ifndef HAVE_MAEMO    
     gtk_box_pack_start (GTK_BOX (time_score_hbox), app_data.game_stop_button,
             FALSE, FALSE, GUESS_HPAD);
+#endif    
     gtk_container_add (GTK_CONTAINER (app_data.main_win), main_vbox);
 
     g_signal_connect (G_OBJECT (app_data.main_win), "destroy", G_CALLBACK (exit), NULL);
 #ifndef HAVE_MAEMO    
     g_signal_connect (G_OBJECT (app_data.new_game_button), "clicked",
                       G_CALLBACK (new_game_button_clicked), NULL);
+    g_signal_connect (G_OBJECT (app_data.game_stop_button), "clicked",
+                      G_CALLBACK (game_stop_button_clicked), NULL);
 #endif    
     g_signal_connect (G_OBJECT (app_data.board_widget), "field-pressed",
         G_CALLBACK (field_pressed_callback), NULL);
@@ -751,9 +750,6 @@ create_main_window (gint boardw, gint boardh)
         G_CALLBACK (guess_submit_clicked), NULL);
     g_signal_connect (G_OBJECT (app_data.guess_del), "clicked",
         G_CALLBACK (guess_del_clicked), NULL);
-    // Added handler for game_stop_button
-    g_signal_connect (G_OBJECT (app_data.game_stop_button), "clicked",
-        G_CALLBACK (game_stop_button_clicked), NULL);
 
     gtk_widget_show (app_data.board_widget);
     gtk_widget_show_all (scrolled_history);
@@ -943,13 +939,12 @@ start_game (void)
     gtk_widget_set_sensitive (app_data.prefs_toolitem, FALSE);
 #else
     gtk_widget_hide (app_data.new_game_button);
+    gtk_widget_show (app_data.game_stop_button);
 #endif    
     gtk_widget_show (app_data.guess_label);
     gtk_widget_show (app_data.guess_entry);
     gtk_widget_show (app_data.guess_del);
     gtk_widget_show (app_data.guess_submit);
-    // Adding support for game stop button.
-    gtk_widget_show (app_data.game_stop_button);
     gtk_editable_set_editable (GTK_EDITABLE (app_data.guess_entry), TRUE);
     gtk_notebook_set_current_page (GTK_NOTEBOOK (app_data.wordlist_notebook),
             0);
@@ -987,14 +982,13 @@ stop_game (void)
     gtk_widget_hide (app_data.guess_entry);
     gtk_widget_hide (app_data.guess_submit);
     gtk_widget_hide (app_data.guess_del);
-    // Adding support for stop game button.
-    gtk_widget_hide (app_data.game_stop_button);
 #ifdef HAVE_MAEMO    
     gtk_widget_set_sensitive (app_data.new_toolitem, TRUE);
     gtk_widget_set_sensitive (app_data.stop_toolitem, FALSE);
     gtk_widget_set_sensitive (app_data.prefs_toolitem, TRUE);
 #else
     gtk_widget_show (app_data.new_game_button);
+    gtk_widget_hide (app_data.game_stop_button);
 #endif    
     gtk_widget_set_sensitive (app_data.new_menuitem, TRUE);
     gtk_widget_set_sensitive (app_data.stop_menuitem, FALSE);
