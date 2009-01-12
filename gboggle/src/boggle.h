@@ -45,7 +45,8 @@ missing_solutions (GPtrArray  **words,
                    GArray     **sol_index,
                    board       *brd,
                    GPtrArray   *solutions,
-                   GPtrArray   *found_words);
+                   GPtrArray   *found_words,
+                   GTree 	   *all_words);
 
 gchar *
 normalize_guess (const gchar *guess);

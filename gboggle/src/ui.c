@@ -36,7 +36,7 @@
 #define LIST_HEIGHT (DEFAULT_BOARD_HEIGHT * FIELDH)
 #define LIST_WIDTH 200 
 
-#define SCORE_FORMAT _("Found: %d")
+#define SCORE_FORMAT _("Found: %d of %d")
 #define FINAL_SCORE_FORMAT _("Found: %d of %d")
 #define TIME_FORMAT _("Time: %d:%02d")
 
@@ -910,6 +910,7 @@ init_game ()
 void
 start_game (void)
 {
+    guess_st st;
     board_dispose (app_data.brd);
     solutions_dispose (app_data.solutions);
     app_data.solutions = NULL;
@@ -922,7 +923,6 @@ start_game (void)
     app_data.found_words = g_ptr_array_new ();
     app_data.guessed_words = g_ptr_array_new ();
     app_data.score = 0;
-    reset_score_label (app_data.score_label);
     if (app_data.current_path)
         path_free (app_data.current_path);
     app_data.current_path = NULL;
@@ -966,6 +966,9 @@ start_game (void)
     	app_data.timer_tag = g_timeout_add (100, timer_func, NULL);    
     	g_get_current_time (&app_data.game_start);
     }
+    
+    app_data.all_words = (GTree *) find_all_solutions(app_data.brd, &app_data.solutions);
+    reset_score_label (app_data.score_label);
 }
 
 void
@@ -1004,8 +1007,9 @@ stop_game (void)
             app_data.guess_keypressed_id);
     gtk_entry_set_text (GTK_ENTRY (app_data.guess_entry), "");
 
-    app_data.solutions = g_ptr_array_new ();
-    st = search_solution (app_data.solutions, NULL, app_data.brd, TRUE);
+    // Do this before the game starts, instead
+    //app_data.solutions = g_ptr_array_new ();
+    //st = search_solution (app_data.solutions, NULL, app_data.brd, TRUE);
     list_solutions_and_score (app_data.solutions, app_data.found_words);
 }
 
@@ -1037,7 +1041,7 @@ list_solutions_and_score (GPtrArray *solutions, GPtrArray *found_words)
     gchar *str;
     
     missing_solutions (&words, &sol_index, app_data.brd, app_data.solutions,
-            app_data.found_words);
+            app_data.found_words, app_data.all_words);
     for (i = 0; i < words->len; ++i)
     {
         gtk_list_store_append (app_data.solutions_list_store, &iter);
@@ -1107,7 +1111,7 @@ submit_guess (gboolean keep_state)
 
         g_ptr_array_add (app_data.found_words, nguess);
         app_data.score += word_val;
-        str = g_strdup_printf(SCORE_FORMAT, app_data.score);
+        str = g_strdup_printf(SCORE_FORMAT, app_data.score, g_tree_nnodes(app_data.all_words));
         gtk_label_set_text (GTK_LABEL (app_data.score_label), str);
         g_free (str);
     }
@@ -1156,7 +1160,7 @@ reset_score_label (GtkWidget *label)
 {
     gchar *zero_score;
 
-    zero_score = g_strdup_printf (SCORE_FORMAT, 0);
+    zero_score = g_strdup_printf (SCORE_FORMAT, 0, app_data.all_words != NULL ? g_tree_nnodes(app_data.all_words) : 0);
     gtk_label_set_text (GTK_LABEL (label), zero_score);
     g_free (zero_score);
 }
