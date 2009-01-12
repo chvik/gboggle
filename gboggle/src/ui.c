@@ -160,6 +160,12 @@ guess_del_clicked (GtkButton *button, gpointer data)
 }
 
 static void
+game_stop_button_clicked (GtkButton *button, gpointer data)
+{
+	stop_game();
+}
+
+static void
 solutions_tree_view_changed (GtkTreeSelection *selection, gpointer data)
 {
     GtkTreeIter iter;
@@ -211,6 +217,7 @@ preferences_callback (GtkMenuItem *menu_item, gpointer user_data)
 {
     gint l;
     gint result;
+    gint new_game_time;
     GBoggleSettings settings = { .language = NULL };
     
     gtk_combo_box_set_active (GTK_COMBO_BOX (app_data.lang_combo),
@@ -230,6 +237,10 @@ preferences_callback (GtkMenuItem *menu_item, gpointer user_data)
         (struct langconf *) g_ptr_array_index (app_data.langconfs, 
                                                l);
     settings.language = conf->lang;
+    
+    settings.game_time = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON ( app_data.time_pref_entry) );
+    app_data.game_time = settings.game_time;
+    
     save_settings(&settings);
 
     if (l != app_data.sel_lang)
@@ -316,7 +327,10 @@ timer_func (gpointer data)
     gchar buf[16];
 
     g_get_current_time (&curr_time);
-    sec = GAME_LENGTH_SEC - (curr_time.tv_sec - app_data.game_start.tv_sec);
+    // Use variable game time instead of static one
+    // so it can be set by the user.
+    //sec = GAME_LENGTH_SEC - (curr_time.tv_sec - app_data.game_start.tv_sec);
+    sec = app_data.game_time - (curr_time.tv_sec - app_data.game_start.tv_sec);
     if (sec < 0)
         sec = 0;
     min = sec / 60;
@@ -621,6 +635,11 @@ create_main_window (gint boardw, gint boardh)
     gtk_button_set_image (GTK_BUTTON (app_data.guess_del), 
             gtk_image_new_from_stock (GTK_STOCK_UNDO,
                 GTK_ICON_SIZE_BUTTON));
+    // Setup stop game button.
+    app_data.game_stop_button = gtk_button_new ();
+    gtk_button_set_image (GTK_BUTTON (app_data.game_stop_button), 
+            gtk_image_new_from_stock (GTK_STOCK_STOP,
+                GTK_ICON_SIZE_BUTTON));
 
     /* guess history */
     app_data.history_list_store = gtk_list_store_new (2, G_TYPE_STRING,
@@ -682,6 +701,9 @@ create_main_window (gint boardw, gint boardh)
                                 GUESS_BUTTON_SIZE);
     gtk_widget_set_size_request(app_data.guess_del, GUESS_BUTTON_SIZE,
                                 GUESS_BUTTON_SIZE);
+    // Added game stop button
+    gtk_widget_set_size_request(app_data.game_stop_button, GUESS_BUTTON_SIZE,
+                                GUESS_BUTTON_SIZE);
     gtk_widget_set_size_request(lower_hbox, -1, GUESS_BUTTON_SIZE);
 #else
     gtk_box_pack_start (GTK_BOX (main_vbox), main_menu, 
@@ -713,6 +735,9 @@ create_main_window (gint boardw, gint boardh)
             FALSE, FALSE, GUESS_HPAD);
     gtk_box_pack_start (GTK_BOX (time_score_hbox), app_data.score_label,
             FALSE, FALSE, GUESS_HPAD);
+    // Setting up game stop button.
+    gtk_box_pack_start (GTK_BOX (time_score_hbox), app_data.game_stop_button,
+            FALSE, FALSE, GUESS_HPAD);
     gtk_container_add (GTK_CONTAINER (app_data.main_win), main_vbox);
 
     g_signal_connect (G_OBJECT (app_data.main_win), "destroy", G_CALLBACK (exit), NULL);
@@ -726,6 +751,9 @@ create_main_window (gint boardw, gint boardh)
         G_CALLBACK (guess_submit_clicked), NULL);
     g_signal_connect (G_OBJECT (app_data.guess_del), "clicked",
         G_CALLBACK (guess_del_clicked), NULL);
+    // Added handler for game_stop_button
+    g_signal_connect (G_OBJECT (app_data.game_stop_button), "clicked",
+        G_CALLBACK (game_stop_button_clicked), NULL);
 
     gtk_widget_show (app_data.board_widget);
     gtk_widget_show_all (scrolled_history);
@@ -757,7 +785,10 @@ create_preferences_dialog (void)
     GtkWidget *dialog;
     GtkWidget *table;
     GtkWidget *lang_label;
+    GtkWidget *time_pref_label;
+    GtkWidget *zero_is_unlimited_label;
     gint i;
+    char default_time[20];
 
     dialog = gtk_dialog_new_with_buttons (_("Preferences"),
                                           GTK_WINDOW (app_data.main_win),
@@ -781,13 +812,23 @@ create_preferences_dialog (void)
         gtk_combo_box_append_text (GTK_COMBO_BOX (app_data.lang_combo), conf->lang);
     }
     gtk_combo_box_set_active (GTK_COMBO_BOX (app_data.lang_combo), 0);
+    
+    // Add a widget to select how long (in minutes) the game should last.
+    time_pref_label = gtk_label_new(_("Game Time:"));
+    app_data.time_pref_spinner_adjust =  GTK_ADJUSTMENT( gtk_adjustment_new(app_data.game_time, 0, 3600, 30, 0, 0) );
+    app_data.time_pref_entry = gtk_spin_button_new(app_data.time_pref_spinner_adjust, 30, 0);
+    
+    zero_is_unlimited_label = gtk_label_new(_("Enter 0 for untimed game."));
 
-    table = gtk_table_new (2, 1, FALSE);
+    table = gtk_table_new (3, 1, FALSE);
     gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), table);
     gtk_table_set_row_spacings (GTK_TABLE (table), 5);
     gtk_table_set_col_spacings (GTK_TABLE (table), 5);
     gtk_table_attach_defaults (GTK_TABLE (table), lang_label, 0, 1, 0, 1);
     gtk_table_attach_defaults (GTK_TABLE (table), app_data.lang_combo, 1, 2, 0, 1);
+    gtk_table_attach_defaults (GTK_TABLE (table), time_pref_label, 0, 1, 1, 2);
+    gtk_table_attach_defaults (GTK_TABLE (table), app_data.time_pref_entry, 1, 2, 1, 2);
+    gtk_table_attach_defaults (GTK_TABLE (table), zero_is_unlimited_label, 0, 2, 2, 3);
 
     gtk_widget_show_all (table);
 
@@ -858,8 +899,9 @@ init_game ()
     app_data.current_path = NULL;
 
     create_main_window (DEFAULT_BOARD_WIDTH, DEFAULT_BOARD_HEIGHT);
-    create_preferences_dialog ();
     settings = load_settings ();
+    app_data.game_time = settings->game_time;
+    create_preferences_dialog ();
     
     if (!settings->language || !set_language_by_name (settings->language))
         set_language (0);
@@ -904,6 +946,8 @@ start_game (void)
     gtk_widget_show (app_data.guess_entry);
     gtk_widget_show (app_data.guess_del);
     gtk_widget_show (app_data.guess_submit);
+    // Adding support for game stop button.
+    gtk_widget_show (app_data.game_stop_button);
     gtk_editable_set_editable (GTK_EDITABLE (app_data.guess_entry), TRUE);
     gtk_notebook_set_current_page (GTK_NOTEBOOK (app_data.wordlist_notebook),
             0);
@@ -915,8 +959,16 @@ start_game (void)
     app_data.guess_keypressed_id =
         g_signal_connect (G_OBJECT (app_data.guess_entry), "key-press-event", 
                           G_CALLBACK(guess_keypressed), NULL);
-    app_data.timer_tag = g_timeout_add (100, timer_func, NULL);    
-    g_get_current_time (&app_data.game_start);
+
+    // Here, set the game time to whatever the user specified in
+    // the preferences.
+    
+    // If game time is 0, don't set a timer.
+    if (app_data.game_time > 0)
+    {
+    	app_data.timer_tag = g_timeout_add (100, timer_func, NULL);    
+    	g_get_current_time (&app_data.game_start);
+    }
 }
 
 void
@@ -924,13 +976,17 @@ stop_game (void)
 {
     guess_st st;
     
-    g_source_remove (app_data.timer_tag);
+    // If we didn't set a timer (untimed game), don't
+    // remove it.
+    if (app_data.timer_tag) { g_source_remove (app_data.timer_tag); }
     app_data.timer_tag = 0;
 
     gtk_widget_hide (app_data.guess_label);
     gtk_widget_hide (app_data.guess_entry);
     gtk_widget_hide (app_data.guess_submit);
     gtk_widget_hide (app_data.guess_del);
+    // Adding support for stop game button.
+    gtk_widget_hide (app_data.game_stop_button);
 #ifdef HAVE_MAEMO    
     gtk_widget_set_sensitive (app_data.new_toolitem, TRUE);
     gtk_widget_set_sensitive (app_data.stop_toolitem, FALSE);
