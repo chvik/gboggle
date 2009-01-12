@@ -58,11 +58,84 @@ trie_add (GNode *root, GPtrArray *alphabet, const letter *word)
  * and their index of solutions in sol_index */
 void
 missing_solutions (GPtrArray **words, GArray **sol_index,
-                   board *brd, GPtrArray *solutions, GPtrArray *found_words)
+                   board *brd, GPtrArray *solutions, GPtrArray *found_words,
+                   GTree *all_solutions)
 {
     GTree *soltree;
     gint i;
+    
+	soltree = all_solutions;
 
+	/* Did all this in find_all_solutions
+    soltree = g_tree_new_full ((GCompareDataFunc)str_compare,
+                               NULL, NULL, NULL);
+    for (i = 0; i < solutions->len; ++i)
+    {
+        GArray *path;
+        gchar *word;
+        gint len;
+        gint j;
+        
+        path = (GArray *)g_ptr_array_index (solutions, i);
+        len = path_length (path);
+        word = g_new0 (gchar , len * 6 + 1);
+        // utf8 wide chars cannot exceed 6 bytes
+        for (j = 0; j < len; ++j)
+        {
+            const gchar *chp;
+            coord c;
+
+            c = path_index (path, j);
+            chp = board_gcharp_at (brd, c.x, c.y);
+            strncat (word, chp, len * 6 - strlen (word));
+        }
+        if (!g_tree_lookup (soltree, (gconstpointer)word))
+        {
+            guint *index;
+
+            index = g_new (guint, 1);
+            *index = i;
+            g_tree_insert (soltree, (gpointer)word, (gpointer)index);
+        }
+    }
+	*/
+	
+    for (i = 0; i < found_words->len; ++i)
+    {
+        gchar *fw;
+        gpointer key, val;
+
+        fw = g_ptr_array_index (found_words, i);
+        if(g_tree_lookup_extended (soltree, (gconstpointer)fw,
+                                   &key, &val))
+        {
+            g_tree_remove (soltree, (gconstpointer)fw);
+            g_free (key);
+            g_free (val);
+        }
+    }
+
+    *words = g_ptr_array_new ();
+    *sol_index = g_array_new (FALSE, FALSE, sizeof (guint));
+    g_tree_foreach (soltree, (GTraverseFunc)append_word,
+                   (gpointer)*words);
+    g_tree_foreach (soltree, (GTraverseFunc)append_index,
+                    (gpointer)*sol_index);
+    g_tree_destroy (soltree);
+}
+
+GTree *
+find_all_solutions(board *brd, GPtrArray **solution_ptr)
+{    
+	GTree *soltree;
+	GPtrArray *solutions;
+	guess_st st;
+    gint i;
+
+    *solution_ptr = g_ptr_array_new ();
+    solutions = *solution_ptr;
+    st = search_solution (solutions, NULL, brd, TRUE);
+    
     soltree = g_tree_new_full ((GCompareDataFunc)str_compare,
                                NULL, NULL, NULL);
     for (i = 0; i < solutions->len; ++i)
@@ -94,29 +167,9 @@ missing_solutions (GPtrArray **words, GArray **sol_index,
             g_tree_insert (soltree, (gpointer)word, (gpointer)index);
         }
     }
-
-    for (i = 0; i < found_words->len; ++i)
-    {
-        gchar *fw;
-        gpointer key, val;
-
-        fw = g_ptr_array_index (found_words, i);
-        if(g_tree_lookup_extended (soltree, (gconstpointer)fw,
-                                   &key, &val))
-        {
-            g_tree_remove (soltree, (gconstpointer)fw);
-            g_free (key);
-            g_free (val);
-        }
-    }
-
-    *words = g_ptr_array_new ();
-    *sol_index = g_array_new (FALSE, FALSE, sizeof (guint));
-    g_tree_foreach (soltree, (GTraverseFunc)append_word,
-                   (gpointer)*words);
-    g_tree_foreach (soltree, (GTraverseFunc)append_index,
-                    (gpointer)*sol_index);
-    g_tree_destroy (soltree);
+    DEBUGMSG("number of solutions: %d\n", g_tree_nnodes(soltree));
+    
+    return soltree;
 }
 
 

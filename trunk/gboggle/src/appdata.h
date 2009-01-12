@@ -52,6 +52,7 @@ struct _AppData {
 
     GPtrArray *found_words;
     GPtrArray *guessed_words;
+    GTree *all_words;  // List of all words found, created at the beginning of the game.
     GPtrArray *solutions;
     GArray *current_path;
 
