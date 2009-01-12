@@ -528,7 +528,14 @@ solutions_dispose (GPtrArray *solutions)
 gint
 str_compare (gconstpointer a, gconstpointer b, gpointer data)
 {
-    return g_utf8_collate (a, b);
+    // Sort by length first, and then alphabetically.
+    int lena, lenb;
+    gint val;
+    lena = strlen((char *) a);
+    lenb = strlen((char *) b);
+    if (lena == lenb) { return g_utf8_collate(a, b); }
+    else { return (gint) (lenb - lena); }
+    //return g_utf8_collate (a, b);
 }
 
 gboolean
