@@ -96,3 +96,33 @@ dictfile "@DICTDIR@/hungarian"
 "v" 2
 "z" 2
 "zs" 1
+
+
+language French
+dictfile "@DICTDIR@/french"
+a 61
+b 14
+c 31
+d 22
+e 100
+f 15
+g 17
+h 12
+i 68
+j 4
+k 2
+l 32
+m 23
+n 57
+o 46
+p 24
+qu 7
+r 70
+s 60
+t 53
+u 29
+v 13
+w 1
+x 5
+y 5
+z 12
