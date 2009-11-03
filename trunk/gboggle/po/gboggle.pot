@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: ch@elte.hu\n"
-"POT-Creation-Date: 2008-07-13 15:50+0200\n"
+"POT-Creation-Date: 2009-11-03 22:04+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,12 +20,7 @@ msgstr ""
 msgid "No valid language configuration found\n"
 msgstr ""
 
-#: src/ui.c:39
-#, c-format
-msgid "Found: %d"
-msgstr ""
-
-#: src/ui.c:40
+#: src/ui.c:39 src/ui.c:40
 #, c-format
 msgid "Found: %d of %d"
 msgstr ""
@@ -36,63 +31,71 @@ msgid "Time: %d:%02d"
 msgstr ""
 
 #. TRANSLATORS: message for a proper guess
-#: src/ui.c:364
+#: src/ui.c:386
 #, c-format
 msgid "%s - ok"
 msgstr ""
 
-#: src/ui.c:370
+#: src/ui.c:392
 #, c-format
 msgid "%s - not in dictionary"
 msgstr ""
 
-#: src/ui.c:377
+#: src/ui.c:399
 #, c-format
 msgid "%s - not on board"
 msgstr ""
 
-#: src/ui.c:384
+#: src/ui.c:406
 #, c-format
 msgid "%s - already guessed"
 msgstr ""
 
-#: src/ui.c:391
+#: src/ui.c:413
 #, c-format
 msgid "%s - too short"
 msgstr ""
 
-#: src/ui.c:493
+#: src/ui.c:515
 msgid "_Game"
 msgstr ""
 
-#: src/ui.c:508
+#: src/ui.c:530
 msgid "_Settings"
 msgstr ""
 
-#: src/ui.c:584
+#: src/ui.c:606
 msgid "Guess:"
 msgstr ""
 
-#: src/ui.c:587
+#: src/ui.c:609
 msgid "New Game"
 msgstr ""
 
-#: src/ui.c:661
+#: src/ui.c:687
 msgid "Guesses"
 msgstr ""
 
-#: src/ui.c:664
+#: src/ui.c:690
 msgid "Missed words"
 msgstr ""
 
-#: src/ui.c:754
+#: src/ui.c:789
 msgid "Preferences"
 msgstr ""
 
-#: src/ui.c:765
+#: src/ui.c:800
 msgid "Language:"
 msgstr ""
 
-#: src/ui.c:1077
+#: src/ui.c:814
+msgid "Game Time (secs):"
+msgstr ""
+
+#: src/ui.c:819
+msgid "Enter 0 for untimed game."
+msgstr ""
+
+#: src/ui.c:1157
 msgid "Loading dictionary"
 msgstr ""

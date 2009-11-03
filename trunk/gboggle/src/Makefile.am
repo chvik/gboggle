@@ -24,4 +24,4 @@ localedir = $(datadir)/locale
 DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@
 
 gbogglerc: gbogglerc.in
-	sed s,'@DICTDIR@',@datadir@/dict, $< >$@
+	sed s,'@DICTDIR@',@datadir@/gboggle/dict, $< >$@
