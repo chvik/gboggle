@@ -1,3 +1,10 @@
+gboggle (1.1.2) unstable; urgency=low
+
+  * Added French support.
+  * Moved dictionaries to separate packages.
+
+ -- NAGY Viktor <ch@elte.hu>  Tue, 03 Nov 2009 21:42:26 +0100
+
 gboggle (1.1.1) unstable; urgency=low
 
   * GtkTreePath must be freed by gtk_tree_path_free - 

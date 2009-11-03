@@ -1,5 +1,5 @@
-language English
-dictfile "/usr/share/dict/words"
+language "American English"
+dictfile "/usr/share/dict/american-english"
 a 8
 b 3
 c 3
@@ -27,7 +27,36 @@ x 1
 y 3
 z 1
 
-language British
+language "British English (system)"
+dictfile "/usr/share/dict/british-english"
+a 8
+b 3
+c 3
+d 3
+e 10
+f 2
+g 3
+h 3
+i 7
+j 1
+k 2
+l 5
+m 3
+n 5
+o 6
+p 3
+qu 1
+r 4
+s 5
+t 5
+u 4
+v 2
+w 2
+x 1
+y 3
+z 1
+
+language "British English (gboggle)"
 dictfile "@DICTDIR@/british"
 a 8
 b 3
@@ -56,7 +85,7 @@ x 1
 y 3
 z 1
 
-language Hungarian
+language magyar
 dictfile "@DICTDIR@/hungarian"
 "a" 6
 "á" 4
@@ -98,7 +127,7 @@ dictfile "@DICTDIR@/hungarian"
 "zs" 1
 
 
-language French
+language "français"
 dictfile "@DICTDIR@/french"
 a 61
 b 14
