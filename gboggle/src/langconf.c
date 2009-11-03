@@ -200,7 +200,7 @@ read_langconf_from (gchar *filename)
             struct langconf *c = 
                 (struct langconf *)g_ptr_array_index (lang_conf, i);                
             g_ptr_array_free (c->alphabet, TRUE);
-            g_free (c->weights);
+            g_array_free (c->weights, TRUE);
             g_free (c->dictf);
             g_free (c->lang);
         }
