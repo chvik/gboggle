@@ -3,6 +3,8 @@ hungarian word list is in public domain.
 british comes from wbritish Debian package. wbritish was debianized by David
 Coe <davidc@debian.org> on Sun, 15 Jun 2003.
 
+french was derived from aspell by Mehdi Yousfi-Monod <mehdi.yousfi@gmail.com>.
+
 SCOWL (Spell Checker Oriented Word Lists) is a collection of 
 English word lists maintained by Kevin Atkinson 
 <kevina@users.sourceforge.net>
