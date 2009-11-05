@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="420"
+   height="300"
+   id="svg2499"
+   sodipodi:version="0.32"
+   inkscape:version="0.46"
+   sodipodi:docname="gboggle.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   inkscape:export-filename="/home/vik/personal/projects/gboggle/gboggle.png"
+   inkscape:export-xdpi="47.73637"
+   inkscape:export-ydpi="47.73637"
+   version="1.0">
+  <defs
+     id="defs2501">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       id="perspective2507" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     gridtolerance="10000"
+     guidetolerance="10"
+     objecttolerance="10"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="108.35722"
+     inkscape:cy="210.39886"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer2"
+     showgrid="true"
+     showguides="false"
+     inkscape:guide-bbox="true"
+     inkscape:window-width="671"
+     inkscape:window-height="719"
+     inkscape:window-x="-4"
+     inkscape:window-y="25">
+    <inkscape:grid
+       type="xygrid"
+       id="grid2525"
+       visible="true"
+       enabled="true" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata2504">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="bg"
+     transform="translate(-80,-122.36218)">
+    <rect
+       style="fill:#008000"
+       id="rect2552"
+       width="140"
+       height="150"
+       x="360"
+       y="272.36218" />
+    <rect
+       style="fill:#00aa00"
+       id="rect2556"
+       width="140"
+       height="150"
+       x="360"
+       y="122.36218" />
+    <rect
+       style="fill:#00ff00"
+       id="rect2558"
+       width="140"
+       height="150"
+       x="220"
+       y="272.36218" />
+    <rect
+       style="fill:#55ff55"
+       id="rect2560"
+       width="140"
+       height="150"
+       x="220"
+       y="122.36218" />
+    <rect
+       style="fill:#80ff80"
+       id="rect2562"
+       width="140"
+       height="150"
+       x="80"
+       y="272.36218" />
+    <rect
+       style="fill:#d5ffd5"
+       id="rect2564"
+       width="140"
+       height="150"
+       x="80"
+       y="122.36218" />
+  </g>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-80,-122.36218)">
+    <text
+       xml:space="preserve"
+       style="font-size:148.32397461px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="101.12997"
+       y="249.5424"
+       id="text2509"
+       transform="scale(0.9888265,1.0112998)"
+       inkscape:export-filename="/home/vik/personal/projects/gboggle/gboggle.png"
+       inkscape:export-xdpi="47.73637"
+       inkscape:export-ydpi="47.73637"><tspan
+         sodipodi:role="line"
+         id="tspan2511"
+         x="101.12997"
+         y="249.5424">B</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="122.85714"
+       y="138.07648"
+       id="text2517"><tspan
+         sodipodi:role="line"
+         id="tspan2519"
+         x="122.85714"
+         y="138.07648" /></text>
+    <text
+       xml:space="preserve"
+       style="font-size:148.32397461px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="91.016983"
+       y="397.86639"
+       id="text2527"
+       transform="scale(0.9888265,1.0112998)"><tspan
+         sodipodi:role="line"
+         id="tspan2529"
+         x="91.016983"
+         y="397.86639">O</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:148.32397461px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="232.59895"
+       y="251.1647"
+       id="text2531"
+       transform="scale(0.9888265,1.0112998)"><tspan
+         sodipodi:role="line"
+         id="tspan2533"
+         x="232.59895"
+         y="251.1647">G</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:148.32397461px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="232.59895"
+       y="399.48868"
+       id="text2535"
+       transform="scale(0.9888265,1.0112998)"><tspan
+         sodipodi:role="line"
+         id="tspan2537"
+         x="232.59895"
+         y="399.48868">G</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:148.32397461px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="384.29391"
+       y="249.5424"
+       id="text2539"
+       transform="scale(0.9888265,1.0112998)"><tspan
+         sodipodi:role="line"
+         id="tspan2541"
+         x="384.29391"
+         y="249.5424">L</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:148.32397461px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="384.29391"
+       y="397.86639"
+       id="text2543"
+       transform="scale(0.9888265,1.0112998)"><tspan
+         sodipodi:role="line"
+         id="tspan2545"
+         x="384.29391"
+         y="397.86639">E</tspan></text>
+  </g>
+</svg>

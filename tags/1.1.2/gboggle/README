@@ -1,0 +1,10 @@
+GBoggle
+
+GBoggle is a traditional boggle game for GTK platform. Currently it supports
+English and Hungarian dictionaries. English dictionary is expected to be in
+/usr/share/dict/words. You can change this path in gbogglerc (to be installed
+to /usr/local/etc by default).
+
+GBoggle also supports maemo platform.
+
+NAGY Viktor ch@elte.hu
