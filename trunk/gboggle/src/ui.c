@@ -27,8 +27,10 @@
 #ifdef HAVE_MAEMO
 #define VPAD 5
 #define GUESS_BUTTON_SIZE 50
+#define GUESS_ENTRY_WIDTH 15
 #else
 #define VPAD 12
+#define GUESS_ENTRY_WIDTH 10
 #endif
 
 #define HPAD 12
@@ -612,7 +614,7 @@ create_main_window (gint boardw, gint boardh)
             gtk_image_new_from_stock (GTK_STOCK_STOP,
                 GTK_ICON_SIZE_BUTTON));
 #endif
-    gtk_entry_set_width_chars (GTK_ENTRY (app_data.guess_entry), 10);
+    gtk_entry_set_width_chars (GTK_ENTRY (app_data.guess_entry), GUESS_ENTRY_WIDTH);
     gtk_entry_set_activates_default (GTK_ENTRY (app_data.guess_entry), TRUE);
     main_vbox = gtk_vbox_new (FALSE, 0);
     upper_hbox = gtk_hbox_new (FALSE, 0);

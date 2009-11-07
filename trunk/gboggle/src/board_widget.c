@@ -16,10 +16,6 @@ static void size_request_cb(GtkWidget *boardw, GtkRequisition *requisition,
 static void size_allocate_cb(GtkWidget *boardw, GtkAllocation *allocation,
                              gpointer user_data);
 
-static const GdkColor bgcolor_marked = BGCOLOR_MARKED;
-static const GdkColor bgcolor_unmarked = BGCOLOR_UNMARKED;
-static const GdkColor bgcolor_active = BGCOLOR_ACTIVE;
-
 #define FIELD(bw,i,j)    (bw)->fields[((j) * (bw)->width + (i))]
 
 enum {
@@ -93,6 +89,7 @@ board_widget_new (gint width, gint height)
     gint i, j;
     BoardWidget *boardw = BOARD_WIDGET (g_object_new (board_widget_get_type (), 
                                                       NULL));
+    GtkStyle *style;
 
     boardw->width = width;
     boardw->height = height;
@@ -106,9 +103,11 @@ board_widget_new (gint width, gint height)
             GtkWidget *evbox;
             
             evbox = gtk_event_box_new ();
+            gtk_widget_set_name(evbox, "BoardCell");
             g_signal_connect (G_OBJECT (evbox), "button-release-event",
                     G_CALLBACK (event_box_clicked_cb), boardw);
             label = gtk_label_new ("");
+            gtk_widget_set_name(label, "BoardLetter");
             gtk_label_set_width_chars (GTK_LABEL (label), 2);
             gtk_container_add (GTK_CONTAINER (evbox), label);
             FIELD (boardw, i, j) = evbox;
@@ -119,6 +118,10 @@ board_widget_new (gint width, gint height)
             gtk_widget_show (evbox);
         }
     
+    style = gtk_rc_get_style(FIELD(boardw, 0, 0));
+    boardw->normalBgColor = style->bg[GTK_STATE_NORMAL];
+    boardw->selectedBgColor = style->bg[GTK_STATE_SELECTED];
+
     board_widget_initbg (boardw);
 
     return GTK_WIDGET (boardw);
@@ -140,8 +143,8 @@ board_widget_init_with_board (BoardWidget *boardw, board *brd)
 static void
 board_widget_unmark_field (BoardWidget *boardw, gint x, gint y)
 {
-    gtk_widget_modify_bg (FIELD(boardw, x, y), GTK_STATE_NORMAL,
-                          &bgcolor_unmarked);
+    GtkWidget *field = FIELD(boardw, x, y);
+    gtk_widget_modify_bg (field, GTK_STATE_NORMAL, &boardw->normalBgColor);
 }
 
 void
@@ -158,16 +161,23 @@ void
 board_widget_mark_field (BoardWidget *boardw, gint x, gint y,
                          gdouble scale)
 {
+    GdkColor normalColor;
+    GdkColor selectedColor;
     GdkColor color;
-    guint compl;
+    double alpha;
+    GtkWidget *field = FIELD(boardw, x, y);
+    GtkStyle *style = gtk_rc_get_style(field);
 
     g_assert (scale >= 0 && scale <= 1);
     
-    compl = .8 * (1 - pow(scale, 3.)) * 0xffff;
+    normalColor = boardw->normalBgColor;
+    selectedColor = boardw->selectedBgColor;
+
+    alpha = .8 * (1 - pow(scale, 3.));
     color.pixel = 0;
-    color.red = compl;
-    color.green = 0xffff;
-    color.blue = compl;
+    color.red = alpha * normalColor.red + (1 - alpha) * selectedColor.red;
+    color.green = alpha * normalColor.green + (1 - alpha) * selectedColor.green;
+    color.blue = alpha * normalColor.blue + (1 - alpha) * selectedColor.blue;
     gtk_widget_modify_bg (FIELD(boardw, x, y), GTK_STATE_NORMAL,
                           &color);
 }

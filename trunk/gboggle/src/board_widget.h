@@ -4,6 +4,7 @@
 #include <glib.h>
 #include <glib-object.h>
 #include <gtk/gtktable.h>
+#include <gdk/gdk.h>
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -25,15 +26,6 @@ G_BEGIN_DECLS
 #define FIELDW (BOARD_WIDGET_FONT_SIZE * BOARD_WIDGET_FIELD_FONT_RATIO)
 #define FIELDH (BOARD_WIDGET_FONT_SIZE * BOARD_WIDGET_FIELD_FONT_RATIO)
 
-#ifdef HAVE_MAEMO
-#define BGCOLOR_UNMARKED { 0, 0xf0f0, 0xf0f0, 0xf0f0 }
-#else
-#define BGCOLOR_UNMARKED { 0, 0xffff, 0xffff, 0xffff }
-#endif
-
-#define BGCOLOR_MARKED { 0, 0x7fff, 0xffff, 0x7fff }
-#define BGCOLOR_ACTIVE { 0, 0, 0xefff, 0 }
-
 typedef struct _BoardWidget BoardWidget;
 typedef struct _BoardWidgetClass BoardWidgetClass;
 
@@ -46,6 +38,8 @@ struct _BoardWidget
     gint fieldw;
     gint fieldh;
     gint font_size;
+    GdkColor normalBgColor;
+    GdkColor selectedBgColor;
 
     gboolean is_active;
     GtkWidget **fields;
