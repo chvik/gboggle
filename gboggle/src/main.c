@@ -37,6 +37,9 @@ int main(int argc, char **argv)
     }
         
     gtk_init (&argc, &argv);
+#ifdef GTKRCFILE    
+    gtk_rc_parse(GTKRCFILE);
+#endif
 
 #ifdef HAVE_MAEMO
     app_data.program = hildon_program_get_instance ();
@@ -49,4 +52,3 @@ int main(int argc, char **argv)
 
     return 0;
 }
-            
