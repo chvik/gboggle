@@ -27,11 +27,15 @@
 #ifdef HAVE_MAEMO
 #define VPAD 5
 #define GUESS_BUTTON_SIZE 50
-#define GUESS_ENTRY_WIDTH 15
+#ifdef     HAVE_DIABLO
+#define    GUESS_ENTRY_WIDTH 10
+#else
+#define    GUESS_ENTRY_WIDTH 15
+#endif // HAVE_DIABLO
 #else
 #define VPAD 12
 #define GUESS_ENTRY_WIDTH 10
-#endif
+#endif // HAVE_MAEMO
 
 #define HPAD 12
 #define GUESS_HPAD 3
