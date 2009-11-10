@@ -23,14 +23,15 @@ AC_ARG_WITH(maemo,
          with_maemo=yes
      fi])
      
+icondir="$datadir/icons/hicolor"
 if test "${with_maemo}" = yes; then
     AC_MSG_NOTICE([Compiling for maemo platform])
     AC_DEFINE([HAVE_MAEMO], [1], [Define if you want build for maemo])
     desktopentrydir=`pkg-config osso-af-settings --variable=desktopentrydir`
-    icondir="$datadir/icons/hicolor/scalable/hildon"
+    iconsubdir="hildon"
 else
     desktopentrydir="$datadir/applications"
-    icondir="$datadir/icons/hicolor/64x64/apps"
+    iconsubdir="apps"
 fi
 
 gtkrcdir="$datadir/gboggle"
@@ -38,6 +39,7 @@ dictdir="$datadir/gboggle/dict"
 
 AC_SUBST(desktopentrydir)
 AC_SUBST(icondir)
+AC_SUBST(iconsubdir)
 AC_SUBST(gtkrcdir)
 AC_SUBST(dictdir)
 
