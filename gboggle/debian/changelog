@@ -1,3 +1,11 @@
+gboggle (1.1.3) unstable; urgency=low
+
+  * Custom style for board widget
+  * Added icons in more sizes
+  * Added new French translation strings 
+
+ -- NAGY Viktor <ch@elte.hu>  Tue, 10 Nov 2009 22:20:25 +0100
+
 gboggle (1.1.2) unstable; urgency=low
 
   * Added French support.
