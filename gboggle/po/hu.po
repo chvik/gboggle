@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gboggle 0.5\n"
 "Report-Msgid-Bugs-To: ch@elte.hu\n"
-"POT-Creation-Date: 2009-11-03 22:04+0100\n"
+"POT-Creation-Date: 2009-11-10 22:11+0100\n"
 "PO-Revision-Date: 2008-02-17 00:49+0100\n"
 "Last-Translator: NAGY Viktor <ch@elte.hu>\n"
 "Language-Team: English\n"
@@ -20,83 +20,83 @@ msgstr ""
 msgid "No valid language configuration found\n"
 msgstr "Nincs érvényes nyelvi beállításfájl\n"
 
-#: src/ui.c:39 src/ui.c:40
+#: src/ui.c:41 src/ui.c:42
 #, c-format
 msgid "Found: %d of %d"
 msgstr "Találat: %d/%d"
 
-#: src/ui.c:41
+#: src/ui.c:43
 #, c-format
 msgid "Time: %d:%02d"
 msgstr "Idő: %d:%02d"
 
 #. TRANSLATORS: message for a proper guess
-#: src/ui.c:386
+#: src/ui.c:388
 #, c-format
 msgid "%s - ok"
 msgstr "%s - ok"
 
-#: src/ui.c:392
+#: src/ui.c:394
 #, c-format
 msgid "%s - not in dictionary"
 msgstr "%s - nincs a szótárban"
 
-#: src/ui.c:399
+#: src/ui.c:401
 #, c-format
 msgid "%s - not on board"
 msgstr "%s - nincs a táblán"
 
-#: src/ui.c:406
+#: src/ui.c:408
 #, c-format
 msgid "%s - already guessed"
 msgstr "%s - már volt"
 
-#: src/ui.c:413
+#: src/ui.c:415
 #, c-format
 msgid "%s - too short"
 msgstr "%s - túl rövid"
 
-#: src/ui.c:515
+#: src/ui.c:517
 msgid "_Game"
 msgstr "_Játék"
 
-#: src/ui.c:530
+#: src/ui.c:532
 msgid "_Settings"
 msgstr "_Beállítások"
 
-#: src/ui.c:606
+#: src/ui.c:608
 msgid "Guess:"
 msgstr "Szó:"
 
-#: src/ui.c:609
+#: src/ui.c:611
 msgid "New Game"
 msgstr "Új játék"
 
-#: src/ui.c:687
+#: src/ui.c:689
 msgid "Guesses"
 msgstr "Próbálkozások"
 
-#: src/ui.c:690
+#: src/ui.c:692
 msgid "Missed words"
 msgstr "Kihagyott szavak"
 
-#: src/ui.c:789
+#: src/ui.c:791
 msgid "Preferences"
 msgstr "Beállítások"
 
-#: src/ui.c:800
+#: src/ui.c:802
 msgid "Language:"
 msgstr "Nyelv:"
 
-#: src/ui.c:814
+#: src/ui.c:816
 msgid "Game Time (secs):"
 msgstr ""
 
-#: src/ui.c:819
+#: src/ui.c:821
 msgid "Enter 0 for untimed game."
 msgstr ""
 
-#: src/ui.c:1157
+#: src/ui.c:1159
 msgid "Loading dictionary"
 msgstr "A szótár töltődik"
 
