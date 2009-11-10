@@ -57,7 +57,7 @@ y 3
 z 1
 
 language "British English (gboggle)"
-dictfile "@DICTDIR@/british"
+dictfile "@dictdir@/british"
 a 8
 b 3
 c 3
@@ -86,7 +86,7 @@ y 3
 z 1
 
 language magyar
-dictfile "@DICTDIR@/hungarian"
+dictfile "@dictdir@/hungarian"
 "a" 6
 "á" 4
 "b" 3
@@ -128,7 +128,7 @@ dictfile "@DICTDIR@/hungarian"
 
 
 language "français"
-dictfile "@DICTDIR@/french"
+dictfile "@dictdir@/french"
 a 61
 b 14
 c 31

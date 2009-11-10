@@ -33,8 +33,13 @@ else
     icondir="$datadir/icons/hicolor/64x64/apps"
 fi
 
+gtkrcdir="$datadir/gboggle"
+dictdir="$datadir/gboggle/dict"
+
 AC_SUBST(desktopentrydir)
 AC_SUBST(icondir)
+AC_SUBST(gtkrcdir)
+AC_SUBST(dictdir)
 
 # Checks for header files.
 AC_HEADER_STDC
@@ -53,7 +58,7 @@ AM_GNU_GETTEXT([external])
 
 AC_CONFIG_FILES([Makefile po/Makefile.in
                  src/Makefile
-                 src/gboggle.desktop
-                 dict/Makefile                 
+                 data/Makefile
+                 dict/Makefile
                 ])
 AC_OUTPUT
