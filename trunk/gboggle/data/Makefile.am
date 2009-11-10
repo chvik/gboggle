@@ -3,12 +3,12 @@ desktopentry_DATA = gboggle.desktop
 
 gtkrc_DATA = gtkrc
 
-EXTRA_DIST = gboggle.48.png gboggle.64.png gboggle.svg gbogglerc.in gboggle.desktop
+EXTRA_DIST = gboggle.48.png gboggle.64.png gboggle.svg gbogglerc.in gboggle.desktop.in gtkrc
 
 CLEANFILES = $(sysconf_DATA) $(desktopentry_DATA)
 
 gboggle.desktop: gboggle.desktop.in
-	sed s,'@'prefix'@',@prefix@, $< >$@
+	sed -e s,'@'prefix'@',@prefix@, -e s,'@'PACKAGE_VERSION'@',@PACKAGE_VERSION@, $< >$@
 
 gbogglerc: gbogglerc.in
 	sed s,'@'dictdir'@',@datadir@/gboggle/dict, $< >$@
