@@ -27,7 +27,7 @@ icondir="$datadir/icons/hicolor"
 if test "${with_maemo}" = yes; then
     AC_MSG_NOTICE([Compiling for maemo platform])
     AC_DEFINE([HAVE_MAEMO], [1], [Define if you want build for maemo])
-    desktopentrydir=`pkg-config osso-af-settings --variable=desktopentrydir`
+    desktopentrydir="$datadir/applications/hildon"
     iconsubdir="hildon"
     PKG_CHECK_EXISTS([ hildon-1 <= 2.0 ], [AC_DEFINE([HAVE_DIABLO], [1], [Diablo release])])
 else
