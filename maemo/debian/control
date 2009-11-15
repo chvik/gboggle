@@ -14,6 +14,7 @@ Description: Internationalized version of the classic boggle game
  internationalization of dictionaries and alphabets (currently English, 
  French and Hungarian are supported). Visual feedback is provided on the board
  for input words and shows missed words at the end of the game.
+XB-Maemo-Display-Name: GBoggle
 XB-Maemo-Icon-26:
  iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAYAAACpSkzOAAAABHNCSVQICAgIfAhkiAAAAAlwSFlz
  AAAA2wAAANsB8FDmnAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAANCSURB
@@ -37,7 +38,8 @@ XB-Maemo-Icon-26:
 Package: gboggle-dictionary-british
 Architecture: all
 Description: Dictionary for gboggle, the internationalized version of the classic boggle game
- This package provides the English dictionary.
+ This package provides the British English dictionary.
+XB-Maemo-Display-Name: GBoggle British English dictionary
 XB-Maemo-Icon-26:
  iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAYAAACpSkzOAAAABHNCSVQICAgIfAhkiAAAAAlwSFlz
  AAAA2wAAANsB8FDmnAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAANCSURB
@@ -61,6 +63,7 @@ Package: gboggle-dictionary-french
 Architecture: all
 Description: Dictionary for gboggle, the internationalized version of the classic boggle game
  This package provides the French dictionary.
+XB-Maemo-Display-Name: GBoggle French dictionary
 XB-Maemo-Icon-26:
  iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAYAAACpSkzOAAAABHNCSVQICAgIfAhkiAAAAAlwSFlz
  AAAA2wAAANsB8FDmnAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAANCSURB
@@ -84,6 +87,7 @@ Package: gboggle-dictionary-hungarian
 Architecture: all
 Description: Dictionary for gboggle, the internationalized version of the classic boggle game
  This package provides the Hungarian dictionary.
+XB-Maemo-Display-Name: GBoggle Hungarian dictionary
 XB-Maemo-Icon-26:
  iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAYAAACpSkzOAAAABHNCSVQICAgIfAhkiAAAAAlwSFlz
  AAAA2wAAANsB8FDmnAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAANCSURB

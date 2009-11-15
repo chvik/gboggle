@@ -1,3 +1,9 @@
+gboggle (1.1.3maemo1) unstable; urgency=low
+
+  * Added app manager display names
+
+ -- Viktor Nagy <vik@garage.maemo.org>  Sun, 15 Nov 2009 11:07:04 +0100
+
 gboggle (1.1.3maemo0) unstable; urgency=low
 
   * Using separate debian dir for packaging in maemo
