@@ -1,3 +1,11 @@
+gboggle (1.1.3maemo2~) UNRELEASED; urgency=low
+
+  * Added XSBC-Bugtracker field in control
+  * Merged dictionaries into gboggle package
+  * Optified the package
+
+ -- Viktor Nagy <viktor.nagy@blumsoft.eu>  Sun, 13 Dec 2009 21:30:20 +0100
+
 gboggle (1.1.3maemo1) unstable; urgency=low
 
   * Added app manager display names
