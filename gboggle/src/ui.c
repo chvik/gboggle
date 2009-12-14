@@ -479,6 +479,27 @@ create_solution_tree_view (GtkTreeModel *model)
     return tree_view;
 }
 
+#ifdef HAVE_FREMANTLE
+static GtkWidget *
+create_hildon_touch_menu (void)
+{
+    GtkWidget *button;
+    GtkWidget *menu = hildon_app_menu_new ();
+
+    button = hildon_gtk_button_new (HILDON_SIZE_AUTO);
+    gtk_button_set_label (GTK_BUTTON (button), _("Settings"));
+    hildon_app_menu_append (HILDON_APP_MENU (menu), button);
+    g_signal_connect (G_OBJECT (button), "clicked",
+                      G_CALLBACK (preferences_callback), NULL);
+    app_data.settings_menubutton = button;
+
+    gtk_widget_show_all (menu);
+
+    return menu;
+}
+
+#else // HAVE_FREMANTLE
+
 static GtkWidget *
 create_main_menu (void)
 {
@@ -537,9 +558,11 @@ create_main_menu (void)
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (menu_item), settings_menu);
     gtk_widget_show (menu_item);
 
-    return main_menu;
+    gtk_widget_show (main_menu);
 
+    return main_menu;
 }
+#endif // HAVE_FREMANTLE
 
 void
 create_main_window (gint boardw, gint boardh)
@@ -554,7 +577,6 @@ create_main_window (gint boardw, gint boardh)
     GtkWidget *time_score_align;
     GtkWidget *guess_hbox;
     GtkWidget *time_score_hbox;
-    GtkWidget *main_menu;
     gchar *zero_time;
 
 #ifdef HAVE_MAEMO
@@ -635,8 +657,6 @@ create_main_window (gint boardw, gint boardh)
     gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (solutions_tree_view),
             FALSE);
     
-    main_menu = create_main_menu();
-    
     gtk_box_pack_start (GTK_BOX (upper_hbox), app_data.board_widget,
                         TRUE, TRUE, 10);
 //    gtk_container_add (GTK_CONTAINER (wordlist_align), 
@@ -659,9 +679,17 @@ create_main_window (gint boardw, gint boardh)
             scrolled_solutions,
             gtk_label_new (_("Missed words")));
 
-#ifdef HAVE_MAEMO
+    // maemo menus
+#ifdef HAVE_FREMANTLE
+    hildon_window_set_app_menu (HILDON_WINDOW (app_data.main_win),
+                                HILDON_APP_MENU (create_hildon_touch_menu ()));
+#endif    
+#ifdef HAVE_DIABLO
     hildon_window_set_menu (HILDON_WINDOW (app_data.main_win), 
-                            GTK_MENU (main_menu));
+                            GTK_MENU (create_main_menu ()));
+#endif
+
+#ifdef HAVE_MAEMO    
     gtk_widget_set_size_request(app_data.guess_submit, ICON_BUTTON_SIZE,
                                 ICON_BUTTON_SIZE);
     gtk_widget_set_size_request(app_data.guess_del, ICON_BUTTON_SIZE,
@@ -670,7 +698,7 @@ create_main_window (gint boardw, gint boardh)
                                 ICON_BUTTON_SIZE);
     gtk_widget_set_size_request(lower_hbox, -1, ICON_BUTTON_SIZE);
 #else
-    gtk_box_pack_start (GTK_BOX (main_vbox), main_menu, 
+    gtk_box_pack_start (GTK_BOX (main_vbox), create_main_menu (), 
                         FALSE, FALSE, 2);
     gtk_widget_set_size_request(app_data.board_widget, 200, 200);
 #endif
@@ -729,7 +757,6 @@ create_main_window (gint boardw, gint boardh)
     gtk_widget_show (lower_hbox);
     gtk_widget_show (main_vbox);
     gtk_widget_show (app_data.main_win);
-    gtk_widget_show (main_menu);
     /* app_data.guess_* remain invisible */
 
     gtk_editable_set_editable (GTK_EDITABLE (app_data.guess_entry), FALSE);
@@ -892,8 +919,12 @@ start_game (void)
             app_data.brd);
     board_widget_set_active (BOARD_WIDGET (app_data.board_widget), TRUE);
 
+#ifdef HAVE_FREMANTLE
+    gtk_widget_set_sensitive (app_data.settings_menubutton, FALSE);
+#else    
     gtk_widget_set_sensitive (app_data.stop_menuitem, TRUE);
     gtk_widget_set_sensitive (app_data.prefs_menuitem, FALSE);
+#endif    
     gtk_widget_hide (app_data.new_game_button);
     gtk_widget_set_sensitive (app_data.game_stop_button, TRUE);
     gtk_widget_show (app_data.guess_label);
@@ -942,9 +973,13 @@ stop_game (void)
     gtk_widget_hide (app_data.guess_del);
     gtk_widget_show (app_data.new_game_button);
     gtk_widget_set_sensitive (app_data.game_stop_button, FALSE);
+#ifdef HAVE_FREMANTLE    
+    gtk_widget_set_sensitive (app_data.settings_menubutton, TRUE);
+#else    
     gtk_widget_set_sensitive (app_data.new_menuitem, TRUE);
     gtk_widget_set_sensitive (app_data.stop_menuitem, FALSE);
     gtk_widget_set_sensitive (app_data.prefs_menuitem, TRUE);
+#endif    
     board_widget_set_active (BOARD_WIDGET (app_data.board_widget), FALSE);
     gtk_notebook_set_current_page (GTK_NOTEBOOK (app_data.wordlist_notebook),
             1);

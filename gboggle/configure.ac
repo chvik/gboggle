@@ -30,6 +30,7 @@ if test "${with_maemo}" = yes; then
     desktopentrydir="$datadir/applications/hildon"
     iconsubdir="hildon"
     PKG_CHECK_EXISTS([ hildon-1 <= 2.0 ], [AC_DEFINE([HAVE_DIABLO], [1], [Diablo release])])
+    PKG_CHECK_EXISTS([ hildon-1 >= 2.2 ], [AC_DEFINE([HAVE_FREMANTLE], [1], [Fremantle release])])
 else
     desktopentrydir="$datadir/applications"
     iconsubdir="apps"
