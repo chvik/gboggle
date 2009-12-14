@@ -974,8 +974,8 @@ history_add (const gchar *word, guess_st st)
             (guint)st, -1);
 
     path = gtk_tree_path_new_from_indices (0, -1);
-    gtk_tree_view_set_cursor (GTK_TREE_VIEW (app_data.history_tree_view), path,
-                              NULL, FALSE);
+    gtk_tree_view_scroll_to_cell (GTK_TREE_VIEW (app_data.history_tree_view),
+                                  path, NULL, FALSE, 0.0, 0.0);
     gtk_tree_path_free (path);
 }
 
