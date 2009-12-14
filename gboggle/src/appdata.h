@@ -43,9 +43,6 @@ struct _AppData {
     GtkWidget *new_menuitem;
     GtkWidget *stop_menuitem;
     GtkWidget *prefs_menuitem;
-    GtkWidget *new_toolitem;
-    GtkWidget *stop_toolitem;
-    GtkWidget *prefs_toolitem;
 
     GtkListStore *history_list_store;
     GtkListStore *solutions_list_store;
