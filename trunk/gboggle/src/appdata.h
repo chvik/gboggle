@@ -40,9 +40,13 @@ struct _AppData {
     GtkWidget *time_pref_entry;  // Preference for number of minutes the game should last.
     GtkAdjustment *time_pref_spinner_adjust;  // Spinner adjustment for the time entry field.
     GtkWidget *wordlist_notebook;
+#ifdef HAVE_FREMANTLE
+    GtkWidget *settings_menubutton;
+#else    
     GtkWidget *new_menuitem;
     GtkWidget *stop_menuitem;
     GtkWidget *prefs_menuitem;
+#endif    
 
     GtkListStore *history_list_store;
     GtkListStore *solutions_list_store;
