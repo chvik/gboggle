@@ -26,15 +26,17 @@
 
 #ifdef HAVE_MAEMO
 #define VPAD 5
-#define GUESS_BUTTON_SIZE 50
+#define ICON_BUTTON_SIZE 50
+#define BUTTON_ICON_SIZE GTK_ICON_SIZE_MENU
 #ifdef     HAVE_DIABLO
 #define    GUESS_ENTRY_WIDTH 10
 #else
-#define    GUESS_ENTRY_WIDTH 15
+#define    GUESS_ENTRY_WIDTH 12
 #endif // HAVE_DIABLO
 #else
 #define VPAD 12
 #define GUESS_ENTRY_WIDTH 10
+#define BUTTON_ICON_SIZE GTK_ICON_SIZE_BUTTON
 #endif // HAVE_MAEMO
 
 #define HPAD 12
@@ -51,9 +53,6 @@ static void submit_guess (gboolean keep_state);
 static void create_progress_dialog (GtkWidget **dialog, GtkWidget **pbar);
 static void reset_score_label (GtkWidget *label);
 static GtkWidget *create_main_menu (void);
-#ifdef HAVE_MAEMO
-static GtkWidget *create_toolbar (void);
-#endif
 
 /*
  * callbacks
@@ -542,39 +541,6 @@ create_main_menu (void)
 
 }
 
-#ifdef HAVE_MAEMO
-static GtkWidget *create_toolbar (void)
-{
-    GtkWidget *toolbar;
-    GtkToolItem *new_tb;
-    GtkToolItem *stop_tb;
-    GtkToolItem *prefs_tb;
-
-    toolbar = gtk_toolbar_new ();
-
-    new_tb = gtk_tool_button_new_from_stock (GTK_STOCK_NEW);
-    gtk_toolbar_insert (GTK_TOOLBAR (toolbar), new_tb, -1);
-    g_signal_connect (G_OBJECT (new_tb), "clicked", 
-                      G_CALLBACK (new_game_button_clicked), NULL);
-    app_data.new_toolitem = GTK_WIDGET(new_tb);
-
-    stop_tb = gtk_tool_button_new_from_stock (GTK_STOCK_STOP);
-    gtk_toolbar_insert (GTK_TOOLBAR (toolbar), stop_tb, -1);
-    g_signal_connect (G_OBJECT (stop_tb), "clicked", 
-                      G_CALLBACK (game_end_callback), NULL);
-    gtk_widget_set_sensitive (GTK_WIDGET(stop_tb), FALSE);
-    app_data.stop_toolitem = GTK_WIDGET(stop_tb);
-
-    prefs_tb = gtk_tool_button_new_from_stock (GTK_STOCK_PREFERENCES);
-    gtk_toolbar_insert (GTK_TOOLBAR (toolbar), prefs_tb, -1);
-    g_signal_connect (G_OBJECT (prefs_tb), "clicked", 
-                      G_CALLBACK (preferences_callback), NULL);
-    app_data.prefs_toolitem = GTK_WIDGET(prefs_tb);
-
-    return toolbar;
-}
-#endif
-
 void
 create_main_window (gint boardw, gint boardh)
 {
@@ -590,9 +556,6 @@ create_main_window (gint boardw, gint boardh)
     GtkWidget *time_score_hbox;
     GtkWidget *main_menu;
     gchar *zero_time;
-#ifdef HAVE_MAEMO
-    GtkWidget *toolbar;
-#endif
 
 #ifdef HAVE_MAEMO
     app_data.main_win = hildon_window_new ();
@@ -611,13 +574,14 @@ create_main_window (gint boardw, gint boardh)
     board_widget_set_active (BOARD_WIDGET (app_data.board_widget), FALSE);
     app_data.guess_label = gtk_label_new (_("Guess:"));
     app_data.guess_entry = gtk_entry_new ();
-#ifndef HAVE_MAEMO
     app_data.new_game_button = gtk_button_new_with_label (_("New Game"));
+
     app_data.game_stop_button = gtk_button_new ();
     gtk_button_set_image (GTK_BUTTON (app_data.game_stop_button), 
             gtk_image_new_from_stock (GTK_STOCK_STOP,
-                GTK_ICON_SIZE_BUTTON));
-#endif
+                BUTTON_ICON_SIZE));
+    gtk_widget_set_sensitive (app_data.game_stop_button, FALSE);
+
     gtk_entry_set_width_chars (GTK_ENTRY (app_data.guess_entry), GUESS_ENTRY_WIDTH);
     gtk_entry_set_activates_default (GTK_ENTRY (app_data.guess_entry), TRUE);
     main_vbox = gtk_vbox_new (FALSE, 0);
@@ -640,11 +604,11 @@ create_main_window (gint boardw, gint boardh)
     app_data.guess_submit = gtk_button_new ();
     gtk_button_set_image (GTK_BUTTON (app_data.guess_submit), 
             gtk_image_new_from_stock (GTK_STOCK_APPLY,
-                GTK_ICON_SIZE_BUTTON));
+                BUTTON_ICON_SIZE));
     app_data.guess_del = gtk_button_new ();
     gtk_button_set_image (GTK_BUTTON (app_data.guess_del), 
             gtk_image_new_from_stock (GTK_STOCK_UNDO,
-                GTK_ICON_SIZE_BUTTON));
+                BUTTON_ICON_SIZE));
 
     /* guess history */
     app_data.history_list_store = gtk_list_store_new (2, G_TYPE_STRING,
@@ -698,15 +662,13 @@ create_main_window (gint boardw, gint boardh)
 #ifdef HAVE_MAEMO
     hildon_window_set_menu (HILDON_WINDOW (app_data.main_win), 
                             GTK_MENU (main_menu));
-    toolbar = create_toolbar ();
-    gtk_widget_show_all (toolbar);
-    hildon_window_add_toolbar (HILDON_WINDOW (app_data.main_win),
-                               GTK_TOOLBAR (toolbar));
-    gtk_widget_set_size_request(app_data.guess_submit, GUESS_BUTTON_SIZE,
-                                GUESS_BUTTON_SIZE);
-    gtk_widget_set_size_request(app_data.guess_del, GUESS_BUTTON_SIZE,
-                                GUESS_BUTTON_SIZE);
-    gtk_widget_set_size_request(lower_hbox, -1, GUESS_BUTTON_SIZE);
+    gtk_widget_set_size_request(app_data.guess_submit, ICON_BUTTON_SIZE,
+                                ICON_BUTTON_SIZE);
+    gtk_widget_set_size_request(app_data.guess_del, ICON_BUTTON_SIZE,
+                                ICON_BUTTON_SIZE);
+    gtk_widget_set_size_request(app_data.game_stop_button, ICON_BUTTON_SIZE,
+                                ICON_BUTTON_SIZE);
+    gtk_widget_set_size_request(lower_hbox, -1, ICON_BUTTON_SIZE);
 #else
     gtk_box_pack_start (GTK_BOX (main_vbox), main_menu, 
                         FALSE, FALSE, 2);
@@ -721,10 +683,8 @@ create_main_window (gint boardw, gint boardh)
             app_data.history_tree_view);
     gtk_container_add (GTK_CONTAINER (scrolled_solutions),
             solutions_tree_view);
-#ifndef HAVE_MAEMO    
     gtk_box_pack_start (GTK_BOX (guess_hbox),
             app_data.new_game_button, FALSE, FALSE, GUESS_HPAD);
-#endif    
     gtk_box_pack_start (GTK_BOX (guess_hbox), app_data.guess_label,
             TRUE, TRUE, GUESS_HPAD);
     gtk_box_pack_start (GTK_BOX (guess_hbox), app_data.guess_entry,
@@ -737,19 +697,15 @@ create_main_window (gint boardw, gint boardh)
             FALSE, FALSE, GUESS_HPAD);
     gtk_box_pack_start (GTK_BOX (time_score_hbox), app_data.score_label,
             FALSE, FALSE, GUESS_HPAD);
-#ifndef HAVE_MAEMO    
     gtk_box_pack_start (GTK_BOX (time_score_hbox), app_data.game_stop_button,
             FALSE, FALSE, GUESS_HPAD);
-#endif    
     gtk_container_add (GTK_CONTAINER (app_data.main_win), main_vbox);
 
     g_signal_connect (G_OBJECT (app_data.main_win), "destroy", G_CALLBACK (exit), NULL);
-#ifndef HAVE_MAEMO    
     g_signal_connect (G_OBJECT (app_data.new_game_button), "clicked",
                       G_CALLBACK (new_game_button_clicked), NULL);
     g_signal_connect (G_OBJECT (app_data.game_stop_button), "clicked",
                       G_CALLBACK (game_stop_button_clicked), NULL);
-#endif    
     g_signal_connect (G_OBJECT (app_data.board_widget), "field-pressed",
         G_CALLBACK (field_pressed_callback), NULL);
     g_signal_connect (G_OBJECT (app_data.guess_submit), "clicked",
@@ -765,11 +721,10 @@ create_main_window (gint boardw, gint boardh)
     gtk_widget_show (time_score_hbox);
     gtk_widget_show (time_score_align);
     gtk_widget_show (app_data.wordlist_notebook);
-#ifndef HAVE_MAEMO    
     gtk_widget_show (app_data.new_game_button);
-#endif    
     gtk_widget_show (app_data.time_label);
     gtk_widget_show (app_data.score_label);
+    gtk_widget_show (app_data.game_stop_button);
     gtk_widget_show_all (upper_hbox);
     gtk_widget_show (lower_hbox);
     gtk_widget_show (main_vbox);
@@ -939,14 +894,8 @@ start_game (void)
 
     gtk_widget_set_sensitive (app_data.stop_menuitem, TRUE);
     gtk_widget_set_sensitive (app_data.prefs_menuitem, FALSE);
-#ifdef HAVE_MAEMO
-    gtk_widget_set_sensitive (app_data.new_toolitem, FALSE);
-    gtk_widget_set_sensitive (app_data.stop_toolitem, TRUE);
-    gtk_widget_set_sensitive (app_data.prefs_toolitem, FALSE);
-#else
     gtk_widget_hide (app_data.new_game_button);
-    gtk_widget_show (app_data.game_stop_button);
-#endif    
+    gtk_widget_set_sensitive (app_data.game_stop_button, TRUE);
     gtk_widget_show (app_data.guess_label);
     gtk_widget_show (app_data.guess_entry);
     gtk_widget_show (app_data.guess_del);
@@ -991,14 +940,8 @@ stop_game (void)
     gtk_widget_hide (app_data.guess_entry);
     gtk_widget_hide (app_data.guess_submit);
     gtk_widget_hide (app_data.guess_del);
-#ifdef HAVE_MAEMO    
-    gtk_widget_set_sensitive (app_data.new_toolitem, TRUE);
-    gtk_widget_set_sensitive (app_data.stop_toolitem, FALSE);
-    gtk_widget_set_sensitive (app_data.prefs_toolitem, TRUE);
-#else
     gtk_widget_show (app_data.new_game_button);
-    gtk_widget_hide (app_data.game_stop_button);
-#endif    
+    gtk_widget_set_sensitive (app_data.game_stop_button, FALSE);
     gtk_widget_set_sensitive (app_data.new_menuitem, TRUE);
     gtk_widget_set_sensitive (app_data.stop_menuitem, FALSE);
     gtk_widget_set_sensitive (app_data.prefs_menuitem, TRUE);
