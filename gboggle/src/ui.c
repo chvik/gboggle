@@ -26,7 +26,7 @@
 
 #ifdef HAVE_MAEMO
 #define VPAD 5
-#define ICON_BUTTON_SIZE 50
+#define ICON_BUTTON_SIZE 60
 #define BUTTON_ICON_SIZE GTK_ICON_SIZE_MENU
 #ifdef     HAVE_DIABLO
 #define    GUESS_ENTRY_WIDTH 10
@@ -488,7 +488,7 @@ create_hildon_touch_menu (void)
 
     button = hildon_gtk_button_new (HILDON_SIZE_AUTO);
     gtk_button_set_label (GTK_BUTTON (button), _("Settings"));
-    hildon_app_menu_append (HILDON_APP_MENU (menu), button);
+    hildon_app_menu_append (HILDON_APP_MENU (menu), GTK_BUTTON (button));
     g_signal_connect (G_OBJECT (button), "clicked",
                       G_CALLBACK (preferences_callback), NULL);
     app_data.settings_menubutton = button;
@@ -657,18 +657,18 @@ create_main_window (gint boardw, gint boardh)
     gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (solutions_tree_view),
             FALSE);
     
-    gtk_box_pack_start (GTK_BOX (upper_hbox), app_data.board_widget,
+    gtk_box_pack_start (GTK_BOX (lower_hbox), app_data.board_widget,
                         TRUE, TRUE, 10);
 //    gtk_container_add (GTK_CONTAINER (wordlist_align), 
 //                       app_data.wordlist_notebook);
 //    gtk_box_pack_start (GTK_BOX (upper_hbox), wordlist_align,
-    gtk_box_pack_start (GTK_BOX (upper_hbox), app_data.wordlist_notebook,
+    gtk_box_pack_start (GTK_BOX (lower_hbox), app_data.wordlist_notebook,
                         TRUE, TRUE, 10);
     gtk_container_add (GTK_CONTAINER (guess_align), guess_hbox);
-    gtk_box_pack_start (GTK_BOX (lower_hbox), guess_align,
+    gtk_box_pack_start (GTK_BOX (upper_hbox), guess_align,
                         TRUE, TRUE, 10);
     gtk_container_add (GTK_CONTAINER (time_score_align), time_score_hbox);
-    gtk_box_pack_start (GTK_BOX (lower_hbox), time_score_align,
+    gtk_box_pack_start (GTK_BOX (upper_hbox), time_score_align,
                         TRUE, TRUE, 10);
 
 
@@ -690,22 +690,23 @@ create_main_window (gint boardw, gint boardh)
 #endif
 
 #ifdef HAVE_MAEMO    
+    gtk_widget_set_size_request(app_data.new_game_button, -1, ICON_BUTTON_SIZE);
     gtk_widget_set_size_request(app_data.guess_submit, ICON_BUTTON_SIZE,
                                 ICON_BUTTON_SIZE);
     gtk_widget_set_size_request(app_data.guess_del, ICON_BUTTON_SIZE,
                                 ICON_BUTTON_SIZE);
     gtk_widget_set_size_request(app_data.game_stop_button, ICON_BUTTON_SIZE,
                                 ICON_BUTTON_SIZE);
-    gtk_widget_set_size_request(lower_hbox, -1, ICON_BUTTON_SIZE);
+    gtk_widget_set_size_request(upper_hbox, -1, ICON_BUTTON_SIZE);
 #else
     gtk_box_pack_start (GTK_BOX (main_vbox), create_main_menu (), 
                         FALSE, FALSE, 2);
     gtk_widget_set_size_request(app_data.board_widget, 200, 200);
 #endif
     gtk_box_pack_start (GTK_BOX (main_vbox), upper_hbox, 
-            TRUE, TRUE, VPAD);
-    gtk_box_pack_start (GTK_BOX (main_vbox), lower_hbox, 
                         FALSE, FALSE, VPAD);
+    gtk_box_pack_start (GTK_BOX (main_vbox), lower_hbox, 
+                        TRUE, TRUE, VPAD);
 
     gtk_container_add (GTK_CONTAINER (scrolled_history),
             app_data.history_tree_view);
@@ -753,8 +754,8 @@ create_main_window (gint boardw, gint boardh)
     gtk_widget_show (app_data.time_label);
     gtk_widget_show (app_data.score_label);
     gtk_widget_show (app_data.game_stop_button);
-    gtk_widget_show_all (upper_hbox);
-    gtk_widget_show (lower_hbox);
+    gtk_widget_show (upper_hbox);
+    gtk_widget_show_all (lower_hbox);
     gtk_widget_show (main_vbox);
     gtk_widget_show (app_data.main_win);
     /* app_data.guess_* remain invisible */
@@ -1105,6 +1106,22 @@ submit_guess (gboolean keep_state)
     if (app_data.score == g_tree_nnodes(app_data.all_words))
     {
         // found all the words, stop the game
+#ifdef HAVE_MAEMO
+        const char *msg = 
+            _("Congratulations! You've found all the words.");
+        GtkWidget *banner = 
+            hildon_banner_show_information (app_data.main_win, NULL, msg);
+#else
+        GtkWidget *dialog = 
+            gtk_message_dialog_new (app_data.main_win,
+                                    GTK_DIALOG_DESTROY_WITH_PARENT,
+                                    GTK_MESSAGE_INFO,
+                                    GTK_BUTTONS_CLOSE,
+                                    msg);
+        gtk_dialog_run (GTK_DIALOG (dialog));
+        gtk_widget_destroy (dialog);        
+#endif        
+
         stop_game ();
         return;
     }
