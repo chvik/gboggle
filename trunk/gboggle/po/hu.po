@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gboggle 0.5\n"
 "Report-Msgid-Bugs-To: ch@elte.hu\n"
-"POT-Creation-Date: 2009-11-10 23:08+0100\n"
+"POT-Creation-Date: 2009-12-15 22:23+0100\n"
 "PO-Revision-Date: 2008-02-17 00:49+0100\n"
 "Last-Translator: NAGY Viktor <ch@elte.hu>\n"
 "Language-Team: English\n"
@@ -20,85 +20,93 @@ msgstr ""
 msgid "No valid language configuration found\n"
 msgstr "Nincs érvényes nyelvi beállításfájl\n"
 
-#: src/ui.c:45 src/ui.c:46
+#: src/ui.c:47 src/ui.c:48
 #, c-format
 msgid "Found: %d of %d"
 msgstr "Találat: %d/%d"
 
-#: src/ui.c:47
+#: src/ui.c:49
 #, c-format
 msgid "Time: %d:%02d"
 msgstr "Idő: %d:%02d"
 
 #. TRANSLATORS: message for a proper guess
-#: src/ui.c:392
+#: src/ui.c:391
 #, c-format
 msgid "%s - ok"
 msgstr "%s - ok"
 
-#: src/ui.c:398
+#: src/ui.c:397
 #, c-format
 msgid "%s - not in dictionary"
 msgstr "%s - nincs a szótárban"
 
-#: src/ui.c:405
+#: src/ui.c:404
 #, c-format
 msgid "%s - not on board"
 msgstr "%s - nincs a táblán"
 
-#: src/ui.c:412
+#: src/ui.c:411
 #, c-format
 msgid "%s - already guessed"
 msgstr "%s - már volt"
 
-#: src/ui.c:419
+#: src/ui.c:418
 #, c-format
 msgid "%s - too short"
 msgstr "%s - túl rövid"
 
-#: src/ui.c:521
-msgid "_Game"
-msgstr "_Játék"
-
-#: src/ui.c:536
-msgid "_Settings"
-msgstr "_Beállítások"
-
-#: src/ui.c:612
-msgid "Guess:"
-msgstr "Szó:"
-
-#: src/ui.c:615
-msgid "New Game"
-msgstr "Új játék"
-
-#: src/ui.c:693
-msgid "Guesses"
-msgstr "Próbálkozások"
-
-#: src/ui.c:696
-msgid "Missed words"
-msgstr "Kihagyott szavak"
-
-#: src/ui.c:795
+#: src/ui.c:490 src/ui.c:778
 msgid "Preferences"
 msgstr "Beállítások"
 
-#: src/ui.c:806
+#: src/ui.c:541
+msgid "_Game"
+msgstr "_Játék"
+
+#: src/ui.c:556
+msgid "_Settings"
+msgstr "_Beállítások"
+
+#: src/ui.c:597
+msgid "Guess:"
+msgstr "Szó:"
+
+#: src/ui.c:599
+msgid "New Game"
+msgstr "Új játék"
+
+#: src/ui.c:677
+msgid "Guesses"
+msgstr "Próbálkozások"
+
+#: src/ui.c:680
+msgid "Missed words"
+msgstr "Kihagyott szavak"
+
+#: src/ui.c:789
 msgid "Language:"
 msgstr "Nyelv:"
 
-#: src/ui.c:820
+#: src/ui.c:803
 msgid "Game Time (secs):"
-msgstr ""
+msgstr "Játékidő (mp):"
 
-#: src/ui.c:825
+#: src/ui.c:808
 msgid "Enter 0 for untimed game."
-msgstr ""
+msgstr "0, ha végtelen"
 
-#: src/ui.c:1163
+#: src/ui.c:1111
+msgid "Congratulations! You've found all the words."
+msgstr "Gratulálok! Minden szót megtaláltál."
+
+#: src/ui.c:1158
 msgid "Loading dictionary"
 msgstr "A szótár töltődik"
+
+#, fuzzy
+#~ msgid "Settings"
+#~ msgstr "_Beállítások"
 
 #~ msgid "Found: %d"
 #~ msgstr "Találat: %d"
