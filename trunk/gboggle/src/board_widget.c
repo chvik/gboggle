@@ -168,12 +168,13 @@ board_widget_mark_field (BoardWidget *boardw, gint x, gint y,
     GtkWidget *field = FIELD(boardw, x, y);
     GtkStyle *style = gtk_rc_get_style(field);
 
-    g_assert (scale >= 0 && scale <= 1);
+    g_assert (scale >= 0.0 && scale <= 1.0);
     
     normalColor = boardw->normalBgColor;
     selectedColor = boardw->selectedBgColor;
 
-    alpha = .8 * (1 - pow(scale, 3.));
+//    alpha = .7 * (1 - pow(scale, 3.));
+    alpha = .7 * (1 - scale*scale);
     color.pixel = 0;
     color.red = alpha * normalColor.red + (1 - alpha) * selectedColor.red;
     color.green = alpha * normalColor.green + (1 - alpha) * selectedColor.green;
