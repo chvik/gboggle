@@ -487,7 +487,7 @@ create_hildon_touch_menu (void)
     GtkWidget *menu = hildon_app_menu_new ();
 
     button = hildon_gtk_button_new (HILDON_SIZE_AUTO);
-    gtk_button_set_label (GTK_BUTTON (button), _("Settings"));
+    gtk_button_set_label (GTK_BUTTON (button), _("Preferences"));
     hildon_app_menu_append (HILDON_APP_MENU (menu), GTK_BUTTON (button));
     g_signal_connect (G_OBJECT (button), "clicked",
                       G_CALLBACK (preferences_callback), NULL);
@@ -552,7 +552,7 @@ create_main_menu (void)
     gtk_widget_show (menu_item);
     app_data.prefs_menuitem = menu_item;
 
-    /* Settings */
+    /* Preferences */
     menu_item = gtk_menu_item_new_with_mnemonic (_("_Settings"));
     gtk_menu_shell_append (GTK_MENU_SHELL (main_menu), menu_item);
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (menu_item), settings_menu);
