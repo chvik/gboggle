@@ -1,0 +1,63 @@
+gboggle (1.1.3maemo3) unstable; urgency=low
+
+  * Improved ui
+
+ -- Viktor Nagy <vik@garage.maemo.org>  Thu, 17 Dec 2009 20:29:47 +0100
+
+gboggle (1.1.3maemo2) unstable; urgency=low
+
+  * Added XSBC-Bugtracker field in control
+  * Merged dictionaries into gboggle package
+  * Optified the package
+  * Removed toolbar
+  * Fixed button icon sizes
+  * Added touch application menu
+
+ -- Viktor Nagy <vik@garage.maemo.org>  Tue, 15 Dec 2009 00:00:54 +0100
+
+gboggle (1.1.3maemo1) unstable; urgency=low
+
+  * Added app manager display names
+
+ -- Viktor Nagy <vik@garage.maemo.org>  Sun, 15 Nov 2009 11:07:04 +0100
+
+gboggle (1.1.3maemo0) unstable; urgency=low
+
+  * Using separate debian dir for packaging in maemo
+
+ -- Viktor Nagy <vik@garage.maemo.org>  Sat, 14 Nov 2009 20:25:16 +0100
+
+gboggle (1.1.3) unstable; urgency=low
+
+  * Custom style for board widget
+  * Added icons in more sizes
+  * Added new French translation strings 
+
+ -- NAGY Viktor <ch@elte.hu>  Tue, 10 Nov 2009 22:20:25 +0100
+
+gboggle (1.1.2) unstable; urgency=low
+
+  * Added French support.
+  * Moved dictionaries to separate packages.
+
+ -- NAGY Viktor <ch@elte.hu>  Tue, 03 Nov 2009 21:42:26 +0100
+
+gboggle (1.1.1) unstable; urgency=low
+
+  * GtkTreePath must be freed by gtk_tree_path_free - 
+    contribution by Mike Olson <mish.olson.public@gmail.com>
+
+ -- NAGY Viktor <ch@elte.hu>  Sun, 28 Dec 2008 13:19:52 +0100
+
+gboggle (1.1.0) unstable; urgency=low
+
+  * Some bug fixes
+  * Added maemo port
+
+ -- NAGY Viktor <ch@elte.hu>  Sat, 12 Jul 2008 22:33:15 +0200
+
+gboggle (1.0.0) unstable; urgency=low
+
+  * Initial release.
+
+ -- NAGY Viktor <ch@elte.hu>  Sat, 08 Mar 2008 11:07:53 +0100

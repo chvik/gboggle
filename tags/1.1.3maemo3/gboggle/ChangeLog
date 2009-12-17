@@ -1,0 +1,41 @@
+2009-11-10 Viktor Nagy <ch@elte.hu>
+
+        * Release of 1.1.3
+
+        * Custom style for board widget
+
+        * Added icons in more sizes
+
+        * Added new French translation strings 
+
+2009-11-05 Viktor Nagy <ch@elte.hu>
+
+        * Release of 1.1.2
+
+        * Added French support
+
+2008-12-14 Viktor Nagy <ch@elte.hu>
+
+	* Release of 1.1.1
+
+	* GtkTreePath must be freed by gtk_tree_path_free - 
+	  contribution by Mike Olson <mish.olson.public@gmail.com>
+
+2008-07-12 Viktor Nagy <ch@elte.hu>
+
+	* Release of 1.1.0
+
+	* Added maemo port
+
+	* Fixed layout and focus problems
+
+	* Added .desktop and icon file, storing selected language in
+	  gconf.
+
+2008-03-08 Viktor Nagy <ch@elte.hu>
+
+	* First release
+
+2008-02-17  Viktor Nagy <ch@elte.hu>
+
+	* First release candidate
