@@ -26,7 +26,8 @@
 
 #ifdef HAVE_MAEMO
 #define VPAD 5
-#define ICON_BUTTON_SIZE 60
+#define ICON_BUTTON_SIZE_LARGE 80
+#define ICON_BUTTON_SIZE_NORMAL 50
 #define BUTTON_ICON_SIZE GTK_ICON_SIZE_MENU
 #ifdef     HAVE_DIABLO
 #define    GUESS_ENTRY_WIDTH 10
@@ -572,7 +573,6 @@ create_main_window (gint boardw, gint boardh)
     GtkWidget *main_vbox;
     GtkWidget *upper_hbox;
     GtkWidget *lower_hbox;
-    GtkWidget *wordlist_align;
     GtkWidget *guess_align;
     GtkWidget *time_score_align;
     GtkWidget *guess_hbox;
@@ -609,7 +609,6 @@ create_main_window (gint boardw, gint boardh)
     main_vbox = gtk_vbox_new (FALSE, 0);
     upper_hbox = gtk_hbox_new (FALSE, 0);
     lower_hbox = gtk_hbox_new (FALSE, 0);
-    wordlist_align = gtk_alignment_new (1, 0, 1, 1);
     guess_align = gtk_alignment_new (0, 0, 0, 0);
     time_score_align = gtk_alignment_new (1, 0.5, 0, 0);
     guess_hbox = gtk_hbox_new (FALSE, 0);
@@ -631,6 +630,10 @@ create_main_window (gint boardw, gint boardh)
     gtk_button_set_image (GTK_BUTTON (app_data.guess_del), 
             gtk_image_new_from_stock (GTK_STOCK_UNDO,
                 BUTTON_ICON_SIZE));
+#ifdef HAVE_FREMANTLE
+    gtk_widget_set_sensitive (app_data.guess_submit, FALSE);    
+    gtk_widget_set_sensitive (app_data.guess_del, FALSE);    
+#endif    
 
     /* guess history */
     app_data.history_list_store = gtk_list_store_new (2, G_TYPE_STRING,
@@ -657,11 +660,27 @@ create_main_window (gint boardw, gint boardh)
     gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (solutions_tree_view),
             FALSE);
     
-    gtk_box_pack_start (GTK_BOX (lower_hbox), app_data.board_widget,
+#ifdef HAVE_MAEMO
+    hildon_helper_set_thumb_scrollbar (GTK_SCROLLED_WINDOW (scrolled_history),
+                                       TRUE);
+    hildon_helper_set_thumb_scrollbar (GTK_SCROLLED_WINDOW (scrolled_solutions),
+                                       TRUE);
+#endif    
+
+
+    GtkWidget *board_align = gtk_alignment_new (0.0, 0.0, 1.0, 1.0);
+    gtk_container_add (GTK_CONTAINER (board_align), app_data.board_widget);
+    gtk_box_pack_start (GTK_BOX (lower_hbox), board_align /*app_data.board_widget*/,
                         TRUE, TRUE, 10);
-//    gtk_container_add (GTK_CONTAINER (wordlist_align), 
-//                       app_data.wordlist_notebook);
-//    gtk_box_pack_start (GTK_BOX (upper_hbox), wordlist_align,
+#ifdef HAVE_FREMANTLE    
+    GtkWidget *button_box = gtk_vbox_new (FALSE, 0);
+    gtk_box_pack_end (GTK_BOX (button_box), app_data.guess_submit,
+                                 FALSE, FALSE, VPAD);
+    gtk_box_pack_end (GTK_BOX (button_box), app_data.guess_del,
+                                 FALSE, FALSE, VPAD);
+    gtk_box_pack_start (GTK_BOX (lower_hbox), button_box,
+                        FALSE, FALSE, 10);
+#endif    
     gtk_box_pack_start (GTK_BOX (lower_hbox), app_data.wordlist_notebook,
                         TRUE, TRUE, 10);
     gtk_container_add (GTK_CONTAINER (guess_align), guess_hbox);
@@ -690,14 +709,16 @@ create_main_window (gint boardw, gint boardh)
 #endif
 
 #ifdef HAVE_MAEMO    
-    gtk_widget_set_size_request(app_data.new_game_button, -1, ICON_BUTTON_SIZE);
-    gtk_widget_set_size_request(app_data.guess_submit, ICON_BUTTON_SIZE,
-                                ICON_BUTTON_SIZE);
-    gtk_widget_set_size_request(app_data.guess_del, ICON_BUTTON_SIZE,
-                                ICON_BUTTON_SIZE);
-    gtk_widget_set_size_request(app_data.game_stop_button, ICON_BUTTON_SIZE,
-                                ICON_BUTTON_SIZE);
-    gtk_widget_set_size_request(upper_hbox, -1, ICON_BUTTON_SIZE);
+    gtk_widget_set_size_request(app_data.new_game_button, -1, ICON_BUTTON_SIZE_NORMAL);
+    gtk_widget_set_size_request(app_data.guess_submit, ICON_BUTTON_SIZE_LARGE,
+                                ICON_BUTTON_SIZE_LARGE);
+    gtk_widget_set_size_request(app_data.guess_del, ICON_BUTTON_SIZE_LARGE,
+                                ICON_BUTTON_SIZE_LARGE);
+    gtk_widget_set_size_request(app_data.game_stop_button, 
+                                ICON_BUTTON_SIZE_NORMAL,
+                                ICON_BUTTON_SIZE_NORMAL);
+    gtk_widget_set_size_request(upper_hbox, -1, ICON_BUTTON_SIZE_NORMAL);
+    gtk_widget_set_size_request(app_data.board_widget, 350, 350);
 #else
     gtk_box_pack_start (GTK_BOX (main_vbox), create_main_menu (), 
                         FALSE, FALSE, 2);
@@ -718,10 +739,12 @@ create_main_window (gint boardw, gint boardh)
             TRUE, TRUE, GUESS_HPAD);
     gtk_box_pack_start (GTK_BOX (guess_hbox), app_data.guess_entry,
             TRUE, TRUE, GUESS_HPAD);
+#ifndef HAVE_FREMANTLE
     gtk_box_pack_start (GTK_BOX (guess_hbox), app_data.guess_submit,
             FALSE, FALSE, GUESS_HPAD);
     gtk_box_pack_start (GTK_BOX (guess_hbox), app_data.guess_del,
             FALSE, FALSE, GUESS_HPAD);
+#endif    
     gtk_box_pack_start (GTK_BOX (time_score_hbox), app_data.time_label,
             FALSE, FALSE, GUESS_HPAD);
     gtk_box_pack_start (GTK_BOX (time_score_hbox), app_data.score_label,
@@ -922,16 +945,18 @@ start_game (void)
 
 #ifdef HAVE_FREMANTLE
     gtk_widget_set_sensitive (app_data.settings_menubutton, FALSE);
+    gtk_widget_set_sensitive (app_data.guess_del, TRUE);
+    gtk_widget_set_sensitive (app_data.guess_submit, TRUE);
 #else    
     gtk_widget_set_sensitive (app_data.stop_menuitem, TRUE);
     gtk_widget_set_sensitive (app_data.prefs_menuitem, FALSE);
+    gtk_widget_show (app_data.guess_del);
+    gtk_widget_show (app_data.guess_submit);
 #endif    
     gtk_widget_hide (app_data.new_game_button);
     gtk_widget_set_sensitive (app_data.game_stop_button, TRUE);
     gtk_widget_show (app_data.guess_label);
     gtk_widget_show (app_data.guess_entry);
-    gtk_widget_show (app_data.guess_del);
-    gtk_widget_show (app_data.guess_submit);
     gtk_editable_set_editable (GTK_EDITABLE (app_data.guess_entry), TRUE);
     gtk_notebook_set_current_page (GTK_NOTEBOOK (app_data.wordlist_notebook),
             0);
@@ -970,13 +995,15 @@ stop_game (void)
 
     gtk_widget_hide (app_data.guess_label);
     gtk_widget_hide (app_data.guess_entry);
-    gtk_widget_hide (app_data.guess_submit);
-    gtk_widget_hide (app_data.guess_del);
     gtk_widget_show (app_data.new_game_button);
     gtk_widget_set_sensitive (app_data.game_stop_button, FALSE);
 #ifdef HAVE_FREMANTLE    
     gtk_widget_set_sensitive (app_data.settings_menubutton, TRUE);
+    gtk_widget_set_sensitive (app_data.guess_submit, FALSE);
+    gtk_widget_set_sensitive (app_data.guess_del, FALSE);
 #else    
+    gtk_widget_hide (app_data.guess_submit);
+    gtk_widget_hide (app_data.guess_del);
     gtk_widget_set_sensitive (app_data.new_menuitem, TRUE);
     gtk_widget_set_sensitive (app_data.stop_menuitem, FALSE);
     gtk_widget_set_sensitive (app_data.prefs_menuitem, TRUE);
