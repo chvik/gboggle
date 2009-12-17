@@ -75,6 +75,6 @@ typedef struct _AppData AppData;
 
 extern AppData app_data;
 
-#define APPNAME "gboggle"
+#define APPNAME "GBoggle"
 
 #endif /* __APPDATA_H__ */

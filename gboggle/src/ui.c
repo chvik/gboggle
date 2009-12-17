@@ -1094,7 +1094,7 @@ update_title (void)
         (struct langconf *) g_ptr_array_index (app_data.langconfs, 
                 app_data.sel_lang);
         
-    title = g_strdup_printf ("%s", conf->lang);
+    title = g_strdup_printf ("%s - %s", conf->lang, APPNAME);
     gtk_window_set_title (GTK_WINDOW (app_data.main_win), title);
     g_free (title);
 }
