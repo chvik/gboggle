@@ -1,4 +1,4 @@
-language "American English"
+language "American English (system)"
 dictfile "/usr/share/dict/american-english"
 a 8
 b 3
@@ -56,7 +56,7 @@ x 1
 y 3
 z 1
 
-language "British English (gboggle)"
+language "British English"
 dictfile "@dictdir@/british"
 a 8
 b 3
