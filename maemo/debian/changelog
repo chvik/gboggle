@@ -1,10 +1,19 @@
-gboggle (1.1.3maemo2~) UNRELEASED; urgency=low
+gboggle (1.1.3maemo3) unstable; urgency=low
+
+  * Improved ui
+
+ -- Viktor Nagy <vik@garage.maemo.org>  Thu, 17 Dec 2009 20:29:47 +0100
+
+gboggle (1.1.3maemo2) unstable; urgency=low
 
   * Added XSBC-Bugtracker field in control
   * Merged dictionaries into gboggle package
   * Optified the package
+  * Removed toolbar
+  * Fixed button icon sizes
+  * Added touch application menu
 
- -- Viktor Nagy <viktor.nagy@blumsoft.eu>  Sun, 13 Dec 2009 21:30:20 +0100
+ -- Viktor Nagy <vik@garage.maemo.org>  Tue, 15 Dec 2009 00:00:54 +0100
 
 gboggle (1.1.3maemo1) unstable; urgency=low
 
