@@ -1,3 +1,9 @@
+gboggle (1.1.3maemo3-1) unstable; urgency=low
+
+  * Declaring the conflict with the old dictionary packages
+
+ -- Viktor Nagy <vik@garage.maemo.org>  Sun, 20 Dec 2009 20:49:24 +0100
+
 gboggle (1.1.3maemo3) unstable; urgency=low
 
   * Improved ui
