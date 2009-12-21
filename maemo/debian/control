@@ -8,8 +8,8 @@ XSBC-Bugtracker: https://bugs.maemo.org/enter_bug.cgi?product=GBoggle
 
 Package: gboggle
 Architecture: any
-Depends: ${shlibs:Depends}, gboggle-dictionary-british | gboggle-dictionary-hungarian | gboggle-dictionary-french
-Suggests: gboggle-dictionary-british, gboggle-dictionary-hungarian, gboggle-dictionary-french
+Depends: ${shlibs:Depends}
+Conflicts: gboggle-dictionary-british, gboggle-dictionary-hungarian, gboggle-dictionary-french
 Description: Internationalized version of the classic boggle game
  GBoggle is a classic boggle game for GTK+ platform. It supports 
  internationalization of dictionaries and alphabets (currently English, 
