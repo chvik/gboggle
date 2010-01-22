@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gboggle 0.5\n"
 "Report-Msgid-Bugs-To: ch@elte.hu\n"
-"POT-Creation-Date: 2009-12-15 22:23+0100\n"
+"POT-Creation-Date: 2010-01-22 21:17+0100\n"
 "PO-Revision-Date: 2009-11-07 19:10-0500\n"
 "Last-Translator: Mehdi Yousfi-Monod <mehdi.yousfi@gmail.com>\n"
 "Language-Team: English\n"
@@ -20,51 +20,51 @@ msgstr ""
 msgid "No valid language configuration found\n"
 msgstr "Aucune configuration de langage valide trouvée\n"
 
-#: src/ui.c:47 src/ui.c:48
+#: src/ui.c:48 src/ui.c:49
 #, c-format
 msgid "Found: %d of %d"
 msgstr "Trouvé(s) : %d sur %d"
 
-#: src/ui.c:49
+#: src/ui.c:50
 #, c-format
 msgid "Time: %d:%02d"
 msgstr "Temps : %d:%02d"
 
 #. TRANSLATORS: message for a proper guess
-#: src/ui.c:391
+#: src/ui.c:392
 #, c-format
 msgid "%s - ok"
 msgstr "%s - ok"
 
-#: src/ui.c:397
+#: src/ui.c:398
 #, c-format
 msgid "%s - not in dictionary"
 msgstr "%s - hors dictionnaire"
 
-#: src/ui.c:404
+#: src/ui.c:405
 #, c-format
 msgid "%s - not on board"
 msgstr "%s - absent de la grille"
 
-#: src/ui.c:411
+#: src/ui.c:412
 #, c-format
 msgid "%s - already guessed"
 msgstr "%s - déjà trouvé"
 
-#: src/ui.c:418
+#: src/ui.c:419
 #, c-format
 msgid "%s - too short"
 msgstr "%s - trop court"
 
-#: src/ui.c:490 src/ui.c:778
+#: src/ui.c:491 src/ui.c:801
 msgid "Preferences"
 msgstr "Préférences"
 
-#: src/ui.c:541
+#: src/ui.c:542
 msgid "_Game"
 msgstr "_Jeu"
 
-#: src/ui.c:556
+#: src/ui.c:557
 msgid "_Settings"
 msgstr "_Options"
 
@@ -76,31 +76,31 @@ msgstr "Proposition :"
 msgid "New Game"
 msgstr "Nouvelle partie"
 
-#: src/ui.c:677
+#: src/ui.c:696
 msgid "Guesses"
 msgstr "Propositions"
 
-#: src/ui.c:680
+#: src/ui.c:699
 msgid "Missed words"
 msgstr "Mots manqués"
 
-#: src/ui.c:789
+#: src/ui.c:812
 msgid "Language:"
 msgstr "Langue :"
 
-#: src/ui.c:803
+#: src/ui.c:826
 msgid "Game Time (secs):"
 msgstr "Temps de jeu (secs) :"
 
-#: src/ui.c:808
+#: src/ui.c:831
 msgid "Enter 0 for untimed game."
 msgstr "Entrez 0 pour un temps infini."
 
-#: src/ui.c:1111
+#: src/ui.c:1137
 msgid "Congratulations! You've found all the words."
 msgstr ""
 
-#: src/ui.c:1158
+#: src/ui.c:1185
 msgid "Loading dictionary"
 msgstr "Chargement du dictionnaire"
 
