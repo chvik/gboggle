@@ -1133,9 +1133,9 @@ submit_guess (gboolean keep_state)
     if (app_data.score == g_tree_nnodes(app_data.all_words))
     {
         // found all the words, stop the game
-#ifdef HAVE_MAEMO
         const char *msg = 
             _("Congratulations! You've found all the words.");
+#ifdef HAVE_MAEMO
         GtkWidget *banner = 
             hildon_banner_show_information (app_data.main_win, NULL, msg);
 #else
