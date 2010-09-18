@@ -1,0 +1,108 @@
+# Finnish translations for gboggle package.
+# Copyright (C) 2010 Viktor Nagy
+# This file is distributed under the same license as the gboggle package.
+# Jouni Mäkeläinen <jouni@twinkle.fi>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gboggle 0.5\n"
+"Report-Msgid-Bugs-To: ch@elte.hu\n"
+"POT-Creation-Date: 2010-01-22 21:17+0100\n"
+"PO-Revision-Date: 2009-11-07 19:10-0500\n"
+"Last-Translator: Jouni Mäkeläinen <jouni@twinkle.fi>\n"
+"Language-Team: English\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/main.c:35
+msgid "No valid language configuration found\n"
+msgstr "Kelvollisia kieliasetuksia ei löytynyt\n"
+
+#: src/ui.c:48 src/ui.c:49
+#, c-format
+msgid "Found: %d of %d"
+msgstr "Löytyi: %d / %d"
+
+#: src/ui.c:50
+#, c-format
+msgid "Time: %d:%02d"
+msgstr "Aika: %d:%02d"
+
+#. TRANSLATORS: message for a proper guess
+#: src/ui.c:392
+#, c-format
+msgid "%s - ok"
+msgstr "%s - ok"
+
+#: src/ui.c:398
+#, c-format
+msgid "%s - not in dictionary"
+msgstr "%s - ei sanakirjassa"
+
+#: src/ui.c:405
+#, c-format
+msgid "%s - not on board"
+msgstr "%s - ei ruudukossa"
+
+#: src/ui.c:412
+#, c-format
+msgid "%s - already guessed"
+msgstr "%s - valittu aiemmin"
+
+#: src/ui.c:419
+#, c-format
+msgid "%s - too short"
+msgstr "%s - liian lyhyt"
+
+#: src/ui.c:491 src/ui.c:801
+msgid "Preferences"
+msgstr "Asetukset"
+
+#: src/ui.c:542
+msgid "_Game"
+msgstr "_Peli"
+
+#: src/ui.c:557
+msgid "_Settings"
+msgstr "_Asetukset"
+
+#: src/ui.c:597
+msgid "Guess:"
+msgstr "Arvaus:"
+
+#: src/ui.c:599
+msgid "New Game"
+msgstr "Uusi peli"
+
+#: src/ui.c:696
+msgid "Guesses"
+msgstr "Arvaukset"
+
+#: src/ui.c:699
+msgid "Missed words"
+msgstr "Puuttuvat sanat"
+
+#: src/ui.c:812
+msgid "Language:"
+msgstr "Kieli:"
+
+#: src/ui.c:826
+msgid "Game Time (secs):"
+msgstr "Peliaika (sek):"
+
+#: src/ui.c:831
+msgid "Enter 0 for untimed game."
+msgstr "Syöttämällä 0 ei aikarajaa."
+
+#: src/ui.c:1137
+msgid "Congratulations! You've found all the words."
+msgstr ""
+
+#: src/ui.c:1185
+msgid "Loading dictionary"
+msgstr "Ladataan sanakirja"
+
+#~ msgid "Found: %d"
+#~ msgstr "Löytyi: %d"
