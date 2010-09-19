@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([gboggle],[1.1.3],[ch@elte.hu])
+AC_INIT([gboggle],[1.1.4],[ch@elte.hu])
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION) 
 #AC_CONFIG_SRCDIR([config.h.in])
 AM_CONFIG_HEADER(config.h)
