@@ -1,0 +1,36 @@
+Source: gboggle
+Section: user/games
+Priority: extra
+Maintainer: NAGY Viktor <vik@garage.maemo.org>
+Build-Depends: debhelper (>= 5), autotools-dev, gettext, libgtk2.0-dev, libgconf2-dev, libhildon1-dev, maemo-optify
+Standards-Version: 3.7.2
+XSBC-Bugtracker: https://bugs.maemo.org/enter_bug.cgi?product=GBoggle
+
+Package: gboggle
+Architecture: any
+Depends: ${shlibs:Depends}
+Conflicts: gboggle-dictionary-british, gboggle-dictionary-hungarian, gboggle-dictionary-french
+Description: Internationalized version of the classic boggle game
+ GBoggle is a classic boggle game for GTK+ platform. It supports 
+ internationalization of dictionaries and alphabets (currently English, 
+ French and Hungarian are supported). Visual feedback is provided on the board
+ for input words and shows missed words at the end of the game.
+XB-Maemo-Display-Name: GBoggle
+XB-Maemo-Icon-26:
+ iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAYAAACpSkzOAAAABHNCSVQICAgIfAhkiAAAAAlwSFlz
+ AAAA2wAAANsB8FDmnAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAANCSURB
+ VEiJ7ZZdSFNhGMd/xx23mW64uaUZhLbIRoEk2ZIky4oKtIiI6KKbFYH0QUpBEAVBRB8XlTd1k/Rh
+ 310EiQZ9YAWVZioUNrWRI0IrN4vamq1tXZyzk5vzKF141QMvPOc5//f9P//nfZ/3HCEajTIZljIp
+ LJNJJHbRtVoN0ENP6CpXU9Uwra2tIY/Ho4oRgSY1gBnzc6BEDaPVacfFiDGnemM1Q1+G0Oq1LFiy
+ AOc+J2Kq8prIcATXcRf9Df0ggNFuxH7QToYt4+9q94GpQKEKkavTRcPbBkK/QhzZeYTG642s3bJW
+ AbbvaAcBFt1YRHp+Or6XPn5+/BlPNAikjaMoZkKKgEbUEAlHlNjvH7/pu9BHZX8lOqsOAHOxecwy
+ jUvkXO7E/92PIAjsObpHifv7/BjmGBQS91k3AU+ArMVZ5FbmTogo7njXPazjdvttqg5VcaLmhBLX
+ Z+vxu/2EA2EArEusaLO0fH7wecKKxuyjcDis+DqrDvNCM57LHoiCca4RQ4FhwiSQpHTRaBRDpoGa
+ YzVxwOKLxbQ52+g+2Y2p2ERwIEjB3oLRK97kb8OUABUJRE29qu1Eel46ZY/K1NPeLI8kJt7ilupc
+ L17GwzAAdKlDFEU+t4+Oug6CQ0FmrpyJfb19NPoxcBfwAw5gE/F98w7oG/E8DZgruSkAg65B6lfX
+ k5GTgX2DnZbaFpoPN8eT1AL7gHnAduALcCchEY+84ix5ZCcoenr0KUXbinDscgCQU5jDqRmnKKku
+ ASPwCzgAvAJmyzPnJ6kPgBXIGx1OARjoHMC20qYEp1imYLFb8Ll9UuA90h0WI2kB7gGuJERPgAvy
+ 6EhQJKaJBL8G4/DBr0FEvbyFeuAbEJFT6wEeAJnAmQSixUjlVWSMcPOW5tHb1KsEvT1eQoEQZpt8
+ n80ADMALGbAF2JBEDYBGTl+MJxIBSveXcmnFJa6tu4ZljoXXV15Tca4CjVYjoQTgPFKPLENqxEag
+ PAnRG+CT7Geh7KUIkGZKY+uzrXx49oHhb8M4djswTjfGL1AOdAKtQAA4DeQnkBQhlThmI46+CKwB
+ EHUi+csSZ4IXbwiQPtMmYFUSFQEkjEnGJDHh/+/Wv9oftpXsjmjb8JcAAAAASUVORK5CYII=
