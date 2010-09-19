@@ -1,3 +1,10 @@
+gboggle (1.1.4maemo1-1) unstable; urgency=low
+
+  * Added Finnish, Italian, Russian and Polish translation
+  * Added Finnish dictionary
+
+ -- Viktor Nagy <vik@garage.maemo.org>  Sun, 19 Sep 2010 13:09:10 +0200
+
 gboggle (1.1.3maemo3-1) unstable; urgency=low
 
   * Declaring the conflict with the old dictionary packages

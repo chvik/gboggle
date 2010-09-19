@@ -30,3 +30,8 @@ Package: gboggle-dictionary-hungarian
 Architecture: all
 Description: Dictionary for gboggle, the internationalized version of the classic boggle game
  This package provides the Hungarian dictionary.
+
+Package: gboggle-dictionary-finnish
+Architecture: all
+Description: Dictionary for gboggle, the internationalized version of the classic boggle game
+ This package provides the Finnish dictionary.
