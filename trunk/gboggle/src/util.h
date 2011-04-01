@@ -6,6 +6,8 @@
 
 #define _(Str) gettext (Str)
 
+#define DEBUG
+
 #ifdef DEBUG
 #define DEBUGMSG(...) g_debug(__VA_ARGS__)
 #else
