@@ -35,3 +35,8 @@ Package: gboggle-dictionary-finnish
 Architecture: all
 Description: Dictionary for gboggle, the internationalized version of the classic boggle game
  This package provides the Finnish dictionary.
+
+Package: gboggle-dictionary-german
+Architecture: all
+Description: Dictionary for gboggle, the internationalized version of the classic boggle game
+ This package provides the German dictionary.

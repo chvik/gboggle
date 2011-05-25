@@ -1,3 +1,9 @@
+gboggle (1.1.5) unstable; urgency=low
+
+  * Added German translation and dictionary
+
+ -- Viktor Nagy <viktor.nagy@blumsoft.eu>  Wed, 25 May 2011 14:14:05 +0200
+
 gboggle (1.1.4) unstable; urgency=low
 
   * Added Finnish, Italian, Russian and Polish translation
