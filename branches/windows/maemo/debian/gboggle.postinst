@@ -1,0 +1,9 @@
+#!/bin/sh
+
+gtk-update-icon-cache /usr/share/icons/hicolor 
+
+if [ -x /usr/bin/update-desktop-database ]; then
+        update-desktop-database /usr/share/applications
+fi
+
+#DEBHELPER#

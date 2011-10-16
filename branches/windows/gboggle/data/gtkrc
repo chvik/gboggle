@@ -1,0 +1,14 @@
+style "BoardCellStyle"
+{
+    bg[NORMAL] = "#f0f0f0"
+    bg[SELECTED] = "#00f000"
+}
+
+style "BoardLetterStyle"
+{
+    fg[NORMAL] = "#000000"
+}
+
+widget "*.BoardCell" style "BoardCellStyle"
+widget "*.BoardLetter" style "BoardLetterStyle"
+
