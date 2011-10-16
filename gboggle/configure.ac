@@ -12,7 +12,12 @@ AC_PROG_CC
 AC_SUBST(CFLAGS)
 
 # Checks for libraries.
-PKG_CHECK_MODULES(PACKAGE, gtk+-2.0 gconf-2.0)
+PKG_CHECK_MODULES(PACKAGE, gtk+-2.0)
+
+# FIXME: store settings in windows
+PKG_CHECK_MODULES(GCONF, gconf-2.0, [
+    AC_DEFINE([HAVE_GCONF], [1], [Define if you want to store settings in gconf])
+], [have_gconf=0])
 
 # Checks platform
 PKG_CHECK_MODULES(MAEMO, hildon-1, [detected_maemo=yes],[detected_maemo=no])

@@ -1,4 +1,7 @@
+#ifdef HAVE_GCONF
 #include <gconf/gconf-client.h>
+#endif
+
 #include "util.h"
 
 #define GCONF_PREFIX "/apps/gboggle"
@@ -11,6 +14,7 @@
 GBoggleSettings *
 load_settings (void)
 {
+#ifdef HAVE_GCONF
     GConfClient *gconf_client = gconf_client_get_default ();
     gchar *language = gconf_client_get_string (gconf_client, 
                                                GCONF_KEY_LANGUAGE, 
@@ -18,6 +22,11 @@ load_settings (void)
     gint game_time = gconf_client_get_int (gconf_client, 
                                           GCONF_KEY_GAME_TIME, 
                                           NULL);
+#else
+    gchar *language = NULL;
+    gint game_time = GAME_LENGTH_SEC;
+#endif
+
     GBoggleSettings *settings = g_new0(GBoggleSettings, 1);
     settings->language = language;
     if (game_time == -1) settings->game_time = 0;
@@ -25,13 +34,17 @@ load_settings (void)
     else settings->game_time = game_time;
     DEBUGMSG("Game time: %d\n", settings->game_time);
 
+#ifdef HAVE_GCONF
     g_object_unref(gconf_client);
+#endif
+
     return settings;
 }
 
 void
 save_settings(const GBoggleSettings *settings)
 {    
+#ifdef HAVE_GCONF
     GConfClient *gconf_client = gconf_client_get_default();
     gboolean res;
     gint saved_game_time;
@@ -60,4 +73,5 @@ save_settings(const GBoggleSettings *settings)
     {
       	DEBUGMSG("Saved game time as %d\n", saved_game_time);
 	}
+#endif // HAVE_GCONF
 }
